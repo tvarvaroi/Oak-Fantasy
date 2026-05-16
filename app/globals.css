@@ -1,0 +1,170 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Brand CSS Variables ──────────────────────────────────────────── */
+:root {
+  --forest-deep: #2D3A1F;
+  --forest-mid: #5A6B3C;
+  --moss: #8FA068;
+  --oak-warm: #8B5E3C;
+  --oak-deep: #5C3A20;
+  --copper: #B87333;
+  --cream-warm: #F5EBD8;
+  --paper-aged: #EDE0C5;
+  --bark: #1F1810;
+  --ink: #2A2218;
+  --ink-soft: #5D4E3A;
+  --highlight: #C9A66B;
+
+  --radius: 0.5rem;
+
+  /* shadcn compat mapped to brand */
+  --background: 38 60% 92%;
+  --foreground: 25 30% 13%;
+  --card: 38 50% 90%;
+  --card-foreground: 25 30% 13%;
+  --popover: 38 60% 92%;
+  --popover-foreground: 25 30% 13%;
+  --primary: 22 42% 39%;
+  --primary-foreground: 38 60% 92%;
+  --secondary: 35 45% 85%;
+  --secondary-foreground: 25 30% 13%;
+  --muted: 35 45% 85%;
+  --muted-foreground: 25 20% 37%;
+  --accent: 35 45% 78%;
+  --accent-foreground: 25 30% 13%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 38 60% 92%;
+  --border: 22 30% 68%;
+  --input: 22 30% 68%;
+  --ring: 22 42% 39%;
+}
+
+/* ─── Base Styles ──────────────────────────────────────────────────── */
+@layer base {
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--cream-warm);
+    color: var(--ink);
+    font-family: var(--font-lora), Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-caudex), 'Cormorant Garamond', serif;
+    color: var(--ink);
+  }
+}
+
+/* ─── Paper Texture Utility ────────────────────────────────────────── */
+@layer utilities {
+  .paper-texture {
+    position: relative;
+  }
+
+  .paper-texture::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.07;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 200px 200px;
+  }
+
+  .font-caudex {
+    font-family: var(--font-caudex), 'Cormorant Garamond', serif;
+  }
+
+  .font-caveat {
+    font-family: var(--font-caveat), 'Kalam', cursive;
+  }
+
+  .font-lora {
+    font-family: var(--font-lora), Georgia, serif;
+  }
+
+  .label-caps {
+    font-family: var(--font-caudex), serif;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.75rem;
+  }
+
+  .text-ink { color: var(--ink); }
+  .text-ink-soft { color: var(--ink-soft); }
+  .text-oak-warm { color: var(--oak-warm); }
+  .text-copper { color: var(--copper); }
+  .text-highlight { color: var(--highlight); }
+  .text-cream-warm { color: var(--cream-warm); }
+  .text-forest-deep { color: var(--forest-deep); }
+
+  .bg-cream-warm { background-color: var(--cream-warm); }
+  .bg-paper-aged { background-color: var(--paper-aged); }
+  .bg-bark { background-color: var(--bark); }
+  .bg-forest-deep { background-color: var(--forest-deep); }
+  .bg-oak-warm { background-color: var(--oak-warm); }
+
+  .border-oak-warm { border-color: var(--oak-warm); }
+  .border-forest-mid { border-color: var(--forest-mid); }
+  .border-copper { border-color: var(--copper); }
+
+  /* SVG draw animation helper */
+  .svg-draw {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+  }
+
+  .svg-draw.drawn {
+    animation: draw-stroke 1.2s ease-in-out forwards;
+  }
+}
+
+/* ─── Hero Specific ─────────────────────────────────────────────────── */
+.hero-headline span.handwritten {
+  font-family: var(--font-caveat), cursive;
+  color: var(--oak-warm);
+  font-size: 1.15em;
+  display: inline-block;
+  transform: rotate(-1deg);
+}
+
+/* ─── Scroll Smooth for all anchor links ────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ─── Custom Scrollbar ──────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--paper-aged);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--oak-warm);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--oak-deep);
+}
+
+/* ─── Canvas / Three.js container ──────────────────────────────────── */
+.three-canvas-wrapper {
+  width: 100%;
+  height: 100%;
+  cursor: none;
+}
