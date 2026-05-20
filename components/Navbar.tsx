@@ -2,30 +2,39 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useReducedMotion } from 'framer-motion';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
+import { localizedPath, type Locale } from '@/lib/i18n-routes';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-const NAV_LINKS_RO = [
-  { label: 'Povestea noastră', href: '#poveste' },
-  { label: 'Atelier', href: '#atelier' },
-  { label: 'Tocătoare', href: '#tocatoare' },
-  { label: 'Îngrijire', href: '#ingrijire' },
+type NavLink =
+  | { label: string; type: 'anchor'; anchor: string }
+  | { label: string; type: 'route'; routeKey: 'despre' };
+
+const NAV_LINKS_RO: NavLink[] = [
+  { label: 'Povestea noastră', type: 'anchor', anchor: '#poveste' },
+  { label: 'Atelier', type: 'anchor', anchor: '#atelier' },
+  { label: 'Despre', type: 'route', routeKey: 'despre' },
+  { label: 'Tocătoare', type: 'anchor', anchor: '#tocatoare' },
+  { label: 'Îngrijire', type: 'anchor', anchor: '#ingrijire' },
 ];
 
-const NAV_LINKS_EN = [
-  { label: 'Our Story', href: '#poveste' },
-  { label: 'Workshop', href: '#atelier' },
-  { label: 'Boards', href: '#tocatoare' },
-  { label: 'Care', href: '#ingrijire' },
+const NAV_LINKS_EN: NavLink[] = [
+  { label: 'Our Story', type: 'anchor', anchor: '#poveste' },
+  { label: 'Workshop', type: 'anchor', anchor: '#atelier' },
+  { label: 'About', type: 'route', routeKey: 'despre' },
+  { label: 'Boards', type: 'anchor', anchor: '#tocatoare' },
+  { label: 'Care', type: 'anchor', anchor: '#ingrijire' },
 ];
 
 interface NavbarProps {
-  language: 'ro' | 'en';
+  language: Locale;
   /** Called when user clicks the language toggle. Parent handles navigation. */
   onToggleLanguage: () => void;
 }
@@ -36,8 +45,13 @@ export default function Navbar({ language, onToggleLanguage }: NavbarProps) {
   const prefersReducedMotion = useReducedMotion();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname() ?? '';
 
   const links = language === 'ro' ? NAV_LINKS_RO : NAV_LINKS_EN;
+  const homePath = `/${language}`;
+  const onHomepage = pathname === homePath || pathname === '/';
+  const desprePath = localizedPath('despre', language);
+  const waitlistHref = `${homePath}#waitlist`;
 
   useEffect(() => {
     const nav = navRef.current;
@@ -52,28 +66,39 @@ export default function Navbar({ language, onToggleLanguage }: NavbarProps) {
     return () => window.removeEventListener('scroll', onScroll);
   }, [prefersReducedMotion]);
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    if (href === '#waitlist') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Anchor-link click: when we're already on the locale homepage, prevent
+  // default and do a smooth scroll (preserves existing UX). When we're on
+  // another route (e.g. /despre), let Next Link navigate to
+  // /{locale}#anchor — the browser jumps to the section on landing
+  // (globals.css `html { scroll-behavior: smooth }` keeps it smooth).
+  const handleAnchorClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    anchor: string,
+  ) => {
+    if (anchor === '#waitlist') {
+      if (onHomepage) {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
       setMenuOpen(false);
       return;
     }
-    const target = document.querySelector(href);
-    if (target) {
-      const offset = target.getBoundingClientRect().top + window.scrollY - 80;
-      window.scrollTo({ top: offset, behavior: 'smooth' });
-      setMenuOpen(false);
+    if (onHomepage) {
+      const target = document.querySelector(anchor);
+      if (target) {
+        e.preventDefault();
+        const offset = target.getBoundingClientRect().top + window.scrollY - 80;
+        window.scrollTo({ top: offset, behavior: 'smooth' });
+      }
     }
+    setMenuOpen(false);
   };
 
   return (
     <header
       ref={navRef}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? 'py-3 shadow-sm'
-          : 'py-5'
+        scrolled ? 'py-3 shadow-sm' : 'py-5'
       }`}
       style={{
         backgroundColor: scrolled ? 'var(--cream-warm)' : 'transparent',
@@ -81,8 +106,17 @@ export default function Navbar({ language, onToggleLanguage }: NavbarProps) {
       }}
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-        {/* Logo */}
-        <a href="#" className="flex-shrink-0 flex items-center gap-3 transition-all duration-500" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+        {/* Logo — clicking goes to locale homepage (Link for cross-page nav). */}
+        <Link
+          href={homePath}
+          className="flex-shrink-0 flex items-center gap-3 transition-all duration-500"
+          onClick={(e) => {
+            if (onHomepage) {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+          }}
+        >
           <Image
             ref={logoRef as any}
             src="/3D_Cutting_Board_Model_Design.svg"
@@ -125,25 +159,53 @@ export default function Navbar({ language, onToggleLanguage }: NavbarProps) {
               stejar · manual
             </span>
           </div>
-        </a>
+        </Link>
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8">
-          {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={(e) => handleNavClick(e, link.href)}
-              className="font-lora text-sm transition-colors duration-200 hover:text-oak-warm relative group"
-              style={{ color: scrolled ? 'var(--ink)' : 'var(--ink)', fontFamily: 'var(--font-lora)' }}
-            >
-              {link.label}
-              <span
-                className="absolute -bottom-0.5 left-0 h-px w-0 group-hover:w-full transition-all duration-300"
-                style={{ backgroundColor: 'var(--oak-warm)' }}
-              />
-            </a>
-          ))}
+          {links.map((link) => {
+            if (link.type === 'route') {
+              const href = localizedPath(link.routeKey, language);
+              const isActive = pathname === desprePath;
+              return (
+                <Link
+                  key={link.label}
+                  href={href}
+                  onClick={() => setMenuOpen(false)}
+                  className="font-lora text-sm transition-colors duration-200 hover:text-oak-warm relative group"
+                  style={{
+                    color: isActive ? 'var(--oak-warm)' : 'var(--ink)',
+                    fontFamily: 'var(--font-lora)',
+                  }}
+                >
+                  {link.label}
+                  <span
+                    className={`absolute -bottom-0.5 left-0 h-px ${
+                      isActive ? 'w-full' : 'w-0 group-hover:w-full'
+                    } transition-all duration-300`}
+                    style={{ backgroundColor: 'var(--oak-warm)' }}
+                  />
+                </Link>
+              );
+            }
+            // anchor link
+            const href = `${homePath}${link.anchor}`;
+            return (
+              <Link
+                key={link.label}
+                href={href}
+                onClick={(e) => handleAnchorClick(e, link.anchor)}
+                className="font-lora text-sm transition-colors duration-200 hover:text-oak-warm relative group"
+                style={{ color: 'var(--ink)', fontFamily: 'var(--font-lora)' }}
+              >
+                {link.label}
+                <span
+                  className="absolute -bottom-0.5 left-0 h-px w-0 group-hover:w-full transition-all duration-300"
+                  style={{ backgroundColor: 'var(--oak-warm)' }}
+                />
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Right: Language + CTA */}
@@ -162,9 +224,9 @@ export default function Navbar({ language, onToggleLanguage }: NavbarProps) {
           </button>
 
           {/* CTA */}
-          <a
-            href="#waitlist"
-            onClick={(e) => handleNavClick(e, '#waitlist')}
+          <Link
+            href={waitlistHref}
+            onClick={(e) => handleAnchorClick(e, '#waitlist')}
             className="hidden md:inline-flex items-center px-5 py-2.5 text-sm font-caudex transition-all duration-200 hover:opacity-90 active:scale-95"
             style={{
               backgroundColor: 'var(--oak-warm)',
@@ -176,7 +238,7 @@ export default function Navbar({ language, onToggleLanguage }: NavbarProps) {
             }}
           >
             {language === 'ro' ? 'Pre-comandă' : 'Pre-order'}
-          </a>
+          </Link>
 
           {/* Mobile hamburger */}
           <button
@@ -203,29 +265,52 @@ export default function Navbar({ language, onToggleLanguage }: NavbarProps) {
       {/* Mobile menu */}
       <div
         className={`md:hidden overflow-hidden transition-all duration-400 ${
-          menuOpen ? 'max-h-80 opacity-100' : 'max-h-0 opacity-0'
+          menuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
         }`}
         style={{ backgroundColor: 'var(--cream-warm)', borderTop: '1px solid rgba(139,94,60,0.15)' }}
       >
         <nav className="flex flex-col px-6 py-4 gap-4">
-          {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={(e) => handleNavClick(e, link.href)}
-              className="font-lora text-base py-1 border-b"
-              style={{
-                color: 'var(--ink)',
-                fontFamily: 'var(--font-lora)',
-                borderColor: 'rgba(139,94,60,0.12)',
-              }}
-            >
-              {link.label}
-            </a>
-          ))}
-          <a
-            href="#waitlist"
-            onClick={(e) => handleNavClick(e, '#waitlist')}
+          {links.map((link) => {
+            if (link.type === 'route') {
+              const href = localizedPath(link.routeKey, language);
+              const isActive = pathname === desprePath;
+              return (
+                <Link
+                  key={link.label}
+                  href={href}
+                  onClick={() => setMenuOpen(false)}
+                  className="font-lora text-base py-1 border-b"
+                  style={{
+                    color: isActive ? 'var(--oak-warm)' : 'var(--ink)',
+                    fontFamily: 'var(--font-lora)',
+                    borderColor: 'rgba(139,94,60,0.12)',
+                    fontWeight: isActive ? 600 : 400,
+                  }}
+                >
+                  {link.label}
+                </Link>
+              );
+            }
+            const href = `${homePath}${link.anchor}`;
+            return (
+              <Link
+                key={link.label}
+                href={href}
+                onClick={(e) => handleAnchorClick(e, link.anchor)}
+                className="font-lora text-base py-1 border-b"
+                style={{
+                  color: 'var(--ink)',
+                  fontFamily: 'var(--font-lora)',
+                  borderColor: 'rgba(139,94,60,0.12)',
+                }}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+          <Link
+            href={waitlistHref}
+            onClick={(e) => handleAnchorClick(e, '#waitlist')}
             className="mt-2 text-center py-3 font-caudex text-sm"
             style={{
               backgroundColor: 'var(--oak-warm)',
@@ -236,7 +321,7 @@ export default function Navbar({ language, onToggleLanguage }: NavbarProps) {
             }}
           >
             {language === 'ro' ? 'Pre-comandă' : 'Pre-order'}
-          </a>
+          </Link>
         </nav>
       </div>
     </header>
