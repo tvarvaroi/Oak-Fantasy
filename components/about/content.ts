@@ -14,7 +14,13 @@ export interface ProcessStep {
   /** small uppercase tick, e.g. "Pas unu" / "Step one" */
   tick: string;
   title: string;
+  /** Long-form body — kept for reference / future restoration. NOT rendered
+   *  by ProcessTimeline since the 2026-05-27 medium-compact refactor. */
   body: string;
+  /** 2–3 sentence body actually rendered by ProcessTimeline post-refactor.
+   *  Trim of `body` retaining the essential information (drying duration,
+   *  glue brand, grit count, etc.) without secondary anecdote. */
+  bodyCompact: string;
   /** monospace caption for the striped placeholder image (design captions, kept EN) */
   placeholder: string;
 }
@@ -36,8 +42,12 @@ export interface AboutContent {
   process: {
     eyebrow: string;
     h2: string;
+    /** Subheading rendered between h2 and the steps grid (post-refactor). */
+    subHeading: string;
     lead: string;
     steps: ProcessStep[];
+    /** Cross-link label rendered at end of process section -> /atelier#proces. */
+    crossLinkLabel: string;
   };
   philosophy: {
     eyebrow: string;
@@ -51,6 +61,8 @@ export interface AboutContent {
     h2: string;
     paragraph: string;
     placeholder: string;
+    /** Cross-link label rendered in workshop banner overlay -> /atelier. */
+    crossLinkLabel: string;
   };
   values: {
     eyebrow: string;
@@ -88,6 +100,7 @@ const ro: AboutContent = {
   process: {
     eyebrow: 'Procesul',
     h2: 'Cinci pași între copac și bucătărie.',
+    subHeading: 'De la copac la bucătărie',
     lead: 'De la stejarul nealtoit din Carpați până la tocătorul pe care îl primești acasă — fiecare etapă cere timp, atenție și mâinile aceluiași om.',
     steps: [
       {
@@ -95,6 +108,7 @@ const ro: AboutContent = {
         tick: 'Pas unu',
         title: 'Alegerea lemnului',
         body: 'Cumpărăm stejar de la oameni din zona Carpaților, doar bucăți cu desen frumos și fără noduri în lemnul de muncă. Restul îl folosim pentru alte lucruri.',
+        bodyCompact: 'Cumpărăm stejar din zona Carpaților, doar bucăți cu desen frumos. Restul îl folosim pentru alte lucruri.',
         placeholder: 'oak log · forest edge · light',
       },
       {
@@ -102,6 +116,7 @@ const ro: AboutContent = {
         tick: 'Pas doi',
         title: 'Uscarea',
         body: 'Lemnul stă la uscat între 6 și 12 luni, până ajunge la umiditatea potrivită (8–10%). Fără asta, tocătorul ar plesni în primele luni de folosință. Nu sărim peste pas.',
+        bodyCompact: 'Lemnul stă la uscat 6–12 luni, până ajunge la 8–10% umiditate. Fără asta, tocătorul ar plesni în primele luni.',
         placeholder: 'drying rack · stacked boards · barn',
       },
       {
@@ -109,6 +124,7 @@ const ro: AboutContent = {
         tick: 'Pas trei',
         title: 'Tăierea și asamblarea',
         body: 'Tăiem la dimensiunile fiecărui SKU, apoi lipim cu adeziv alimentar Titebond III — același folosit în atelierele de mobilier din SUA și Europa de zeci de ani. Presăm și lăsăm să se odihnească 24 de ore.',
+        bodyCompact: 'Tăiem la dimensiunile fiecărui SKU, apoi lipim cu adeziv alimentar Titebond III. Presăm 24 de ore.',
         placeholder: 'clamps · glue-up · workbench',
       },
       {
@@ -116,6 +132,7 @@ const ro: AboutContent = {
         tick: 'Pas patru',
         title: 'Șlefuirea',
         body: 'Trecem prin patru-cinci graduri de șlefuit, de la 80 la 320. Trebuie să simți lemnul fără rugozități, dar și fără să fie lucios — un tocător prea neted nu îți «ține» cuțitul, alunecă.',
+        bodyCompact: 'Patru-cinci graduri de la 80 la 320. Trebuie să simți lemnul fără rugozități, dar și fără să fie lucios.',
         placeholder: 'sanding · grit progression · sawdust',
       },
       {
@@ -123,9 +140,11 @@ const ro: AboutContent = {
         tick: 'Pas cinci',
         title: 'Finisajul',
         body: 'Ungem cu ulei alimentar + ceară de albine — câteva straturi, fiecare lăsat să intre în lemn 24 de ore. Asta îți protejează tocătorul, hrănește lemnul, și-l face să arate mai bun cu vârsta.',
+        bodyCompact: 'Ungem cu ulei alimentar și ceară de albine — câteva straturi, fiecare lăsat să intre în lemn 24 de ore.',
         placeholder: 'oil rag · finished board · low light',
       },
     ],
+    crossLinkLabel: 'Vezi cum lucrăm în atelier',
   },
   philosophy: {
     eyebrow: 'Filosofia noastră',
@@ -143,6 +162,7 @@ const ro: AboutContent = {
     paragraph:
       'Lucrăm într-un atelier mic, undeva în zona Carpaților, unde lumina e bună dimineața și liniștită seara. Aici tăiem, șlefuim și împachetăm fiecare tocător. Aici primim și mesajele voastre. Nu e showroom — e atelier.',
     placeholder: 'workshop interior · golden hour · wide shot',
+    crossLinkLabel: 'Vezi atelierul în detaliu',
   },
   values: {
     eyebrow: 'Valorile noastre',
@@ -196,6 +216,7 @@ const en: AboutContent = {
   process: {
     eyebrow: 'The process',
     h2: 'Five steps between the tree and your kitchen.',
+    subHeading: 'From tree to kitchen',
     lead: 'From wild Carpathian oak to the board that arrives at your home — every stage takes time, attention, and the same pair of hands.',
     steps: [
       {
@@ -203,6 +224,7 @@ const en: AboutContent = {
         tick: 'Step one',
         title: 'Choosing the wood',
         body: 'We buy oak from people in the Carpathian region — only pieces with beautiful grain and no knots in the working surface. The rest we use for other things.',
+        bodyCompact: 'We buy oak from the Carpathian region, only pieces with beautiful grain. The rest we use for other things.',
         placeholder: 'oak log · forest edge · light',
       },
       {
@@ -210,6 +232,7 @@ const en: AboutContent = {
         tick: 'Step two',
         title: 'Drying',
         body: 'The wood dries for 6 to 12 months, until it reaches the right moisture (8–10%). Without this, the board would crack in its first months of use. We don’t skip this step.',
+        bodyCompact: 'Wood dries for 6–12 months until it reaches 8–10% humidity. Without this, the board would crack in its first months.',
         placeholder: 'drying rack · stacked boards · barn',
       },
       {
@@ -217,6 +240,7 @@ const en: AboutContent = {
         tick: 'Step three',
         title: 'Cutting and assembly',
         body: 'We cut to each SKU’s dimensions, then glue with Titebond III food-safe adhesive — the same one used in furniture workshops across the US and Europe for decades. We press and let it rest for 24 hours.',
+        bodyCompact: 'We cut to each SKU’s dimensions, then glue with food-safe Titebond III adhesive. We press for 24 hours.',
         placeholder: 'clamps · glue-up · workbench',
       },
       {
@@ -224,6 +248,7 @@ const en: AboutContent = {
         tick: 'Step four',
         title: 'Sanding',
         body: 'We work through four or five sanding grits, from 80 to 320. You should feel the wood with no roughness, but not glossy either — a board that’s too smooth doesn’t “grip” the knife — it slips.',
+        bodyCompact: 'Four-five grits from 80 to 320. You should feel the wood with no roughness, but not glossy either.',
         placeholder: 'sanding · grit progression · sawdust',
       },
       {
@@ -231,9 +256,11 @@ const en: AboutContent = {
         tick: 'Step five',
         title: 'The finish',
         body: 'We rub in food-safe oil + beeswax — a few coats, each left to soak into the wood for 24 hours. This protects your board, feeds the wood, and makes it look better with age.',
+        bodyCompact: 'We rub in food-safe oil and beeswax — a few coats, each left to soak into the wood for 24 hours.',
         placeholder: 'oil rag · finished board · low light',
       },
     ],
+    crossLinkLabel: 'See how we work in the workshop',
   },
   philosophy: {
     eyebrow: 'Our philosophy',
@@ -251,6 +278,7 @@ const en: AboutContent = {
     paragraph:
       'We work in a small workshop, somewhere in the Carpathian region, where the light is good in the morning and quiet in the evening. Here we cut, sand and pack every board. Here we also receive your messages. It’s not a showroom — it’s a workshop.',
     placeholder: 'workshop interior · golden hour · wide shot',
+    crossLinkLabel: 'See the workshop in detail',
   },
   values: {
     eyebrow: 'Our values',

@@ -31,9 +31,9 @@ export default function AboutContent({ locale }: { locale: Locale }) {
       <Navbar language={locale} onToggleLanguage={toggleLanguage} />
       <main style={{ backgroundColor: 'var(--cream-warm)' }}>
         <AboutHero content={content} />
-        <ProcessTimeline content={content} />
+        <ProcessTimeline content={content} locale={locale} />
         <PhilosophySection content={content} />
-        <WorkshopBanner content={content} />
+        <WorkshopBanner content={content} locale={locale} />
         <ValuesGrid content={content} />
         <AboutCTA content={content} locale={locale} />
       </main>
