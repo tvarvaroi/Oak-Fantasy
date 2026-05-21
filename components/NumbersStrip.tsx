@@ -2,65 +2,8 @@
 
 import { useRef, useEffect, useState } from 'react';
 import { motion, useReducedMotion, animate } from 'framer-motion';
-
-/* ─── Stat data ──────────────────────────────────────────────────── */
-
-interface Stat {
-  /* the numeric portion that counts up */
-  from: number;
-  to: number;
-  /* suffix appended after the number */
-  suffix: string;
-  /* prefix before the number (empty for most) */
-  prefix: string;
-  labelRo: string;
-  labelEn: string;
-  captionRo: string;
-  captionEn: string;
-}
-
-const stats: Stat[] = [
-  {
-    from: 0,
-    to: 1200,
-    suffix: '+',
-    prefix: '',
-    labelRo: 'pe listă',
-    labelEn: 'on the list',
-    captionRo: 'Persoane care aşteaptă',
-    captionEn: 'People waiting',
-  },
-  {
-    from: 0,
-    to: 100,
-    suffix: '%',
-    prefix: '',
-    labelRo: 'stejar românesc',
-    labelEn: 'Romanian oak',
-    captionRo: 'Material provenit local',
-    captionEn: 'Locally sourced material',
-  },
-  {
-    from: 0,
-    to: 8,
-    suffix: 'h',
-    prefix: '',
-    labelRo: 'per tocător',
-    labelEn: 'per board',
-    captionRo: 'Ore de lucru manual',
-    captionEn: 'Hours of handwork',
-  },
-  {
-    from: 0,
-    to: 20,
-    suffix: '+ ani',
-    prefix: '',
-    labelRo: 'de meşteşug',
-    labelEn: 'of craft',
-    captionRo: 'Experienţă în atelier',
-    captionEn: 'Workshop experience',
-  },
-];
+import type { Locale } from '@/lib/i18n-routes';
+import { numbersStripContent, type Stat } from './numbers-strip-content';
 
 /* ─── Single animated counter ───────────────────────────────────── */
 
@@ -68,10 +11,12 @@ function Counter({
   stat,
   play,
   index,
+  numberLocale,
 }: {
   stat: Stat;
   play: boolean;
   index: number;
+  numberLocale: string;
 }) {
   const prefersReduced = useReducedMotion();
   const [display, setDisplay] = useState(stat.from);
@@ -98,10 +43,10 @@ function Counter({
     return () => controls.stop();
   }, [play, prefersReduced, stat.from, stat.to, index]);
 
-  /* format thousands with comma */
+  /* format thousands per locale */
   const formatted =
     stat.to >= 1000
-      ? display.toLocaleString('ro-RO')
+      ? display.toLocaleString(numberLocale)
       : String(display);
 
   return (
@@ -139,9 +84,10 @@ function VerticalDivider() {
 
 /* ─── Section ────────────────────────────────────────────────────── */
 
-export default function NumbersStrip({ language }: { language: 'ro' | 'en' }) {
+export default function NumbersStrip({ language }: { language: Locale }) {
   const ref = useRef<HTMLElement>(null);
   const [play, setPlay] = useState(false);
+  const { ariaLabel, numberLocale, stats } = numbersStripContent[language];
 
   useEffect(() => {
     const el = ref.current;
@@ -164,7 +110,7 @@ export default function NumbersStrip({ language }: { language: 'ro' | 'en' }) {
       ref={ref}
       className="relative overflow-hidden"
       style={{ backgroundColor: 'var(--forest-deep)' }}
-      aria-label={language === 'ro' ? 'Cifre' : 'Numbers'}
+      aria-label={ariaLabel}
     >
       {/* subtle paper grain */}
       <div className="paper-texture absolute inset-0 pointer-events-none" aria-hidden />
@@ -185,7 +131,7 @@ export default function NumbersStrip({ language }: { language: 'ro' | 'en' }) {
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0 lg:gap-0">
           {stats.map((stat, i) => (
-            <div key={stat.labelRo} className="flex lg:contents">
+            <div key={stat.label} className="flex lg:contents">
               {/* vertical divider before each item except first */}
               {i > 0 && <VerticalDivider />}
 
@@ -213,7 +159,7 @@ export default function NumbersStrip({ language }: { language: 'ro' | 'en' }) {
                   />
                 )}
 
-                <Counter stat={stat} play={play} index={i} />
+                <Counter stat={stat} play={play} index={i} numberLocale={numberLocale} />
 
                 {/* label */}
                 <p
@@ -225,7 +171,7 @@ export default function NumbersStrip({ language }: { language: 'ro' | 'en' }) {
                     marginTop: 6,
                   }}
                 >
-                  {language === 'ro' ? stat.labelRo : stat.labelEn}
+                  {stat.label}
                 </p>
 
                 {/* caption */}
@@ -237,7 +183,7 @@ export default function NumbersStrip({ language }: { language: 'ro' | 'en' }) {
                     lineHeight: 1.5,
                   }}
                 >
-                  {language === 'ro' ? stat.captionRo : stat.captionEn}
+                  {stat.caption}
                 </p>
               </motion.div>
             </div>
