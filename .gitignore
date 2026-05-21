@@ -43,3 +43,8 @@ next-env.d.ts
 # Brain inbox (transient)
 _brain/inbox/*
 !_brain/inbox/.gitkeep
+
+# Playwright artifacts (test-results = traces on failure; report = HTML output)
+/test-results/
+/playwright-report/
+/playwright/.cache/
