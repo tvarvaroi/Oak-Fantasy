@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lighthouse": "lhci autorun --config=lighthouserc.desktop.json",
+    "lighthouse:mobile": "lhci autorun --config=lighthouserc.mobile.json"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -78,6 +80,7 @@
     "zustand": "4.5.5"
   },
   "devDependencies": {
+    "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.60.0"
   }
 }

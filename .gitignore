@@ -48,3 +48,6 @@ _brain/inbox/*
 /test-results/
 /playwright-report/
 /playwright/.cache/
+
+# Lighthouse CI artifacts
+/.lighthouseci/
