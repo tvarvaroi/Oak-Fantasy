@@ -8,7 +8,7 @@ The Oak Fantasy project ships with a single command that verifies the site is st
 npm run verify
 ```
 
-Runs in <90 seconds and gates on:
+Runs in ~3 minutes (114 E2E tests across 3 viewports + typecheck + lint + i18n) and gates on:
 
 1. **TypeScript** — `tsc --noEmit`, zero errors
 2. **ESLint** — `next lint`, zero errors
@@ -21,7 +21,7 @@ Lighthouse runs separately (slower, 1–2 min per preset).
 
 | Script | When | Time |
 |---|---|---|
-| `npm run verify` | Before every commit, in every task | <90s |
+| `npm run verify` | Before every commit, in every task | ~3min |
 | `npm run typecheck` | Quick TS sanity check during refactor | <5s |
 | `npm run lint` | ESLint only, while iterating | <5s |
 | `npm run check:i18n` | Catch i18n bugs fast (5s, zero deps) | <5s |

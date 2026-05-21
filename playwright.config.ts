@@ -13,7 +13,10 @@ export default defineConfig({
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: 1,
+  // 3 workers = one per project (mobile/tablet/desktop) so projects run in parallel.
+  // Tests within a project stay sequential (fullyParallel: false) — visual regression
+  // order is stable that way.
+  workers: 3,
   reporter: [['html', { open: 'never' }], ['list']],
   snapshotPathTemplate: '{testDir}/__screenshots__/{testFilePath}/{arg}-{projectName}{ext}',
   expect: {
