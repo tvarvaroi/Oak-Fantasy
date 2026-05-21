@@ -91,7 +91,61 @@ docs/verification.md                              # Workflow docs pentru verify 
 ```
 
 **Npm scripts noi:**
-- `verify` (gate principal — typecheck → lint → check:i18n → test:e2e, ~3min)
-- `test:e2e` / `test:e2e:headed` / `test:e2e:update`
+- `verify` (gate principal — typecheck → lint → check:i18n → test:e2e → test:e2e:visual, ~4min)
+- `test:e2e` (non-visual, 3 paralel workers, ~1.5min)
+- `test:e2e:visual` (only visual regression, `--workers=1` sequential, ~2.5min)
+- `test:e2e:headed` / `test:e2e:update` (refresh baselines)
 - `check:i18n` (cu opțional `-- --json` pentru output mașină)
 - `lighthouse` / `lighthouse:mobile` (audit separat, 1-2min)
+
+## /atelier page (Faza 2026-05-27)
+
+```
+app/[locale]/atelier/
+  page.tsx                       Server Component + 3 JSON-LD (AboutPage + BreadcrumbList + ItemList tools) + generateMetadata
+components/atelier/
+  content.ts                     Record<Locale, AtelierContent> (RO verbatim v3-catalog, EN founder-approved glossary)
+  atelier.module.css             Port v3-catalog.html bespoke CSS + reuse brand vars
+  AtelierContent.tsx             Client wrapper (Navbar + 10 sections + Footer)
+  AtelierHero.tsx                Dark hero + 3×3 rotated cell grid
+  ToolsSection.tsx               6 tool cards în grid 12-col asimetric (centerpiece)
+  WorkshopPlace.tsx              2-col text + 2-image stack
+  DayInAtelier.tsx               4 day-moments compact strip
+  PullQuoteBridge.tsx            Caveat pull-quote bridge
+  ProcessSummary.tsx             5-step compact + cross-ref Link → /despre#proces
+  Conditions.tsx                 2 cond-cards cu **markdown bold** parser inline
+  Seasonality.tsx                4 season-cards (text-only, no SVG icons în Variant C)
+  RelatedArticles.tsx            4 placeholder articles cu "Articol în pregătire" badge
+  AtelierCTA.tsx                 Dark CTA
+```
+
+**Reuse din /despre:** `components/about/Reveal.tsx`, `components/about/PlaceholderImage.tsx` (import direct via @/components/about/...).
+
+**URL routes:**
+- RO: `/ro/atelier`
+- EN: `/en/workshop` (PATHNAMES extension)
+- Cross-redirects: `/en/atelier` → 308 → `/en/workshop`, `/ro/workshop` → 308 → `/ro/atelier`
+
+## /despre refactor (Faza 2026-05-27)
+
+`components/about/ProcessTimeline.tsx`:
+- Layout NOU: vertical centered cards max-width 760px, fără alternating, fără placeholder images per step
+- Renderează `step.bodyCompact` (2-3 propoziții) în loc de `step.body` (long-form, păstrat pentru reference)
+- Cross-ref link la final: `Vezi cum lucrăm în atelier → /{locale}/atelier#proces`
+
+`components/about/WorkshopBanner.tsx`:
+- Adăugat în overlay cross-ref Link: `Vezi atelierul în detaliu → /{locale}/atelier`
+
+`components/about/content.ts` shape extins:
+- `ProcessStep.bodyCompact: string` — versiune compact rendered
+- `process.subHeading: string` — "De la copac la bucătărie" sub h2
+- `process.crossLinkLabel: string`
+- `workshop.crossLinkLabel: string`
+
+## Navbar update (Faza 2026-05-27)
+
+`components/Navbar.tsx`:
+- `NavLink` route key extended: `'despre' | 'atelier'`
+- 5 link-uri în ambele locale: Povestea (anchor) → Despre (route) → Atelier (route) → Tocătoare (anchor) → Îngrijire (anchor)
+- Dropped: anchor `Atelier #atelier` (decizie D1 — homepage WorkshopSection rămâne content, nu navigare)
+- Active state per-link: `pathname === localizedPath(link.routeKey, language)`

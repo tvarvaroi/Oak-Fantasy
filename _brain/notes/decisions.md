@@ -75,6 +75,56 @@
 **Motiv:** Cross-system rendering diff = ~0.5-1% (font subpixel anti-aliasing, color profile). 2% acoperă drift normal, fail pe schimbări reale (typo / color = 5%+). Commit screenshots = ground truth comună; fără commit, fiecare dev are baselines proprii (useless).
 **Alternative respinse:** 0% threshold (false positives constanti), 5% (ascunde regresii reale), screenshots per-dev (rupe colaborarea).
 
+## 2026-05-27 — /atelier = mini-documentar long-form (vs short tease)
+
+**Context:** După /despre (1 pagină) trebuia decis profundimea /atelier — short tease sau full documentary?
+**Decizie:** **Long-form mini-documentar** (Variant C — Tool-Forward Catalog). 8 secțiuni: Hero dark + Tools centerpiece (6 cards 12-col asimetric) + Place + Day + Pull-quote + Process summary + Conditions + Seasonality + Articles + CTA.
+**Motiv:** Founder spec explicit: "Mai lungă decât /despre — un articol pentru cititorul care vrea să înțeleagă locul, uneltele, ritmul zilei, condițiile, sezonul." E pagina de "vino să vezi atelierul" pentru cititori curioși de proces, nu pagină de conversie. Catalog format pune uneltele în prim-plan, ceea ce e identitatea brandului (artisan + tool-craft).
+**Alternative respinse:** Variant A (Editorial Long-Form — capitole romane + drop caps) — prea premium fără fotografie reală încă. Variant B (Timeline Documentary) — bun dar focus pe timp/zi, mai puțin pe unelte.
+
+## 2026-05-27 — /despre process refactor = medium-compact (Option C)
+
+**Context:** v3-catalog spunea "detalii pe /despre" DAR founder Task 2 cerea /despre process compact. Contradicție.
+**Decizie:** **Compromise C** — /despre process devine **medium-compact**: păstrez 2-3 propoziții esențiale per pas (în câmp nou `bodyCompact`), elimin doar greutate vizuală (placeholder images + alternating layout). Layout nou = vertical centered cards max 760px. /atelier rămâne very-short (1 propoziție per pas) cu cross-ref `Detalii complete pe pagina Despre`.
+**Motiv:** Option A (ambele compact) ar șterge tot info-ul process din site până la blog launch — risc real de a pierde keyword-uri SEO. Option B (păstrare detailed /despre) — defy founder Task 2 direct. C reconciliază: cititorul de pe /atelier are cross-ref onest pentru detalii, cititorul de pe /despre are info esențial fără greutate vizuală.
+**Alternative respinse:** A (lose content), B (defy founder).
+**Implementare:** câmp `bodyCompact` adăugat per step în content.ts; câmpul `body` original păstrat for future restoration.
+
+## 2026-05-27 — Slug EN /atelier = "workshop"
+
+**Context:** EN URL pentru /atelier. Opțiuni: passthrough ("/en/atelier") sau localized ("/en/workshop").
+**Decizie:** **`/en/workshop`** — slug EN diferit, gestionat via PATHNAMES + middleware (același pattern ca /despre↔/about).
+**Motiv:** SEO friendly URLs per locale. "Workshop" e termenul natural EN; "atelier" e franco-italian acceptat în EN dar mai puțin universal. Plus consistency cu /despre↔/about precedent.
+**Alternative respinse:** Passthrough (/en/atelier) — rupe simetria cu /about.
+
+## 2026-05-27 — Variant-switch pill din handoff ignorat
+
+**Context:** Bundle handoff avea `<nav class="atelier-switch">` fixed bottom cu butoane A/B/C pentru switching între variante.
+**Decizie:** **Ignorat complet** — variant switcher e tool intern Claude Design pentru review, NU element pentru utilizatorul final.
+**Motiv:** Clutter pentru cititor; nu există variante A/B/C în production, doar varianta aprobată (C).
+**Alternative respinse:** Implementare ca "preview" — nu are sens.
+
+## 2026-05-27 — Drop Navbar anchor `#atelier`, add route link `/atelier`
+
+**Context:** Navbar avea anchor "Atelier" → `#atelier` (homepage WorkshopSection). Adăugarea rutei `/atelier` creează 2 link-uri cu același label.
+**Decizie:** **D1** — drop anchor din Navbar. Singular "Atelier" în nav = ruta `/ro/atelier`. WorkshopSection rămâne pe homepage ca conținut (scroll natural), nu ca destination navigare.
+**Motiv:** Zero ambiguity vizuală în nav. Ruta dedicate are detalii complete; section homepage e doar tease scroll natural pentru users care nu fac click pe nav.
+**Alternative respinse:** D2 (păstrare ambele cu redenumiri) — clutter + confuzie.
+
+## 2026-05-27 — Tool images = placeholder stripat (NU real photos, NU AI gen)
+
+**Context:** 6 tool cards din /atelier — care e tratamentul vizual pentru imagine?
+**Decizie:** **Striped placeholder** cu caption monospace (același pattern ca /despre's PlaceholderImage). NU real photos, NU AI gen.
+**Motiv:** Real photos vin la sesiune foto produs viitoare (deja decizie Faza A — workshop.webp era mislabeled, nu utilizabil). AI gen ar fi nesigur pentru brand identity și nu se aliniază cu valorea "manual" / "lucrat". Placeholder onest = "vine fotografie reală" e mai bun decât AI sintetic.
+**Alternative respinse:** AI generation, real photos premature.
+
+## 2026-05-27 — Visual regression workers=1 (split test:e2e)
+
+**Context:** `playwright.config.ts` `workers: 3` (decizie Faza C pentru rapid verify). La regenerarea baselines pentru /atelier + /despre + /home, 6 tests fail consistently — chromium-mobile/tablet/desktop simultane cu fullPage screenshots → instabilitate. Individual rulează stabil, paralel nu.
+**Decizie:** **Split test scripts** — `test:e2e` (non-visual, workers paralel) + `test:e2e:visual` (only visual regression, `--workers=1` sequential). `verify` rulează ambele chained.
+**Motiv:** Workers=1 GLOBAL ar regresa Faza C performance (3.3min → 5.8min). Split preserves fast non-visual + reliable visual. Trade-off acceptabil: total verify 3.3min → 4min, dar 100% deterministic.
+**Alternative respinse:** `workers: 1` global (prea slow), `test.describe.configure({ mode: 'serial' })` (doesn't fix cross-project parallelism), skip visual din verify (pierde gate).
+
 ## 2026-05-21 — Workshop H2 EN păstrată cu virgulă (NU em-dash)
 
 **Context:** Workshop banner EN H2 = `Sawdust on the floor, oil on our fingers.` Discuție dacă virgula trebuie schimbată în em-dash.
