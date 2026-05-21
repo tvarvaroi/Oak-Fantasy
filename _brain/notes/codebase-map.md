@@ -40,7 +40,7 @@ supabase/migrations/      # 1 migration: waitlist table
 | `StoryStrip.tsx` | `{ language }` | framer-motion, SVG ornamente | 3 coloane cu ornamente SVG animate (svg-draw) |
 | `WorkshopSection.tsx` | `{ language }` | framer-motion `useScroll`/`useTransform`, next/image | Layout asimetric cu parallax |
 | `ProductTease.tsx` | `{ language }` | gsap ScrollTrigger, next/image, framer-motion | Galerie orizontală scroll-driven |
-| `NumbersStrip.tsx` | `{ language }` | framer-motion `animate` | Countere animate (count-up) |
+| `NumbersStrip.tsx` | `{ language: Locale }` | framer-motion `animate`, `./numbers-strip-content` | Countere animate (count-up). Conținut + sufixe + ariaLabel + `numberLocale` pentru `toLocaleString` în content map separat (Faza B refactor) |
 | `CraftVideoTease.tsx` | `{ language }` | framer-motion, useRef video | Placeholder video proces atelier |
 | `WaitlistSection.tsx` | `{ language }` | framer-motion, SVG (`BranchProps`), `EmailForm` | Email capture (source `waitlist`) + ornament ramură |
 | `Footer.tsx` | `{ language }` (`FooterLinkProps` intern) | next/image, framer-motion | Footer dark, 3 coloane |
@@ -62,3 +62,11 @@ supabase/migrations/      # 1 migration: waitlist table
 ## Rute noi — convenție
 
 `app/[locale]/numele-rutei/page.tsx`. NU `pages/`. Componente cu hooks/animații → `'use client'`. Imagini → `next/image`. 3D → `next/dynamic` cu `ssr:false`.
+
+## i18n content map pattern (Faza B)
+
+Componente shared cu conținut multilingv > ~5 string-uri: extras în fișier sibling `components/[name]-content.ts` cu shape `Record<Locale, ContentInterface>`. Component primește `language: Locale` și face `const { ... } = content[language]`. Exemple: `components/numbers-strip-content.ts`. Pattern paralel cu `components/about/content.ts` (route-scoped).
+
+Componente cu 1-2 string-uri hardcodate: ternar inline `language === 'ro' ? 'X' : 'Y'`. Exemplu: Navbar tagline `stejar · manual` / `oak · handmade`.
+
+Componente cu obj `nav = { ro:{}, en:{} }[language]` existent: adăugare cheie nouă în ambele obj. Exemplu: Footer `microTagline`.

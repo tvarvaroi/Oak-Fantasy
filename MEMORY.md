@@ -20,3 +20,13 @@
 **Iron Law — eșec de mediu, NU de cod:** `npm run build` → `✓ Compiled successfully` (TypeScript/lint OK) dar prerender `/ro` + `/en` pică: `Error: supabaseUrl is required`. Cauză: `.env.local` lipsește în checkout-ul ăsta + `lib/supabase.ts` instanțiază clientul la import cu `!`. Bootstrap-ul NU a atins cod (doar `.md` + `.agents/skills/`). Detalii + fix în [[_brain/notes/gotchas]]. De reținut: pentru build/dev local e nevoie de `.env.local` cu cheile Supabase reale.
 
 **REZOLVAT (2026-05-16):** fondatorul a furnizat cheile → `.env.local` creat (gitignored, confirmat cu `git check-ignore`). `npm run build` → **exit 0, zero erori, zero warnings**, `/ro`+`/en` prerendered SSG. Iron Law validat. `.env.local` NU se comite niciodată (e în `.gitignore` linia 29 `.env*.local`).
+
+---
+
+## 2026-05-21 — Faza B: shared components i18n cleanup
+
+**Pattern descoperit:** Bolt landing-ul a lăsat două antipattern-uri i18n pe shared components: (a) string-uri hardcodate inline în JSX care nu trec prin obiectul `nav = { ro:{}, en:{} }[language]` (ex Footer linia 224 `stejar · manual · România`); (b) interface-uri "half-localized" cu sufixe paralele (`labelRo`/`labelEn`/`captionRo`/`captionEn`) care obligă componentele să facă `language === 'ro' ? stat.labelRo : stat.labelEn` la fiecare câmp. NumbersStrip a fost exemplul tipic.
+
+**Aplicat la:** Navbar (1 string `stejar · manual` → ternar), Footer (cheie nouă `microTagline` în nav obj + logo swap SVG→real brand jpeg la 100px cu `borderRadius: '50%'` pentru a masca marginile albe ale jpeg-ului), NumbersStrip (refactor complet — extras în `components/numbers-strip-content.ts` cu `Record<Locale, NumbersStripContent>`, sufix `+ ani`/`+ years` localizat, `numberLocale` per locale pentru `toLocaleString` corect, ariaLabel extrasă din inline).
+
+**De ce contează:** (1) Pattern reutilizabil pentru orice altă componentă shared cu i18n incomplet — verifică Hero, StoryStrip, WorkshopSection, ProductTease, CraftVideoTease, WaitlistSection, FloatingCTA, EmailForm la următoarea ocazie. (2) Verificare false-positive: founder credea că 4 string-uri Footer sunt hardcodate; doar 1 era (restul erau deja în obj `[language]` selector). Mereu verifică sursa înainte de "fix everywhere" — `git diff` minimal e mai bun decât refactor global. (3) Diacritice cedilla turcească (ş/ţ) vs virgulă românească standard (ș/ț) — Unicode codepoints diferite, vizual ~identice. Bolt a folosit cedilla în NumbersStrip (`aşteaptă`, `Experienţă`, `meşteşug`). Per CLAUDE.md §6 = fix obligatoriu. Voi face scan global la următorul refactor de componente shared.
