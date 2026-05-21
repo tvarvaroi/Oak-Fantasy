@@ -47,6 +47,34 @@
 **Motiv:** Quick fix pe suffix doar n-ar fi rezolvat datoria tehnică — la următoarea ediție de cifre, ai re-întâlni același bug. Pattern `Record<Locale, ...>` e deja folosit pe `/despre content.ts`; standardizare cross-componentă. Reusable pentru următoarele componente shared cu pattern similar (Hero, StoryStrip, etc.)
 **Alternative respinse:** Quick fix sufix-only (datorie tehnică nerezolvată), `useTranslations` hook custom (overhead pentru un site mic — vezi decizia din 2026-05-16 împotriva next-intl).
 
+## 2026-05-23 — Playwright Chromium-only (vs all browsers)
+
+**Context:** Visual regression + E2E pe Oak Fantasy.
+**Decizie:** Doar Chromium pentru Playwright. NU Firefox, NU WebKit. Override `browserName: 'chromium'` la projects care moștenesc `devices['iPhone 13']` și `devices['iPad Mini']` (default WebKit).
+**Motiv:** Audiență production 70%+ Chromium-based (Chrome, Edge, Opera). Fiecare engine în plus = +200MB install + 2x runtime. Firefox/Safari au quirks separate de rendering — visual regression pe Chromium prinde cazul dominant. La nevoie viitoare, adăug pe CI un job separat Firefox.
+**Alternative respinse:** Cele 3 engines (overkill marketing site), doar WebKit (audiență prea mică).
+
+## 2026-05-23 — Lighthouse OUT din `npm run verify`
+
+**Context:** `verify` rulează pe fiecare commit. Trebuie să dea feedback rapid.
+**Decizie:** Lighthouse NU în `verify`. Scripts separate `npm run lighthouse` (desktop) și `npm run lighthouse:mobile` pentru audit periodic.
+**Motiv:** Lighthouse rulează 1-2 min per URL × 4 URLs = 4-8 min. Combinat cu E2E (3 min), `verify` ar deveni 7-11 min. Cadența potrivită Lighthouse = săptămânal / înainte de deploy major, NU per-commit. Per-commit gate trebuie să rămână în zona <5min.
+**Alternative respinse:** Lighthouse în verify (sparge budget timp), Lighthouse pe doar 1 URL în verify (incomplet, fals de optimist).
+
+## 2026-05-23 — i18n checker custom (Node stdlib, vs i18next-checker / lingui-extract)
+
+**Context:** Verificare automată că shared components nu au `stejar` pe EN, nu au cedilla, nu lipsesc chei.
+**Decizie:** Script custom `scripts/check-i18n.mjs`, zero dependencies, 169 linii. Balanced-brace parser pentru `Record<Locale, ...>` extraction, regex pentru cedilla + RO chars în EN block + key parity.
+**Motiv:** Tool-urile externe (i18next-parser, lingui-extract) așteaptă message catalogs framework-specific (.po, .json). Noi folosim `Record<Locale, ContentInterface>` în TS — zero match cu tool-uri externe. ~150 linii de Node stdlib (`fs.promises`, `path`) face exact ce avem nevoie + reguli specifice (cedilla, scan JSX hardcoded). Zero overhead.
+**Alternative respinse:** `i18next-parser` (cataloage neutiluzate), `lingui-extract` (overhead framework), AST-parsing complet TS via `typescript` package (overkill — heuristic regex e suficient).
+
+## 2026-05-23 — Visual regression `maxDiffPixelRatio: 0.02` + screenshots commit-uite
+
+**Context:** Stabilitate cross-system pentru `toHaveScreenshot`.
+**Decizie:** `maxDiffPixelRatio: 0.02` (2% tolerance) + `snapshotPathTemplate` fără `{platform}` (baselines portabile cross-OS) + commit screenshots în `tests/e2e/__screenshots__/`.
+**Motiv:** Cross-system rendering diff = ~0.5-1% (font subpixel anti-aliasing, color profile). 2% acoperă drift normal, fail pe schimbări reale (typo / color = 5%+). Commit screenshots = ground truth comună; fără commit, fiecare dev are baselines proprii (useless).
+**Alternative respinse:** 0% threshold (false positives constanti), 5% (ascunde regresii reale), screenshots per-dev (rupe colaborarea).
+
 ## 2026-05-21 — Workshop H2 EN păstrată cu virgulă (NU em-dash)
 
 **Context:** Workshop banner EN H2 = `Sawdust on the floor, oil on our fingers.` Discuție dacă virgula trebuie schimbată în em-dash.

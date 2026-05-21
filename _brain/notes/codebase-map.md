@@ -70,3 +70,28 @@ Componente shared cu conținut multilingv > ~5 string-uri: extras în fișier si
 Componente cu 1-2 string-uri hardcodate: ternar inline `language === 'ro' ? 'X' : 'Y'`. Exemplu: Navbar tagline `stejar · manual` / `oak · handmade`.
 
 Componente cu obj `nav = { ro:{}, en:{} }[language]` existent: adăugare cheie nouă în ambele obj. Exemplu: Footer `microTagline`.
+
+## Testing infrastructure (Faza C)
+
+```
+playwright.config.ts                              # Root config — chromium-only, 3 projects, workers: 3
+tests/e2e/
+  fixtures.ts                                     # disableAnimations + reducedMotion + consoleErrors + maskCanvas
+  homepage.spec.ts                                # /ro + /en — 5 tests
+  despre.spec.ts                                  # /ro/despre + /en/about + redirects — 7 tests
+  shared-components.spec.ts                       # Navbar + Footer + NumbersStrip Faza B fixes — 9 tests
+  seo.spec.ts                                     # title/desc all, canonical+hreflang+JSON-LD doar /despre — 14 tests
+  visual-regression.spec.ts                       # 4 pages × 3 viewports = 12 screenshots
+  __screenshots__/                                # Baselines committed (12 PNG, ~22MB)
+scripts/
+  check-i18n.mjs                                  # Zero-dep Node ES module, 169 linii
+lighthouserc.desktop.json                         # Preset desktop + 4 URLs + thresholds 80/95/95/90
+lighthouserc.mobile.json                          # Preset mobile + same URLs/thresholds
+docs/verification.md                              # Workflow docs pentru verify pipeline
+```
+
+**Npm scripts noi:**
+- `verify` (gate principal — typecheck → lint → check:i18n → test:e2e, ~3min)
+- `test:e2e` / `test:e2e:headed` / `test:e2e:update`
+- `check:i18n` (cu opțional `-- --json` pentru output mașină)
+- `lighthouse` / `lighthouse:mobile` (audit separat, 1-2min)
