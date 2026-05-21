@@ -10,13 +10,15 @@ import { test, expect } from './fixtures';
  */
 
 const ALL_PAGES = [
-  { path: '/ro',         title: /Oak Fantasy/i },
-  { path: '/en',         title: /Oak Fantasy/i },
-  { path: '/ro/despre',  title: /Despre Oak Fantasy/i },
-  { path: '/en/about',   title: /About Oak Fantasy/i },
+  { path: '/ro',           title: /Oak Fantasy/i },
+  { path: '/en',           title: /Oak Fantasy/i },
+  { path: '/ro/despre',    title: /Despre Oak Fantasy/i },
+  { path: '/en/about',     title: /About Oak Fantasy/i },
+  { path: '/ro/atelier',   title: /Atelierul Oak Fantasy/i },
+  { path: '/en/workshop',  title: /Oak Fantasy Workshop/i },
 ];
 
-const PAGES_WITH_FULL_SEO = ['/ro/despre', '/en/about'] as const;
+const PAGES_WITH_FULL_SEO = ['/ro/despre', '/en/about', '/ro/atelier', '/en/workshop'] as const;
 
 test.describe('SEO — title + description (all pages)', () => {
   for (const { path, title } of ALL_PAGES) {

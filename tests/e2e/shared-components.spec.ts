@@ -13,6 +13,44 @@ test.describe('Navbar tagline (Faza B fix)', () => {
   });
 });
 
+test.describe('Navbar Atelier link (2026-05-27 — /atelier route)', () => {
+  test('RO Navbar has "Atelier" route link pointing to /ro/atelier', async ({ page }) => {
+    await page.goto('/ro');
+    const link = page.locator('header a[href="/ro/atelier"]').first();
+    await expect(link).toBeVisible();
+    await expect(link).toContainText('Atelier');
+  });
+
+  test('EN Navbar has "Workshop" route link pointing to /en/workshop', async ({ page }) => {
+    await page.goto('/en');
+    const link = page.locator('header a[href="/en/workshop"]').first();
+    await expect(link).toBeVisible();
+    await expect(link).toContainText('Workshop');
+  });
+
+  test('Click Atelier on /ro navigates to /ro/atelier', async ({ page }) => {
+    await page.goto('/ro');
+    await page.locator('header a[href="/ro/atelier"]').first().click();
+    await page.waitForURL('**/ro/atelier');
+    expect(new URL(page.url()).pathname).toBe('/ro/atelier');
+  });
+
+  test('Atelier link has active state on /ro/atelier (oak-warm color)', async ({ page }) => {
+    await page.goto('/ro/atelier');
+    const link = page.locator('header a[href="/ro/atelier"]').first();
+    await expect(link).toBeVisible();
+    // Active color is var(--oak-warm) = #8B5E3C → rgb(139, 94, 60)
+    const color = await link.evaluate((el) => getComputedStyle(el).color);
+    expect(color).toBe('rgb(139, 94, 60)');
+  });
+
+  test('Navbar no longer has homepage #atelier anchor (D1 decision)', async ({ page }) => {
+    await page.goto('/ro');
+    const anchorLink = page.locator('header a[href="/ro#atelier"]');
+    await expect(anchorLink).toHaveCount(0);
+  });
+});
+
 test.describe('Footer microTagline (Faza B fix)', () => {
   test('RO footer shows "stejar · manual · România"', async ({ page }) => {
     await page.goto('/ro');
