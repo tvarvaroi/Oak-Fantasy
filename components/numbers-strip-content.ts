@@ -20,10 +20,10 @@ export const numbersStripContent: Record<Locale, NumbersStripContent> = {
     ariaLabel: 'Cifre',
     numberLocale: 'ro-RO',
     stats: [
-      { from: 0, to: 1200, prefix: '', suffix: '+',     label: 'pe listă',         caption: 'Persoane care aşteaptă' },
+      { from: 0, to: 1200, prefix: '', suffix: '+',     label: 'pe listă',         caption: 'Persoane care așteaptă' },
       { from: 0, to: 100,  prefix: '', suffix: '%',     label: 'stejar românesc',  caption: 'Material provenit local' },
       { from: 0, to: 8,    prefix: '', suffix: 'h',     label: 'per tocător',      caption: 'Ore de lucru manual' },
-      { from: 0, to: 20,   prefix: '', suffix: '+ ani', label: 'de meşteşug',      caption: 'Experienţă în atelier' },
+      { from: 0, to: 20,   prefix: '', suffix: '+ ani', label: 'de meșteșug',      caption: 'Experiență în atelier' },
     ],
   },
   en: {
