@@ -158,7 +158,7 @@ export default function CraftVideoTease({ language }: { language: 'ro' | 'en' })
     ro: {
       eyebrow: 'Procesul nostru',
       title: 'Vedere din atelier',
-      sub: 'Câteva minute din ziua unui tocător — de la buşteanul de stejar brut până la uleiul de finisare.',
+      sub: 'Câteva minute din ziua unui tocător — de la bușteanul de stejar brut până la uleiul de finisare.',
       coming: 'Video în curând',
     },
     en: {
