@@ -143,6 +143,7 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
       tagline: 'Făcut cu drag în România.',
       copy: `© ${new Date().getFullYear()} Oak Fantasy. Toate drepturile rezervate.`,
       brandDesc: 'Tocătoare din stejar românesc, lucrate manual în atelierul nostru din inima Transilvaniei.',
+      microTagline: 'stejar · manual · România',
     },
     en: {
       colBrand: 'Brand',
@@ -162,6 +163,7 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
       tagline: 'Made with love in Romania.',
       copy: `© ${new Date().getFullYear()} Oak Fantasy. All rights reserved.`,
       brandDesc: 'Romanian oak cutting boards, handcrafted in our workshop in the heart of Transylvania.',
+      microTagline: 'oak · handmade · Romania',
     },
   }[language];
 
@@ -199,13 +201,12 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
             </p>
 
             {/* logo */}
-            <div style={{ width: 52, height: 52 }}>
+            <div style={{ width: 100, height: 100, borderRadius: '50%', overflow: 'hidden' }}>
               <Image
-                src="/3D_Cutting_Board_Model_Design.svg"
+                src="/WhatsApp_Image_2026-05-14_at_20.59.06.jpeg"
                 alt="Oak Fantasy logo"
-                width={52}
-                height={52}
-                style={{ filter: 'brightness(0) saturate(100%) invert(62%) sepia(40%) saturate(400%) hue-rotate(340deg) brightness(95%)' }}
+                width={100}
+                height={100}
               />
             </div>
 
@@ -221,7 +222,7 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
                 className="font-caveat"
                 style={{ fontSize: '0.9rem', color: 'var(--copper)', marginTop: 2 }}
               >
-                stejar · manual · România
+                {nav.microTagline}
               </p>
             </div>
 
