@@ -19,6 +19,7 @@ export const DEFAULT_LOCALE: Locale = 'ro';
  */
 export const PATHNAMES = {
   despre: { ro: 'despre', en: 'about' },
+  atelier: { ro: 'atelier', en: 'workshop' },
 } as const;
 
 export type RouteKey = keyof typeof PATHNAMES;
