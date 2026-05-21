@@ -15,20 +15,23 @@ if (typeof window !== 'undefined') {
 
 type NavLink =
   | { label: string; type: 'anchor'; anchor: string }
-  | { label: string; type: 'route'; routeKey: 'despre' };
+  | { label: string; type: 'route'; routeKey: 'despre' | 'atelier' };
 
+// 2026-05-27: replaced the homepage #atelier anchor with a route link to
+// /atelier (Q2 decision D1). Homepage WorkshopSection still exists but is
+// no longer reachable from the Navbar — only via natural scroll.
 const NAV_LINKS_RO: NavLink[] = [
   { label: 'Povestea noastră', type: 'anchor', anchor: '#poveste' },
-  { label: 'Atelier', type: 'anchor', anchor: '#atelier' },
   { label: 'Despre', type: 'route', routeKey: 'despre' },
+  { label: 'Atelier', type: 'route', routeKey: 'atelier' },
   { label: 'Tocătoare', type: 'anchor', anchor: '#tocatoare' },
   { label: 'Îngrijire', type: 'anchor', anchor: '#ingrijire' },
 ];
 
 const NAV_LINKS_EN: NavLink[] = [
   { label: 'Our Story', type: 'anchor', anchor: '#poveste' },
-  { label: 'Workshop', type: 'anchor', anchor: '#atelier' },
   { label: 'About', type: 'route', routeKey: 'despre' },
+  { label: 'Workshop', type: 'route', routeKey: 'atelier' },
   { label: 'Boards', type: 'anchor', anchor: '#tocatoare' },
   { label: 'Care', type: 'anchor', anchor: '#ingrijire' },
 ];
@@ -50,7 +53,6 @@ export default function Navbar({ language, onToggleLanguage }: NavbarProps) {
   const links = language === 'ro' ? NAV_LINKS_RO : NAV_LINKS_EN;
   const homePath = `/${language}`;
   const onHomepage = pathname === homePath || pathname === '/';
-  const desprePath = localizedPath('despre', language);
   const waitlistHref = `${homePath}#waitlist`;
 
   useEffect(() => {
@@ -166,7 +168,7 @@ export default function Navbar({ language, onToggleLanguage }: NavbarProps) {
           {links.map((link) => {
             if (link.type === 'route') {
               const href = localizedPath(link.routeKey, language);
-              const isActive = pathname === desprePath;
+              const isActive = pathname === href;
               return (
                 <Link
                   key={link.label}
@@ -273,7 +275,7 @@ export default function Navbar({ language, onToggleLanguage }: NavbarProps) {
           {links.map((link) => {
             if (link.type === 'route') {
               const href = localizedPath(link.routeKey, language);
-              const isActive = pathname === desprePath;
+              const isActive = pathname === href;
               return (
                 <Link
                   key={link.label}
