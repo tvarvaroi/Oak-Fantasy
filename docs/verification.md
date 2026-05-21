@@ -21,13 +21,14 @@ Lighthouse runs separately (slower, 1–2 min per preset).
 
 | Script | When | Time |
 |---|---|---|
-| `npm run verify` | Before every commit, in every task | ~3min |
+| `npm run verify` | Before every commit, in every task | ~4–5min |
 | `npm run typecheck` | Quick TS sanity check during refactor | <5s |
 | `npm run lint` | ESLint only, while iterating | <5s |
 | `npm run check:i18n` | Catch i18n bugs fast (5s, zero deps) | <5s |
-| `npm run test:e2e` | Run E2E + visual regression headless | 60–90s |
+| `npm run test:e2e` | Non-visual E2E tests, 3 parallel workers | ~1.5min |
+| `npm run test:e2e:visual` | Visual regression alone, single worker (stability) | ~2.5min |
 | `npm run test:e2e:headed` | Debug a failing E2E test, watch the browser | 1–2min |
-| `npm run test:e2e:update` | After intentional visual changes — refresh screenshot baselines | 60–90s |
+| `npm run test:e2e:update` | Refresh visual regression baselines after intentional changes | ~2.5min |
 | `npm run lighthouse` | Desktop perf audit, before major deploys | 1–2min |
 | `npm run lighthouse:mobile` | Mobile perf audit, weekly | 1–2min |
 

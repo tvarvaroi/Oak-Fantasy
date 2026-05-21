@@ -13,8 +13,23 @@ test.describe('Visual regression', () => {
   for (const { path, name } of PAGES) {
     test(`${name} screenshot matches baseline`, async ({ page }) => {
       await page.goto(path);
-      // Wait for fonts, SVG draws, GSAP ScrollTrigger animations to settle.
       await page.waitForLoadState('networkidle');
+      // Atelier has 10 Reveal sections — fullPage screenshot scrolls during
+      // capture, triggering whileInView mid-stitch. Pre-scroll once with
+      // `once: true` reveals so they're all settled before capture. Homepage
+      // uses GSAP ScrollTrigger which re-fires on every scroll position,
+      // so we leave it alone (its sections animate but stabilize naturally).
+      if (name.startsWith('atelier-')) {
+        await page.evaluate(async () => {
+          const step = 600;
+          const h = document.body.scrollHeight;
+          for (let y = 0; y <= h; y += step) {
+            window.scrollTo(0, y);
+            await new Promise((r) => setTimeout(r, 80));
+          }
+          window.scrollTo(0, 0);
+        });
+      }
       await page.waitForTimeout(1500);
       await expect(page).toHaveScreenshot(`${name}.png`, {
         fullPage: true,
