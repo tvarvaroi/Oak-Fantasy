@@ -30,6 +30,14 @@
 **Recomandare (necesită brainstorming + aprobare, NU implementat acum):** lazy init Supabase (instanțiere la prima folosire, nu la import) ca o variabilă lipsă să degradeze grațios, nu să crape prerender-ul. Vezi `decisions.md` dacă se adoptă.
 **Fișiere:** `lib/supabase.ts`, consumat de `components/EmailForm.tsx`.
 
+## 2026-05-23 — WorkshopSection SSR hydration mismatch (`transform:translateY(4%)` vs `null`)
+
+**Simptom:** Pe `/ro` și `/en` în dev, console.warn: `Warning: Prop \`style\` did not match. Server: "transform:translateY(4%)" Client: "null" at WorkshopSection`. Doar dev mode (Next.js React warnings).
+**Cauză reală:** `WorkshopSection.tsx` folosește framer-motion `useScroll()` + `useTransform()` care produc valori diferite la SSR (server n-are scroll-context, returnează valoarea inițială) vs client (calculează din scroll real). Pe primul render client după hydration, `transform: null` (înainte de mount) ≠ `transform: translateY(4%)` (server SSR snapshot).
+**Fix recomandat (NU implementat în Faza C — out of scope):** wrap `useScroll` într-un `useEffect` care setează un state `isMounted`, render `motion.div` doar după mount, sau folosește `useMotionValueEvent` cu `whileInView` în loc de scroll-driven `useTransform`. Pattern documentat în framer-motion docs ca "ssr-safe useScroll".
+**Workaround test:** `tests/e2e/homepage.spec.ts` filtrează `consoleErrors` care încep cu `Warning:` sau conțin `Hydration` — astea sunt dev-only, nu apar în prod build. Fix-ul real al hydration mismatch e un task viitor.
+**Fișiere:** `components/WorkshopSection.tsx`, `tests/e2e/homepage.spec.ts` (filter).
+
 ## 2026-05-18 — "Cannot find module './vendor-chunks/framer-motion.js'"
 
 **Simptom:** Server Error la `app/[locale]/page.js` (homepage): `Cannot find module './vendor-chunks/framer-motion.js'` în dev server.
