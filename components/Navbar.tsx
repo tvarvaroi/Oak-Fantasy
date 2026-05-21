@@ -156,7 +156,7 @@ export default function Navbar({ language, onToggleLanguage }: NavbarProps) {
                 lineHeight: 1,
               }}
             >
-              stejar · manual
+              {language === 'ro' ? 'stejar · manual' : 'oak · handmade'}
             </span>
           </div>
         </Link>
