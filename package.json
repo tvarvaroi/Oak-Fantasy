@@ -8,8 +8,13 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:update": "playwright test --update-snapshots",
+    "check:i18n": "node scripts/check-i18n.mjs",
     "lighthouse": "lhci autorun --config=lighthouserc.desktop.json",
-    "lighthouse:mobile": "lhci autorun --config=lighthouserc.mobile.json"
+    "lighthouse:mobile": "lhci autorun --config=lighthouserc.mobile.json",
+    "verify": "npm run typecheck && npm run lint && npm run check:i18n && npm run test:e2e"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
