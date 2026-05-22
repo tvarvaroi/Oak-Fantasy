@@ -4,8 +4,10 @@
   is_admin(): SECURITY DEFINER so it bypasses RLS on profiles -> no infinite
   recursion when used inside the profiles policy itself (known Supabase gotcha).
 
-  guard_profile_role(): blocks non-admins from changing their own role, so the
-  "users update own profile" policy can stay simple (id = auth.uid()).
+  guard_profile_role(): blocks an AUTHENTICATED non-admin from changing their own
+  role, so the "users update own profile" policy can stay simple (id = auth.uid()).
+  Trusted server contexts (SQL editor / service role / server actions) have a NULL
+  auth.uid() and are exempt — otherwise the very first admin could never be set.
 
   Server-side writes (guest order creation, stock movements at fulfillment) use
   the service-role key inside 'use server' actions / route handlers, which
@@ -31,7 +33,12 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 BEGIN
-  IF NEW.role IS DISTINCT FROM OLD.role AND NOT public.is_admin() THEN
+  -- auth.uid() is NULL in trusted server contexts (Supabase SQL editor, service
+  -- role, server actions). Allow those so the FIRST admin can be set manually.
+  -- Only block an authenticated, non-admin user from escalating their own role.
+  IF NEW.role IS DISTINCT FROM OLD.role
+     AND auth.uid() IS NOT NULL
+     AND NOT public.is_admin() THEN
     RAISE EXCEPTION 'Only admins can change a profile role';
   END IF;
   RETURN NEW;
