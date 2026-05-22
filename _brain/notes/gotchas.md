@@ -45,3 +45,33 @@
 **Fix:** oprește dev server → șterge `.next/` (cache regenerabil; PowerShell `Remove-Item -Recurse -Force .next`, NU `rm -rf` — e în deny-list) → repornește `npm run dev`.
 **Prevenție (proces):** NU rula `npm run build` cât rulează `npm run dev`. În timpul task-urilor verific cu `npm run typecheck`. `npm run build` (Iron Law) doar coordonat, cu dev oprit. Build-urile prod cer repornirea dev server-ului.
 **Fișiere:** niciunul (artefact de build).
+
+## 2026-05-22 — Audit "rename tabelă": numără referințe reale, nu potriviri de string
+
+**Simptom:** `grep "waitlist"` pe `.ts/.tsx` → 33 potriviri în ~12 fișiere. Pare risc mare să redenumești tabela `waitlist`.
+**Cauză reală:** doar **1** e o referință la *tabela DB* (`lib/supabase.ts` `.from('waitlist')`). Restul sunt complet neafectate de un rename de tabelă: anchor-ul homepage `#waitlist`, componenta `WaitlistSection`, valoarea coloanei `source: 'waitlist'`, numele funcției `addToWaitlist`, tipul `WaitlistEntry`, copy UI "Waitlist".
+**Fix:** rename direct (1 linie de schimbat), NU VIEW shim de compatibilitate (ar fi over-engineering pentru un singur `.from()`).
+**Lecție:** la decizia de rename, count-ul relevant = referințele reale la obiectul DB (`.from('X')` / FK / policy), nu `grep | wc -l` brut. Vezi [[decisions]] D3.
+**Fișiere:** `lib/supabase.ts` (singura referință tabelă).
+
+## 2026-05-22 — RLS guard trigger: first-admin lockout (auth.uid() NULL în SQL editor)
+
+**Simptom:** trigger-ul `guard_profile_role` ar arunca excepție chiar la `UPDATE profiles SET role='admin'` rulat de fondator în Supabase SQL editor (pasul de creare a primului admin).
+**Cauză reală:** în SQL editor / service role / server actions, `auth.uid()` întoarce **NULL** → `is_admin()` = false → `NOT is_admin()` = true → `RAISE EXCEPTION`. Chicken-egg clasic: regula care interzice escaladarea de rol blochează și setarea manuală a PRIMULUI admin (nimeni nu e încă admin).
+**Fix:** condiție suplimentară `auth.uid() IS NOT NULL` în trigger. Contextele server de încredere (uid NULL) sunt exceptate; doar un user **autentificat** non-admin e blocat să-și escaladeze rolul. Adminii logați (uid not null, is_admin true) pot schimba roluri.
+**Detectat la:** review static manual (Postgres local indisponibil pentru `psql --check`).
+**Fișiere:** `supabase/migrations/20260522090010_rls_policies.sql`.
+
+## 2026-05-22 — `profiles.email NOT NULL` presupune auth cu email
+
+**Context:** `handle_new_user` inserează `NEW.email` în `profiles` (coloană `NOT NULL`).
+**Risc latent:** dacă se adaugă vreodată un provider de auth fără email (ex. phone OTP), INSERT-ul din trigger pică → întreg signup-ul eșuează (triggerul e AFTER INSERT pe `auth.users`).
+**Status:** OK pentru providerii aprobați (Email + Google OAuth — ambii furnizează email). De revizitat (email nullable + COALESCE) DOAR dacă se adaugă phone auth.
+**Fișiere:** `supabase/migrations/20260522090001_create_profiles.sql`.
+
+## 2026-05-22 — `git status` "up to date with origin/main" e stale fără fetch
+
+**Simptom:** după ce remote-ul GitHub a fost resetat extern (incident reset #4), `git status` local raporta totuși "Your branch is up to date with 'origin/main'".
+**Cauză reală:** `origin/main` e un ref-cache LOCAL, actualizat doar la `fetch`/`push`. Fără fetch, reflectă ultimul push reușit (015ea88), nu starea reală a remote-ului.
+**Lecție:** într-un diagnostic de recovery, NU folosi "up to date" ca dovadă că remote-ul e intact. Commit-urile locale sunt în siguranță față de un simplu `fetch` (fetch nu șterge obiecte locale). Pericolul real care poate suprascrie local-ul = `git pull` sau `git reset --hard origin/main`. Recovery garantat din: git objects locale + `git bundle --all` + copie pe disk.
+**Fișiere:** niciunul (proces git).
