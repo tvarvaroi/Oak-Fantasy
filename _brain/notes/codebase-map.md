@@ -201,3 +201,74 @@ components/atelier/
 **Status apply:**
 - Staging (`juuozsjvuikdtjqhdylw`): 13 migrări aplicate clean ✓ · seed 10 produse ✓ · 9 tabele confirmate ✓ · produse `draft` (NU active încă)
 - Production: NU aplicat încă; runbook ready pentru replay.
+
+## /tocatoare page (Etapa 2.1.5) [2026-05-23]
+
+```
+app/[locale]/tocatoare/
+  page.tsx                       Server Component, ISR=60, generateMetadata
+                                 (canonical + alternates.languages + OG + twitter),
+                                 JSON-LD BreadcrumbList + ItemList of products (nested
+                                 Product with offers — rich-result candidate),
+                                 fetchActiveProducts() + notFound on invalid locale.
+components/tocatoare/
+  content.ts                     Record<Locale, TocatoareContent> (meta, hero, filters,
+                                 sort, card, tierDisplay, emptyState, bottomCta).
+                                 formatPriceRon(bani, locale) cu RO period / EN comma.
+                                 formatDimensions(jsonb, locale) pentru rect + round.
+  tocatoare.module.css           Port v1-editorial.html + shared.css. Hero ::after
+                                 treeline.png (aspect-ratio 5760/1911, opacity .62).
+                                 Sticky filterbar (top: 70px, blur). 3-col grid (2 tablet,
+                                 1 mobile). paper-aged cards cu hover lift -6px. Medallion
+                                 cu radial-gradient + SVG noise + photoBadge. Caveat tier
+                                 chip rotated -1deg copper. Dims ::before mini-icon.
+                                 Sort dropdown menu fade-up. Empty state dashed border.
+                                 Bottom CTA paper-aged padding 120px.
+  TocatoareHero.tsx              Client. Eyebrow + h1 (titleStart + em titleEm) + sub
+                                 paragraph în col 1, Reveal-wrapped hero-note pill
+                                 paper-aged solid în col 2 (NU glass — D3).
+  TocatoareCatalog.tsx           Client. State: filter ('all'|tier), sort (default|
+                                 price-asc|price-desc), sortOpen. Counts memoized.
+                                 Outside-click listener închide sort. Visible products
+                                 derivate cu filter+sort. Empty state branched.
+  ProductCard.tsx                Client. data-product, data-tier, data-price, data-slug
+                                 pentru E2E hooks. Medallion + tier chip + dims + name
+                                 + desc + price. Dual CTA Link both → /{locale}?
+                                 interested_product=slug#waitlist (D2 parked param).
+  TocatoareBottomCTA.tsx         Client. Reveal-wrapped. Mailto button to atelier@oakfantasy.ro.
+  TocatoareContent.tsx           Client wrapper. Navbar (toggleLanguage via router.push
+                                 localizedPath('tocatoare', next)) + Hero + Catalog +
+                                 BottomCTA + Footer.
+```
+
+**Reuse din /despre + /atelier:** `components/about/Reveal.tsx` (framer-motion whileInView wrapper), `components/Navbar.tsx` (route key extended `'tocatoare'`, D5), `components/Footer.tsx` (Vecteezy attribution added globally, D4).
+
+**Asset:** `public/treeline.png` (5760×1911 PNG, **16.7MB**). Sursă: Vecteezy free PNG (file 45647623). License requires footer attribution. **TODO founder-side:** compress to ~1-2MB via TinyPNG/Squoosh înainte de prod ship.
+
+**URL routes:**
+- RO: `/ro/tocatoare`
+- EN: `/en/cutting-boards` (PATHNAMES `tocatoare: { ro: 'tocatoare', en: 'cutting-boards' }`)
+- Cross-redirects: `/en/tocatoare → 308 → /en/cutting-boards`, `/ro/cutting-boards → 308 → /ro/tocatoare`
+
+**Data flow:**
+- Server: `fetchActiveProducts()` din `lib/db/products.ts` → `CatalogProduct[]` (Database['public']['Tables']['products']['Row'])
+- Filter `status='active'`, order `sort_order ASC`
+- Empty state grațios on missing env / fetch error
+- ISR `revalidate=60` reflectă activările Studio fără redeploy
+
+**Tier display labels (bilingual):**
+- entry → "Pentru început" / "Starters"
+- core → "Esențiale" / "Essentials"
+- premium → "Deosebite" / "Standouts" (evită "premium" loanword brand voice)
+- hero → "Moștenire" / "Heirloom"
+
+**Tests:**
+- `tests/e2e/tocatoare.spec.ts` (13 tests): 200 + title; redirects; RO diacritics / EN no-RO-chars; hero + filter pills (5) + sort dropdown + bottom CTA mailto; JSON-LD (BreadcrumbList + ItemList); branched empty-state vs cards; CTA href format (skip dacă empty).
+- `tests/e2e/seo.spec.ts`: ALL_PAGES + PAGES_WITH_FULL_SEO extinse; JSON-LD split AboutPage (despre+atelier) vs ItemList (tocatoare).
+- `tests/e2e/shared-components.spec.ts`: "Navbar Tocătoare link" describe (4 tests + dead-anchor 0-count).
+- `tests/e2e/visual-regression.spec.ts`: NU adăugat /tocatoare încă (D5 — defer post-activation). 18 baselines existente regenerate datorită Navbar+Footer shared changes.
+
+**Status:**
+- Code + tests committed (post founder-review pe 18 baselines regenerate).
+- Live render local: empty state (prod nu are tabela products).
+- Founder activation pe staging → eu regen baselines /tocatoare → review → commit baselines + adăugare la PAGES.

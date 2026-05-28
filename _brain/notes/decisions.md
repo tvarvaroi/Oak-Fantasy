@@ -194,3 +194,45 @@
 **Decizie:** Fișier NOU `lib/supabase-server.ts` cu `getServerSupabase()` (cookie-bound) + `getServiceSupabase()` (service-role, bypasses RLS). `lib/supabase.ts` rămâne neschimbat (browser anon pentru `EmailForm`).
 **Motiv:** Importul `next/headers` într-un fișier ulterior pulled de Client Component = build fail clar. Split = enforce server-only via import constraints. Pattern reutilizabil pentru toate fișierele DB viitoare.
 **Alternative respinse:** Rewrite `lib/supabase.ts` complet (spargem `EmailForm`).
+
+## 2026-05-23 — Task 2.1.5 D1: Implement v1-editorial faithful, NU hybrid
+
+**Context:** Claude Design oferea 3 variante (A Editorial / B Shop / C Tier-Sectioned). Fondatorul a ales A. Chat-ul de design recomanda hybrid C+A (tier sections + paper cards).
+**Decizie:** Implementare A exact ca în `tocatoare/v1-editorial.html` — single 3-col grid, paper-aged cards, Caveat tier chips, sticky filter pills, sort dropdown, dual CTA. **NU hybrid**, NU "îmbunătățiri".
+**Motiv:** Varianta A a fost aleasă explicit de fondator. Adaptările "îmbunătățiri" diluează intenția design-erului și creează drift față de iterația din chat. Faithful = predictible + reversibil dacă fondatorul vrea alt aspect ulterior.
+**Alternative respinse:** C+A hybrid (over-engineering pentru un MVP catalog).
+
+## 2026-05-23 — Task 2.1.5 D2: Dual CTA → `/[locale]?interested_product=slug#waitlist`
+
+**Context:** Design are dual CTA pe card („Vezi detalii" link + quick-add cart icon button). Cart-ul vine la Etapa 3 (Stripe). Product detail page nu există încă.
+**Decizie:** Ambele CTA rutează la `/{locale}?interested_product=${slug}#waitlist`. Visual distinction păstrat (text link + cart icon round button), behavioral identic.
+**Motiv:** Vizual păstrăm intent-ul design-erului (catalog cu „cumpără / explorează"). Behavioral, până la Etapa 3, cea mai utilă acțiune e captura email cu interes per-produs; query param `interested_product` e parked acum, citit la Etapa 2.6 pentru `email_subscribers.interested_product_ids[]`.
+**Alternative respinse:** Single CTA (sparge design-ul), cart funcțional acum (out-of-scope), product detail placeholder 404/coming-soon (worse UX).
+
+## 2026-05-23 — Task 2.1.5 D3: Hero-note paper-aged solid, NU glassy
+
+**Context:** HANDOFF.md descrie glassy caption pattern (backdrop-blur + cream-warm-translucent + copper hairlines). Inițial l-am aplicat pe `.hero-note` din /tocatoare.
+**Decizie:** Revert la `paper-aged` solid + copper 1px border — exact ca în `tocatoare/v1-editorial.html`.
+**Motiv:** Re-citire atentă: glassy pattern e folosit pe homepage + /despre subhead (text mic peste treeline). Pe /tocatoare hero-note e un block separat în col 2 — design-erul a ales solid paper, NU glass. Per-page intent matters.
+**Alternative respinse:** Glass pe orice text peste treeline (uniformizare greșită — design diferențiază).
+
+## 2026-05-23 — Task 2.1.5 D4: Vecteezy attribution în Footer GLOBAL
+
+**Context:** `public/treeline.png` = free PNG Vecteezy; license cere atribuire vizibilă clickable.
+**Decizie:** Adăugat în `components/Footer.tsx` (apare pe TOATE paginile). Link `https://www.vecteezy.com/free-png/tree` + text "Tree PNGs by Vecteezy", styled mic sub copyright.
+**Motiv:** Footer global = pattern legal corect (atribuire prezentă oriunde se folosește asset-ul). Mic, nu intrusive, nu hidden.
+**Alternative respinse:** Atribuire doar pe paginile cu treeline (ergonomic worse, same legal status), remove asset (pierdem identitatea aprobată).
+
+## 2026-05-23 — Task 2.1.5 D5: Visual baselines `/tocatoare` DEFER post-activation
+
+**Context:** Produsele sunt `status='draft'` pe staging până fondatorul le activează. Pe prod (.env.local-ul de dev), tabela `products` nu există încă. `fetchActiveProducts()` returnează `[]` în ambele cazuri → empty state.
+**Decizie:** NU adaug `/tocatoare` la `visual-regression.spec.ts` PAGES acum. Baselines se generează DUPĂ ce fondatorul: (1) pointuiește `.env.local` la staging, (2) activează cele 10 produse, (3) confirmă render local, (4) eu generez baselines + fondatorul aprobă + commit.
+**Motiv:** Baselines pe empty-state acum + regen post-activation = 2 churn-uri de baselines + commits inutile. Defer-ul aliniază momentul baseline generation cu starea reală pe care utilizatorul o va vedea live.
+**Alternative respinse:** Baselines pe empty-state acum (regen forțat ulterior), skip visual regression total pe /tocatoare (pierdem gate).
+
+## 2026-05-23 — Task 2.1.5 D6: Regen 18 baselines existente la schimbări Navbar/Footer
+
+**Context:** Adăugarea route link `/tocatoare` în Navbar + Vecteezy attribution în Footer = schimbări shared cross-page; baselines vechi pentru home/despre/atelier × 3 viewports nu mai pot match (legitime, nu regresii).
+**Decizie:** Regen automat al celor 18 baselines la commit-ul Task 2.1.5; founder review BEFORE push.
+**Motiv:** Schimbările sunt legitime (D5 + atribuire legală obligatorie), NU regresii. Trebuie regen. Protocol: regen → review founder → push (same ca /atelier).
+**Alternative respinse:** Skip visual regression pentru commit-ul ăsta (sparge Iron Law), commit baselines cu push fără review (risc baselines greșite în repo, hard de revertit), revert Navbar/Footer (sparge D5 + legal).
