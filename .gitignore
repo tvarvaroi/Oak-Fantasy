@@ -55,3 +55,4 @@ _brain/inbox/*
 # Supabase CLI local state (project link metadata, pooler URLs — may include secrets)
 supabase/.temp/
 supabase/.branches/
+.claude/agent-memory/
