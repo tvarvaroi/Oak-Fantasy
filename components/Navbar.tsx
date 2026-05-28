@@ -15,16 +15,17 @@ if (typeof window !== 'undefined') {
 
 type NavLink =
   | { label: string; type: 'anchor'; anchor: string }
-  | { label: string; type: 'route'; routeKey: 'despre' | 'atelier' };
+  | { label: string; type: 'route'; routeKey: 'despre' | 'atelier' | 'tocatoare' };
 
 // 2026-05-27: replaced the homepage #atelier anchor with a route link to
-// /atelier (Q2 decision D1). Homepage WorkshopSection still exists but is
-// no longer reachable from the Navbar — only via natural scroll.
+// /atelier (D1). 2026-05-23: replaced the dead #tocatoare anchor with a
+// route link to /tocatoare (D5 — same pattern). Homepage sections still
+// reachable via natural scroll only.
 const NAV_LINKS_RO: NavLink[] = [
   { label: 'Povestea noastră', type: 'anchor', anchor: '#poveste' },
   { label: 'Despre', type: 'route', routeKey: 'despre' },
   { label: 'Atelier', type: 'route', routeKey: 'atelier' },
-  { label: 'Tocătoare', type: 'anchor', anchor: '#tocatoare' },
+  { label: 'Tocătoare', type: 'route', routeKey: 'tocatoare' },
   { label: 'Îngrijire', type: 'anchor', anchor: '#ingrijire' },
 ];
 
@@ -32,7 +33,7 @@ const NAV_LINKS_EN: NavLink[] = [
   { label: 'Our Story', type: 'anchor', anchor: '#poveste' },
   { label: 'About', type: 'route', routeKey: 'despre' },
   { label: 'Workshop', type: 'route', routeKey: 'atelier' },
-  { label: 'Boards', type: 'anchor', anchor: '#tocatoare' },
+  { label: 'Cutting Boards', type: 'route', routeKey: 'tocatoare' },
   { label: 'Care', type: 'anchor', anchor: '#ingrijire' },
 ];
 
