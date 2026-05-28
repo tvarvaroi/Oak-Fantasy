@@ -357,7 +357,7 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
           </p>
 
           {/* Vecteezy attribution — REQUIRED by their free-PNG license for the
-              treeline.png hero backdrop used on /tocatoare (and future pages). */}
+              treeline.webp hero backdrop used on /tocatoare (and future pages). */}
           <p
             className="font-lora"
             style={{

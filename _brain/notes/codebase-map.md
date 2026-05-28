@@ -217,7 +217,7 @@ components/tocatoare/
                                  formatPriceRon(bani, locale) cu RO period / EN comma.
                                  formatDimensions(jsonb, locale) pentru rect + round.
   tocatoare.module.css           Port v1-editorial.html + shared.css. Hero ::after
-                                 treeline.png (aspect-ratio 5760/1911, opacity .62).
+                                 treeline.webp (aspect-ratio 5760/1911, opacity .62).
                                  Sticky filterbar (top: 70px, blur). 3-col grid (2 tablet,
                                  1 mobile). paper-aged cards cu hover lift -6px. Medallion
                                  cu radial-gradient + SVG noise + photoBadge. Caveat tier
@@ -243,7 +243,7 @@ components/tocatoare/
 
 **Reuse din /despre + /atelier:** `components/about/Reveal.tsx` (framer-motion whileInView wrapper), `components/Navbar.tsx` (route key extended `'tocatoare'`, D5), `components/Footer.tsx` (Vecteezy attribution added globally, D4).
 
-**Asset:** `public/treeline.png` (5760×1911 PNG, **16.7MB**). Sursă: Vecteezy free PNG (file 45647623). License requires footer attribution. **TODO founder-side:** compress to ~1-2MB via TinyPNG/Squoosh înainte de prod ship.
+**Asset:** `public/treeline.webp` (1920×638 WebP, **243KB** — convertit via ffmpeg `libwebp` din PNG-ul original Vecteezy 5760×1911 16.7MB; q75 lossy cu alpha). Sursă: Vecteezy free PNG (file 45647623). License requires footer attribution. **Decizie istorică:** PNG-ul original era 98% prea mare pentru un asset decorativ background; PNG-ul NU a ajuns niciodată pe branch tips push-uite (history rewrite via `reset --mixed` pre-push).
 
 **URL routes:**
 - RO: `/ro/tocatoare`

@@ -218,7 +218,7 @@
 
 ## 2026-05-23 — Task 2.1.5 D4: Vecteezy attribution în Footer GLOBAL
 
-**Context:** `public/treeline.png` = free PNG Vecteezy; license cere atribuire vizibilă clickable.
+**Context:** `public/treeline.webp` (convertit din Vecteezy free PNG) — license cere atribuire vizibilă clickable.
 **Decizie:** Adăugat în `components/Footer.tsx` (apare pe TOATE paginile). Link `https://www.vecteezy.com/free-png/tree` + text "Tree PNGs by Vecteezy", styled mic sub copyright.
 **Motiv:** Footer global = pattern legal corect (atribuire prezentă oriunde se folosește asset-ul). Mic, nu intrusive, nu hidden.
 **Alternative respinse:** Atribuire doar pe paginile cu treeline (ergonomic worse, same legal status), remove asset (pierdem identitatea aprobată).
@@ -236,3 +236,11 @@
 **Decizie:** Regen automat al celor 18 baselines la commit-ul Task 2.1.5; founder review BEFORE push.
 **Motiv:** Schimbările sunt legitime (D5 + atribuire legală obligatorie), NU regresii. Trebuie regen. Protocol: regen → review founder → push (same ca /atelier).
 **Alternative respinse:** Skip visual regression pentru commit-ul ăsta (sparge Iron Law), commit baselines cu push fără review (risc baselines greșite în repo, hard de revertit), revert Navbar/Footer (sparge D5 + legal).
+
+## 2026-05-23 — Task 2.1.5 D7: treeline.png 16.7MB → treeline.webp 243KB pre-push
+
+**Context:** PNG-ul Vecteezy original era 5760×1911 / 16.7MB. Folosit ca CSS `background-image` pe `.hero::after` (pseudo-element decorativ), opacity .62, scalat `100% 100%` în box cu `aspect-ratio: 5760/1911`. Pe widest desktop = afișat la ~1920px = **33% din rezoluția nativă** = risipă masivă. Asset-ul a fost committat local, dar **nu a apucat push-ul** când founder-ul a semnalat problema.
+**Decizie:** Convertit cu ffmpeg `libwebp` la 1920×638, quality 75, lossy cu alpha → **243KB (98% reducere)**. CSS background swap `.png` → `.webp`. **History rewrite** via `git reset --mixed cb3aab8` + re-commit 6 grupuri atomice cu asset-ul nou — PNG-ul de 16MB NU ajunge niciodată pe branch tips push-uite, deci git push nu transmite blob-ul (reachability-based).
+**Motiv:** Git history e permanent — un blob committat și push-uit rămâne în istorie chiar dacă fișierul e șters ulterior. 16MB inflate `git clone` time + CI bandwidth perpetuu. WebP la 243KB e sub orice budget rezonabil (~1% din PNG; tipic LCP impact <100ms pe 4G). Photo backdrop păstrat (pe care fondatorul l-a ales explicit peste SVG/gradient în iterația de design).
+**Lecție:** Orice binary asset >500KB trebuie evaluat ÎNAINTE de commit. NU „will optimize later" — git history permanent. ffmpeg `libwebp` e disponibil în mediu (8.0.1) — folosește pentru PNG→WebP. Pentru asset peste 1MB, conversia + size check înainte de `git add`.
+**Alternative respinse:** OPȚIUNEA B (gradient/SVG pur) — fondatorul a respins SVG explicit în iterația design după 7+ încercări; pierdem fotorealism agreat. OPȚIUNEA C (SVG hand-drawn) — același motiv. Keep PNG (commit + later compress) — git history permanent. `git filter-repo` / BFG cleanup post-push — mai mult overhead și nu salvează network bandwidth-ul push-ului.
