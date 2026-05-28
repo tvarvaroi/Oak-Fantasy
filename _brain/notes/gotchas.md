@@ -75,3 +75,13 @@
 **Cauză reală:** `origin/main` e un ref-cache LOCAL, actualizat doar la `fetch`/`push`. Fără fetch, reflectă ultimul push reușit (015ea88), nu starea reală a remote-ului.
 **Lecție:** într-un diagnostic de recovery, NU folosi "up to date" ca dovadă că remote-ul e intact. Commit-urile locale sunt în siguranță față de un simplu `fetch` (fetch nu șterge obiecte locale). Pericolul real care poate suprascrie local-ul = `git pull` sau `git reset --hard origin/main`. Recovery garantat din: git objects locale + `git bundle --all` + copie pe disk.
 **Fișiere:** niciunul (proces git).
+
+## 2026-05-23 — `supabase login` refuză non-TTY (bash agentic = no browser flow)
+
+**Simptom:** `npx supabase login` din bash-ul agentului → `Cannot use automatic login flow inside non-TTY environments. Please provide --token flag or set the SUPABASE_ACCESS_TOKEN environment variable.` exit 1.
+**Cauză reală:** CLI-ul deschide browser-ul OS-ului + pornește listener local pentru callback OAuth. Fără TTY n-are unde să afișeze progress/spinner sau să raporteze interactiv. Refuză să pornească flow-ul ca să nu hanguie tăcut.
+**Fix (cel folosit):** Fondatorul rulează `npx supabase login` ÎN TERMINALUL LUI (cu TTY) o singură dată. Sesiunea se salvează în `~/.supabase/` (per-user). Bash-ul agentului (același user OS) o **moștenește** automat. Subsequent commands non-interactive (`db push`, `gen types`, `migration list`, etc.) merg curat din agent.
+**Fix alternativ (când agent rulează headless cu env var):** Generează Personal Access Token din Supabase Dashboard → Account → Access Tokens. Setează `SUPABASE_ACCESS_TOKEN=xxx` în mediul agentului. CLI-ul îl folosește direct, fără browser.
+**Aplicabil și la:** `supabase link --project-ref X` cere DB password interactiv → fondatorul rulează în terminalul lui (sau pasează `--password X` / setează `SUPABASE_DB_PASSWORD=X`). După link, password-ul se cache-uiește local; subsequent `db push` din agent merge.
+**Workflow stabilit:** login + link = founder terminal (one-time). Tot restul DB ops = agent bash.
+**Fișiere:** niciunul (proces CLI).

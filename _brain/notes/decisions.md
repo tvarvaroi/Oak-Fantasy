@@ -131,3 +131,66 @@
 **Decizie:** Păstrare CU VIRGULĂ. NU em-dash.
 **Motiv:** Founder a decis în chat-ul strategic. Virgula respiră natural în structura paralelă (sawdust on X, oil on Y); em-dash ar fi accentuat ruptura. Voice editorial Apartamento-style, nu corporate punctuație.
 **Alternative respinse:** Em-dash (`Sawdust on the floor — oil on our fingers.`), punct intermediar (rupe ritmul).
+
+## 2026-05-23 — Etapa 2.1 D1: Supabase SQL migrations (NU Drizzle ORM)
+
+**Context:** Tooling pentru schema management.
+**Decizie:** Versioned raw SQL migrations în `supabase/migrations/` aplicate cu `npx supabase db push`. NU Drizzle.
+**Motiv:** Existing waitlist e raw SQL (consistency). RLS policies + PL/pgSQL functions (atomic locks, sequences) sunt SQL-native; Drizzle nu le gestionează — ai scrie raw SQL oricum pentru ele. Zero new heavy dep / peer-deps risk (R3F deja fragilă). Type-safety prin `supabase gen types`. `.claude/rules/backend.md` rescris să reflecte stack-ul real (în loc de regula generic "Drizzle only" care contrazicea proiectul).
+**Alternative respinse:** Drizzle (overhead, still needs raw SQL for RLS/functions).
+
+## 2026-05-23 — Etapa 2.1 D2: enums = text + CHECK (NU native ENUM)
+
+**Context:** Reprezentare enums (role, status, payment_method, etc.).
+**Decizie:** `text NOT NULL CHECK (col IN ('a','b',...))` peste tot.
+**Motiv:** Consistent cu waitlist existent. Native Postgres ENUM e dureros de evoluat (adăugare valori OK, dar remove cere table rewrite). text+CHECK = adaugi/scoți valori via simplu `DROP CONSTRAINT + ADD CONSTRAINT`.
+**Alternative respinse:** Native ENUM (rigid).
+
+## 2026-05-23 — Etapa 2.1 D3: waitlist → email_subscribers (rename direct, NU VIEW shim)
+
+**Context:** Tabela `waitlist` trebuie extinsă pentru per-product interest + unsubscribe. Risc de rename?
+**Decizie:** `ALTER TABLE waitlist RENAME TO email_subscribers` + extend coloane + broaden source CHECK. Plus `lib/supabase.ts` `.from('waitlist')` → `.from('email_subscribers')` AMÂNAT până migrarea aplicată pe prod.
+**Motiv:** Audit pe `.ts/.tsx`: 33 potriviri brute, dar doar **1** e referință la tabela DB (`.from('waitlist')`); restul = anchor `#waitlist`, componenta `WaitlistSection`, valoarea coloanei `source`, nume funcție/tip. 1 referință → rename direct = curat. VIEW shim ar fi over-engineering. Code change PAIRED cu migration A9 → forțat să fie aplicat secvențial (DB migrate prod → code swap → deploy).
+**Alternative respinse:** New table + COPY data (date duplicate, complicat), VIEW shim (overkill pentru 1 referință).
+
+## 2026-05-23 — Etapa 2.1 D4: slug EN /tocatoare = "cutting-boards"
+
+**Context:** EN URL pentru catalog. Opțiuni: `/en/boards` vs `/en/cutting-boards`.
+**Decizie:** **`/en/cutting-boards`** — exact-match keyword SEO.
+**Motiv:** "Cutting board" = volum mare căutare; "boards" = ambiguu (surfboards, message boards, forums). Slug ușor mai lung dar descriptiv > ambiguu. Nav label EN = "Cutting Boards".
+**Alternative respinse:** `/en/boards` (ambiguu pentru SEO).
+
+## 2026-05-23 — Etapa 2.1 D5: Navbar /tocatoare = ruta, NU anchor mort
+
+**Context:** Navbar avea anchor `#tocatoare` (poziția 4) → dead link (nu există `id="tocatoare"` nicăieri — doar `id="waitlist"`).
+**Decizie:** Înlocuit cu route link `/tocatoare` (Task 2.1.5, când se construiește pagina). Aplicat la PAS 8 = adăugare `tocatoare` în PATHNAMES (middleware-ul rămâne neschimbat — route-key generic).
+**Motiv:** D1-consistent cu /atelier (drop anchor mort). Nu pierdem funcționalitate (era deja dead link). Symmetry între /despre, /atelier, /tocatoare = toate route-uri în nav.
+**Alternative respinse:** Păstrare anchor (continuă să nu funcționeze).
+
+## 2026-05-23 — Etapa 2.1 D6: /tocatoare = ISR `revalidate=60` (NU SSG, NU force-dynamic)
+
+**Context:** Render pattern pentru catalog (Task 2.1.5).
+**Decizie:** `export const revalidate = 60` în Server Component + graceful empty-state on fetch error.
+**Motiv:** Build nu pică pe Supabase down (gotcha "supabaseUrl is required" + `fetchActiveProducts` returnează `[]` pe orice eșec). Activarea de produse din Studio se reflectă în ~60s fără redeploy. Dev mode override SSR pentru testing stabilitate screenshots.
+**Alternative respinse:** SSG (activarea ar cere redeploy), force-dynamic (overhead inutil pentru date care se schimbă rar).
+
+## 2026-05-23 — Etapa 2.1 D7: Helper functions split (DB vs TS)
+
+**Context:** `generate_order_number`, `reserve_stock`, `release_stock`, `fulfill_stock`, `calculateOrderTotal`.
+**Decizie:** **Stock + order-number = DB** (PL/pgSQL, `FOR UPDATE` locks, audit row in same transaction, SECURITY DEFINER). **Total calc = TS** (`lib/db/order-math.ts`, pure, unit-testable).
+**Motiv:** Stocul cere atomicitate + lock + audit într-o tranzacție; TS-only ar fi race-condition prone. Total = aritmetică pură care merită teste unitare ușoare. SECURITY DEFINER pentru DB functions permite apel din server actions fără să fie blocat de RLS pe insertul în audit.
+**Alternative respinse:** Tot DB (overhead pentru aritmetică simplă), tot TS (race conditions pe stoc).
+
+## 2026-05-23 — Etapa 2.1 D8: Staging-first pentru DB application
+
+**Context:** Risk pe prod live waitlist data (collecting emails).
+**Decizie:** Proiect separat Supabase staging (`juuozsjvuikdtjqhdylw`); aplici migrări + seed + activare acolo, verifică, apoi replay același SQL pe prod.
+**Motiv:** Win10 Home + Docker local = friction excesivă. Staging cloud = zero Docker, sandbox safe. Replay deterministic pe prod cu același SQL = încredere. NU rulăm `db push` direct pe prod până nu confirmăm staging clean. `.env.staging.local` (gitignored prin pattern `.env*.local`) ține cheile separate de `.env.local` (prod).
+**Alternative respinse:** Local Docker (Win10 Home friction), direct pe prod (risc waitlist data + zero rehearsal).
+
+## 2026-05-23 — Etapa 2.1 extra: Server/client client SPLIT
+
+**Context:** Plan inițial spunea `lib/supabase.ts: createServerClient`. Realitate: fișierul e importat de `EmailForm.tsx` (`'use client'`) — `createServerClient` din `@supabase/ssr` folosește `next/headers` care e server-only.
+**Decizie:** Fișier NOU `lib/supabase-server.ts` cu `getServerSupabase()` (cookie-bound) + `getServiceSupabase()` (service-role, bypasses RLS). `lib/supabase.ts` rămâne neschimbat (browser anon pentru `EmailForm`).
+**Motiv:** Importul `next/headers` într-un fișier ulterior pulled de Client Component = build fail clar. Split = enforce server-only via import constraints. Pattern reutilizabil pentru toate fișierele DB viitoare.
+**Alternative respinse:** Rewrite `lib/supabase.ts` complet (spargem `EmailForm`).

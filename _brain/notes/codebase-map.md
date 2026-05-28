@@ -149,3 +149,55 @@ components/atelier/
 - 5 link-uri în ambele locale: Povestea (anchor) → Despre (route) → Atelier (route) → Tocătoare (anchor) → Îngrijire (anchor)
 - Dropped: anchor `Atelier #atelier` (decizie D1 — homepage WorkshopSection rămâne content, nu navigare)
 - Active state per-link: `pathname === localizedPath(link.routeKey, language)`
+
+## Database layer (Etapa 2.1) [2026-05-23]
+
+**Schema files** — `supabase/migrations/`:
+- `20260515114129_create_waitlist_table.sql` (original, Etapa 1)
+- `20260522090000_shared_helpers.sql` — `set_updated_at()` trigger generic
+- `20260522090001_create_profiles.sql` — profiles (1:1 cu auth.users) + `handle_new_user` trigger (auto-profil la signup)
+- `20260522090002_create_addresses.sql` — addresses (shipping/billing per profile)
+- `20260522090003_create_products.sql` — products bilingv (bani integer, soft-delete via status)
+- `20260522090004_create_inventory.sql` — inventory 1:1 products, `quantity_available` STORED generated column
+- `20260522090005_create_orders.sql` — orders (guest checkout supported, jsonb address snapshots)
+- `20260522090006_create_order_items.sql` — line items cu `product_snapshot` jsonb
+- `20260522090007_create_order_status_history.sql` — audit status
+- `20260522090008_create_stock_movements.sql` — audit stoc
+- `20260522090009_extend_waitlist_to_email_subscribers.sql` — rename + extend (interested_product_ids[], unsubscribed_at)
+- `20260522090010_rls_policies.sql` — RLS + `is_admin()` + `guard_profile_role` trigger
+- `20260522090011_db_functions.sql` — `generate_order_number` + reserve/release/fulfill stock atomice
+
+**Tabele publice (9):** addresses, email_subscribers (was waitlist), inventory, order_items, order_status_history, orders, products, profiles, stock_movements.
+
+**RLS pe scurt:**
+- `products`: public reads `status='active'`; admin full
+- `profiles`: user reads/updates own; admin full; `guard_profile_role` trigger blochează escaladare rol (excepție `auth.uid() IS NULL` = trusted server context)
+- `addresses`: owner CRUD; admin full
+- `orders` / `order_items` / `order_status_history`: owner reads own via parent; admin full; INSERT-uri doar via service role
+- `inventory` / `stock_movements`: admin only; scrieri via DB functions SECURITY DEFINER
+- `email_subscribers`: anon+auth INSERT (existing policy renamed); read = service role only
+
+**Funcții DB:**
+- `is_admin()` SECURITY DEFINER (anti-recursie RLS pe profiles)
+- `generate_order_number()` (`OF-YYYY-NNNN`, sequence globală fără reset anual)
+- `reserve_stock(product_id, qty, order_id)` — `FOR UPDATE` lock + audit `order_reserved`
+- `release_stock(product_id, qty, order_id)` — audit `order_cancelled`
+- `fulfill_stock(product_id, qty, order_id)` — audit `order_fulfilled` (scade fizic + reserved)
+
+**Seed** — `supabase/seeds/01_products.sql`: 10 SKU (status=draft) + 10 inventory rows (qty=0). Aplicat pe staging via Studio SQL Editor.
+
+**Types** — `types/supabase.ts` (generated): 20KB, toate 9 tabele cu Row/Insert/Update + Functions + Enums. Sursă: `npx supabase gen types typescript --project-id juuozsjvuikdtjqhdylw`.
+
+**Client code (`lib/`):**
+- `lib/supabase.ts` — anon browser client (existing, `EmailForm` consumer). Tabela = `'waitlist'` **TEMPORAR** până migrarea aplicată pe prod (atunci swap la `'email_subscribers'` + adăugare `Database` generic).
+- `lib/supabase-server.ts` (NEW) — `getServerSupabase()` cookie-bound (next/headers) + `getServiceSupabase()` service-role. SERVER ONLY (next/headers throws în client). Ambele cu `Database` generic.
+- `lib/db/products.ts` (NEW) — `fetchActiveProducts(): Promise<CatalogProduct[]>`. Anon client server-side; RLS permite SELECT pe active. Graceful empty-state pe missing env / fetch error.
+- `lib/db/order-math.ts` (existing) — `lineTotalRon` + `calculateOrderTotal`, TS pur.
+
+**Env vars** — `.env.example` documentează: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (server only, never NEXT_PUBLIC_).
+
+**Runbook** — `docs/etapa-2-1-supabase-setup.md` (8 pași pentru replay pe prod).
+
+**Status apply:**
+- Staging (`juuozsjvuikdtjqhdylw`): 13 migrări aplicate clean ✓ · seed 10 produse ✓ · 9 tabele confirmate ✓ · produse `draft` (NU active încă)
+- Production: NU aplicat încă; runbook ready pentru replay.
