@@ -72,6 +72,38 @@ test.describe('Navbar Atelier link (2026-05-27 — /atelier route)', () => {
   });
 });
 
+test.describe('Navbar Tocătoare link (2026-05-23 — /tocatoare route)', () => {
+  test('RO Navbar has "Tocătoare" route link pointing to /ro/tocatoare', async ({ page }) => {
+    await page.goto('/ro');
+    await openMobileMenuIfNeeded(page);
+    const link = page.locator('header a[href="/ro/tocatoare"]:visible').first();
+    await expect(link).toBeVisible();
+    await expect(link).toContainText('Tocătoare');
+  });
+
+  test('EN Navbar has "Cutting Boards" route link pointing to /en/cutting-boards', async ({ page }) => {
+    await page.goto('/en');
+    await openMobileMenuIfNeeded(page);
+    const link = page.locator('header a[href="/en/cutting-boards"]:visible').first();
+    await expect(link).toBeVisible();
+    await expect(link).toContainText('Cutting Boards');
+  });
+
+  test('Click Tocătoare on /ro navigates to /ro/tocatoare', async ({ page }) => {
+    await page.goto('/ro');
+    await openMobileMenuIfNeeded(page);
+    await page.locator('header a[href="/ro/tocatoare"]:visible').first().click();
+    await page.waitForURL('**/ro/tocatoare');
+    expect(new URL(page.url()).pathname).toBe('/ro/tocatoare');
+  });
+
+  test('Navbar no longer has dead #tocatoare anchor (D5 decision)', async ({ page }) => {
+    await page.goto('/ro');
+    const anchorLink = page.locator('header a[href="/ro#tocatoare"]');
+    await expect(anchorLink).toHaveCount(0);
+  });
+});
+
 test.describe('Footer microTagline (Faza B fix)', () => {
   test('RO footer shows "stejar · manual · România"', async ({ page }) => {
     await page.goto('/ro');

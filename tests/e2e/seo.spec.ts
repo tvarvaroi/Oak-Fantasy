@@ -10,15 +10,26 @@ import { test, expect } from './fixtures';
  */
 
 const ALL_PAGES = [
-  { path: '/ro',           title: /Oak Fantasy/i },
-  { path: '/en',           title: /Oak Fantasy/i },
-  { path: '/ro/despre',    title: /Despre Oak Fantasy/i },
-  { path: '/en/about',     title: /About Oak Fantasy/i },
-  { path: '/ro/atelier',   title: /Atelierul Oak Fantasy/i },
-  { path: '/en/workshop',  title: /Oak Fantasy Workshop/i },
+  { path: '/ro',                  title: /Oak Fantasy/i },
+  { path: '/en',                  title: /Oak Fantasy/i },
+  { path: '/ro/despre',           title: /Despre Oak Fantasy/i },
+  { path: '/en/about',            title: /About Oak Fantasy/i },
+  { path: '/ro/atelier',          title: /Atelierul Oak Fantasy/i },
+  { path: '/en/workshop',         title: /Oak Fantasy Workshop/i },
+  { path: '/ro/tocatoare',        title: /Tocătoarele noastre/i },
+  { path: '/en/cutting-boards',   title: /Our cutting boards/i },
 ];
 
-const PAGES_WITH_FULL_SEO = ['/ro/despre', '/en/about', '/ro/atelier', '/en/workshop'] as const;
+const PAGES_WITH_FULL_SEO = [
+  '/ro/despre', '/en/about',
+  '/ro/atelier', '/en/workshop',
+  '/ro/tocatoare', '/en/cutting-boards',
+] as const;
+
+// JSON-LD types per page family — /despre + /atelier emit AboutPage; /tocatoare
+// emits ItemList for the product catalog (rich-result candidate).
+const ABOUT_PAGES_LD = ['/ro/despre', '/en/about', '/ro/atelier', '/en/workshop'] as const;
+const CATALOG_PAGES_LD = ['/ro/tocatoare', '/en/cutting-boards'] as const;
 
 test.describe('SEO — title + description (all pages)', () => {
   for (const { path, title } of ALL_PAGES) {
@@ -56,8 +67,8 @@ test.describe('SEO — canonical + hreflang (only /despre routes for now)', () =
   }
 });
 
-test.describe('JSON-LD structured data on /despre pages', () => {
-  for (const path of PAGES_WITH_FULL_SEO) {
+test.describe('JSON-LD — AboutPage family (/despre, /atelier)', () => {
+  for (const path of ABOUT_PAGES_LD) {
     test(`${path} — AboutPage + BreadcrumbList JSON-LD scripts present`, async ({ page }) => {
       await page.goto(path);
       const scripts = page.locator('script[type="application/ld+json"]');
@@ -72,6 +83,25 @@ test.describe('JSON-LD structured data on /despre pages', () => {
         .filter(Boolean);
       expect(types).toContain('AboutPage');
       expect(types).toContain('BreadcrumbList');
+    });
+  }
+});
+
+test.describe('JSON-LD — Catalog family (/tocatoare)', () => {
+  for (const path of CATALOG_PAGES_LD) {
+    test(`${path} — BreadcrumbList + ItemList JSON-LD scripts present`, async ({ page }) => {
+      await page.goto(path);
+      const scripts = page.locator('script[type="application/ld+json"]');
+      await expect(scripts).toHaveCount(2);
+
+      const payloads = await scripts.allTextContents();
+      const types = payloads
+        .map((p) => {
+          try { return JSON.parse(p)['@type']; } catch { return null; }
+        })
+        .filter(Boolean);
+      expect(types).toContain('BreadcrumbList');
+      expect(types).toContain('ItemList');
     });
   }
 });
