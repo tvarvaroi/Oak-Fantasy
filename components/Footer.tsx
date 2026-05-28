@@ -355,6 +355,27 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
           >
             {nav.copy}
           </p>
+
+          {/* Vecteezy attribution — REQUIRED by their free-PNG license for the
+              treeline.png hero backdrop used on /tocatoare (and future pages). */}
+          <p
+            className="font-lora"
+            style={{
+              fontSize: '0.7rem',
+              color: 'rgba(245,235,216,0.22)',
+              textAlign: 'center',
+              marginTop: 4,
+            }}
+          >
+            <a
+              href="https://www.vecteezy.com/free-png/tree"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'inherit', textDecoration: 'underline' }}
+            >
+              Tree PNGs by Vecteezy
+            </a>
+          </p>
         </div>
       </div>
     </footer>
