@@ -51,3 +51,7 @@ _brain/inbox/*
 
 # Lighthouse CI artifacts
 /.lighthouseci/
+
+# Supabase CLI local state (project link metadata, pooler URLs — may include secrets)
+supabase/.temp/
+supabase/.branches/
