@@ -30,7 +30,7 @@ export default function AtelierContent({ locale }: { locale: Locale }) {
 
   return (
     <div>
-      <Navbar language={locale} onToggleLanguage={toggleLanguage} />
+      <Navbar language={locale} onToggleLanguage={toggleLanguage} darkHero />
       <main>
         <AtelierHero content={content} />
         <ToolsSection content={content} />

@@ -41,9 +41,20 @@ interface NavbarProps {
   language: Locale;
   /** Called when user clicks the language toggle. Parent handles navigation. */
   onToggleLanguage: () => void;
+  /**
+   * Set true on pages whose hero has a dark background (e.g. /atelier).
+   * Navbar adapts text/icon colors to cream when transparent + dark hero,
+   * and reverts to ink once scrolled past the hero (own cream bg takes over).
+   * Default false (cream hero pages keep ink text throughout).
+   */
+  darkHero?: boolean;
 }
 
-export default function Navbar({ language, onToggleLanguage }: NavbarProps) {
+export default function Navbar({
+  language,
+  onToggleLanguage,
+  darkHero = false,
+}: NavbarProps) {
   const navRef = useRef<HTMLElement>(null);
   const logoRef = useRef<HTMLImageElement>(null);
   const prefersReducedMotion = useReducedMotion();
@@ -56,10 +67,26 @@ export default function Navbar({ language, onToggleLanguage }: NavbarProps) {
   const onHomepage = pathname === homePath || pathname === '/';
   const waitlistHref = `${homePath}#waitlist`;
 
+  // FIX 1 (2026-05-28): Navbar text adapts to cream when transparent over a
+  // dark hero (currently only /atelier). Once scrolled past 100px the Navbar
+  // gets its own cream-warm bg + shadow, so text reverts to ink regardless
+  // of what's behind it. SSR-safe: derived from props/state, no observer.
+  const onDark = darkHero && !scrolled;
+  const navInk = onDark ? 'var(--cream-warm)' : 'var(--ink)';
+  const navInkSoft = onDark ? 'rgba(245, 235, 216, 0.72)' : 'var(--ink-soft)';
+  const navAccent = onDark ? 'var(--copper)' : 'var(--oak-warm)';
+  const colorTransition = prefersReducedMotion ? undefined : 'color 0.3s ease';
+
   useEffect(() => {
     const nav = navRef.current;
-    if (!nav || prefersReducedMotion) return;
+    if (!nav) return;
 
+    // FIX 1 (2026-05-28): scroll listener must run regardless of
+    // prefers-reduced-motion. Reduced motion only suppresses CSS transitions
+    // (handled separately via colorTransition); the scrolled STATE itself
+    // must update so the navbar bg/text colors switch correctly. Before this
+    // fix, reduced-motion users got a permanently transparent navbar and on
+    // /atelier the active link stayed copper forever.
     const onScroll = () => {
       const past = window.scrollY > 100;
       setScrolled(past);
@@ -67,7 +94,7 @@ export default function Navbar({ language, onToggleLanguage }: NavbarProps) {
 
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
-  }, [prefersReducedMotion]);
+  }, []);
 
   // Anchor-link click: when we're already on the locale homepage, prevent
   // default and do a smooth scroll (preserves existing UX). When we're on
@@ -137,9 +164,11 @@ export default function Navbar({ language, onToggleLanguage }: NavbarProps) {
               style={{
                 fontSize: scrolled ? '1.6rem' : '2.4rem',
                 fontWeight: 700,
-                color: 'var(--ink)',
+                color: navInk,
                 letterSpacing: '0.02em',
-                transition: 'font-size 0.4s ease',
+                transition: prefersReducedMotion
+                  ? 'font-size 0.4s ease'
+                  : 'font-size 0.4s ease, color 0.3s ease',
                 lineHeight: 1.1,
               }}
             >
@@ -177,8 +206,9 @@ export default function Navbar({ language, onToggleLanguage }: NavbarProps) {
                   onClick={() => setMenuOpen(false)}
                   className="font-lora text-sm transition-colors duration-200 hover:text-oak-warm relative group"
                   style={{
-                    color: isActive ? 'var(--oak-warm)' : 'var(--ink)',
+                    color: isActive ? navAccent : navInk,
                     fontFamily: 'var(--font-lora)',
+                    transition: colorTransition,
                   }}
                 >
                   {link.label}
@@ -186,7 +216,7 @@ export default function Navbar({ language, onToggleLanguage }: NavbarProps) {
                     className={`absolute -bottom-0.5 left-0 h-px ${
                       isActive ? 'w-full' : 'w-0 group-hover:w-full'
                     } transition-all duration-300`}
-                    style={{ backgroundColor: 'var(--oak-warm)' }}
+                    style={{ backgroundColor: navAccent }}
                   />
                 </Link>
               );
@@ -199,12 +229,16 @@ export default function Navbar({ language, onToggleLanguage }: NavbarProps) {
                 href={href}
                 onClick={(e) => handleAnchorClick(e, link.anchor)}
                 className="font-lora text-sm transition-colors duration-200 hover:text-oak-warm relative group"
-                style={{ color: 'var(--ink)', fontFamily: 'var(--font-lora)' }}
+                style={{
+                  color: navInk,
+                  fontFamily: 'var(--font-lora)',
+                  transition: colorTransition,
+                }}
               >
                 {link.label}
                 <span
                   className="absolute -bottom-0.5 left-0 h-px w-0 group-hover:w-full transition-all duration-300"
-                  style={{ backgroundColor: 'var(--oak-warm)' }}
+                  style={{ backgroundColor: navAccent }}
                 />
               </Link>
             );
@@ -217,12 +251,33 @@ export default function Navbar({ language, onToggleLanguage }: NavbarProps) {
           <button
             onClick={onToggleLanguage}
             className="label-caps text-xs font-caudex transition-colors duration-200 hover:text-oak-warm"
-            style={{ color: 'var(--ink-soft)', fontFamily: 'var(--font-caudex)', letterSpacing: '0.15em' }}
+            style={{
+              color: navInkSoft,
+              fontFamily: 'var(--font-caudex)',
+              letterSpacing: '0.15em',
+              transition: colorTransition,
+            }}
           >
             {language === 'ro' ? (
-              <span><span className="text-oak-warm font-bold" style={{ color: 'var(--oak-warm)' }}>RO</span> | EN</span>
+              <span>
+                <span
+                  className="text-oak-warm font-bold"
+                  style={{ color: navAccent, transition: colorTransition }}
+                >
+                  RO
+                </span>{' '}
+                | EN
+              </span>
             ) : (
-              <span>RO | <span className="text-oak-warm font-bold" style={{ color: 'var(--oak-warm)' }}>EN</span></span>
+              <span>
+                RO |{' '}
+                <span
+                  className="text-oak-warm font-bold"
+                  style={{ color: navAccent, transition: colorTransition }}
+                >
+                  EN
+                </span>
+              </span>
             )}
           </button>
 
@@ -243,23 +298,23 @@ export default function Navbar({ language, onToggleLanguage }: NavbarProps) {
             {language === 'ro' ? 'Pre-comandă' : 'Pre-order'}
           </Link>
 
-          {/* Mobile hamburger */}
+          {/* Mobile hamburger — FIX 2 (D4): 44px+ touch target (WCAG 2.5.5). */}
           <button
-            className="md:hidden flex flex-col gap-1.5 p-1"
+            className="md:hidden flex flex-col items-center justify-center gap-1.5 p-3 min-w-[44px] min-h-[44px]"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle menu"
           >
             <span
               className={`block w-6 h-0.5 transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-2' : ''}`}
-              style={{ backgroundColor: 'var(--ink)' }}
+              style={{ backgroundColor: navInk, transition: prefersReducedMotion ? undefined : 'background-color 0.3s ease, transform 0.3s ease' }}
             />
             <span
               className={`block w-6 h-0.5 transition-all duration-300 ${menuOpen ? 'opacity-0' : ''}`}
-              style={{ backgroundColor: 'var(--ink)' }}
+              style={{ backgroundColor: navInk, transition: prefersReducedMotion ? undefined : 'background-color 0.3s ease, opacity 0.3s ease' }}
             />
             <span
               className={`block w-6 h-0.5 transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-2' : ''}`}
-              style={{ backgroundColor: 'var(--ink)' }}
+              style={{ backgroundColor: navInk, transition: prefersReducedMotion ? undefined : 'background-color 0.3s ease, transform 0.3s ease' }}
             />
           </button>
         </div>
@@ -282,7 +337,7 @@ export default function Navbar({ language, onToggleLanguage }: NavbarProps) {
                   key={link.label}
                   href={href}
                   onClick={() => setMenuOpen(false)}
-                  className="font-lora text-base py-1 border-b"
+                  className="font-lora text-base py-3 border-b min-h-[44px] flex items-center"
                   style={{
                     color: isActive ? 'var(--oak-warm)' : 'var(--ink)',
                     fontFamily: 'var(--font-lora)',
@@ -300,7 +355,7 @@ export default function Navbar({ language, onToggleLanguage }: NavbarProps) {
                 key={link.label}
                 href={href}
                 onClick={(e) => handleAnchorClick(e, link.anchor)}
-                className="font-lora text-base py-1 border-b"
+                className="font-lora text-base py-3 border-b min-h-[44px] flex items-center"
                 style={{
                   color: 'var(--ink)',
                   fontFamily: 'var(--font-lora)',

@@ -6,10 +6,12 @@
 .hero {
   background: var(--bark);
   color: var(--cream-warm);
-  padding: 200px 0 120px;
+  /* FIX 2: clamp top/bottom for mobile (was 200px/120px fixed). */
+  padding: clamp(120px, 15vh, 200px) 0 clamp(60px, 10vh, 120px);
   position: relative;
   overflow: hidden;
-  min-height: 90vh;
+  /* FIX 2: ease min-height on small screens so hero isn't 132% viewport. */
+  min-height: clamp(70vh, 80vh, 90vh);
   display: flex;
   align-items: center;
 }
@@ -101,7 +103,7 @@
 }
 
 /* ─── TOOLS (the centerpiece) ──────────────────────────────────────────── */
-.toolsHero { background: var(--cream-warm); padding: 140px 0 80px; }
+.toolsHero { background: var(--cream-warm); padding: clamp(60px, 10vh, 140px) 0 clamp(40px, 6vh, 80px); }
 .toolsWrap { max-width: 1280px; margin: 0 auto; padding: 0 48px; }
 .toolsHead {
   display: grid;
@@ -166,11 +168,14 @@
 .toolsFeature > :nth-child(2) { grid-column: span 6; }
 .toolsFeature > :nth-child(5) { grid-column: span 4; }
 .toolsFeature > :nth-child(6) { grid-column: span 8; }
+/* FIX 2 (2026-05-28): use :nth-child(n) selectors so specificity (0,2,0)
+   matches the per-child asymmetric overrides above. With `> *` alone the
+   media queries were silently losing on tablet/mobile. */
 @media (max-width: 1024px) {
-  .toolsFeature > * { grid-column: span 6; }
+  .toolsFeature > :nth-child(n) { grid-column: span 6; }
 }
 @media (max-width: 640px) {
-  .toolsFeature > * { grid-column: span 12; }
+  .toolsFeature > :nth-child(n) { grid-column: span 12; }
 }
 .toolTag {
   position: absolute;
@@ -237,7 +242,7 @@
 /* ─── PLACE ────────────────────────────────────────────────────────────── */
 .place {
   background: var(--paper-aged);
-  padding: 140px 0;
+  padding: clamp(60px, 10vh, 140px) 0;
   position: relative;
   overflow: hidden;
 }
@@ -282,7 +287,7 @@
 }
 
 /* ─── DAY (compact 4-card strip) ────────────────────────────────────────── */
-.day { background: var(--cream-warm); padding: 120px 0; }
+.day { background: var(--cream-warm); padding: clamp(60px, 10vh, 120px) 0; }
 .dayWrap { max-width: 1200px; margin: 0 auto; padding: 0 48px; }
 .dayHead {
   display: grid;
@@ -374,7 +379,7 @@
 /* ─── PROCESS strip ───────────────────────────────────────────────────── */
 .proc {
   background: var(--paper-aged);
-  padding: 100px 0;
+  padding: clamp(60px, 10vh, 100px) 0;
   border-top: 1px solid rgba(139, 94, 60, 0.2);
   border-bottom: 1px solid rgba(139, 94, 60, 0.2);
 }
@@ -387,7 +392,8 @@
   gap: 80px;
   align-items: start;
 }
-@media (max-width: 900px) {
+/* FIX 2 (D3): breakpoint 900 → 640 so tablet (768) keeps 2-col split. */
+@media (max-width: 640px) {
   .procWrap { grid-template-columns: 1fr; gap: 32px; }
 }
 .procH2 {
@@ -463,7 +469,7 @@
 .crossRef:hover svg { transform: translateX(2px); }
 
 /* ─── CONDITIONS ───────────────────────────────────────────────────────── */
-.cond { background: var(--cream-warm); padding: 120px 0; }
+.cond { background: var(--cream-warm); padding: clamp(60px, 10vh, 120px) 0; }
 .condWrap { max-width: 1200px; margin: 0 auto; padding: 0 48px; }
 .condHead {
   display: grid;
@@ -472,7 +478,8 @@
   align-items: end;
   margin-bottom: 48px;
 }
-@media (max-width: 900px) {
+/* FIX 2 (D3): breakpoint 900 → 640 so tablet (768) keeps 2-col head split. */
+@media (max-width: 640px) {
   .condHead { grid-template-columns: 1fr; gap: 20px; }
 }
 .condH2 {
@@ -495,7 +502,8 @@
   grid-template-columns: 1fr 1fr;
   gap: 36px;
 }
-@media (max-width: 900px) {
+/* FIX 2 (D3): breakpoint 900 → 640 so tablet (768) keeps 2-col card grid. */
+@media (max-width: 640px) {
   .condGrid { grid-template-columns: 1fr; }
 }
 .condCard {
@@ -522,7 +530,7 @@
 .condCard strong { color: var(--ink); font-weight: 500; }
 
 /* ─── SEASONALITY ──────────────────────────────────────────────────────── */
-.season { background: var(--paper-aged); padding: 130px 0; }
+.season { background: var(--paper-aged); padding: clamp(60px, 10vh, 130px) 0; }
 .seasonWrap { max-width: 1200px; margin: 0 auto; padding: 0 48px; }
 .seasonHead { text-align: center; margin-bottom: 48px; }
 .seasonH2 {
@@ -569,7 +577,7 @@
 }
 
 /* ─── ARTICLES ─────────────────────────────────────────────────────────── */
-.articles { background: var(--cream-warm); padding: 140px 0; }
+.articles { background: var(--cream-warm); padding: clamp(60px, 10vh, 140px) 0; }
 .articlesWrap { max-width: 1200px; margin: 0 auto; padding: 0 48px; }
 .articlesHead { text-align: center; margin-bottom: 48px; }
 .articlesH2 {
@@ -666,7 +674,8 @@
 .cta {
   background: var(--bark);
   color: var(--cream-warm);
-  padding: 140px 0 170px;
+  /* FIX 2: clamp padding (was 140px/170px) so CTA isn't 55% empty on mobile. */
+  padding: clamp(60px, 10vh, 140px) 0 clamp(80px, 12vh, 170px);
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -762,4 +771,31 @@
   opacity: 0.07;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
   pointer-events: none;
+}
+
+/* ─── FIX 2 (2026-05-28): aggregate mobile overrides ─────────────────────
+   Reduces editorial 48px gutter to 24px (D2 +17% content area on 375 vp),
+   removes stagger margin that loses intent on small screens, tightens day
+   strip top padding. Specificity-safe; placed after all base rules so
+   source order guarantees override. */
+@media (max-width: 640px) {
+  /* D2 — universal horizontal gutter reduction */
+  .heroWrap,
+  .toolsWrap,
+  .placeWrap,
+  .dayWrap,
+  .procWrap,
+  .condWrap,
+  .seasonWrap,
+  .articlesWrap {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+  .ctaWrap { padding-left: 20px; padding-right: 20px; }
+
+  /* WorkshopPlace — stagger margin loses intent at 375; zero it. */
+  .placeImg:nth-child(2) { margin-left: 0; }
+
+  /* DayInAtelier — tighten top padding (no clamp on existing rule). */
+  .day { padding: clamp(48px, 8vh, 80px) 0; }
 }
