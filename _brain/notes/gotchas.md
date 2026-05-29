@@ -110,6 +110,50 @@
 **Pattern preventiv:** Înainte de `npm run verify` într-un mediu interactiv, check `netstat -ano | grep ":3000"`. Dacă există PID nefamiliar (nu Playwright's webServer process), kill-l înainte. Alternativ: setează `process.env.CI=1` ca să forţezi `reuseExistingServer: false` — dar atunci Next.js încearcă 3000 → blocked → fallback 3001 → `webServer.url` check pe 3000 fail.
 **Fişiere:** `playwright.config.ts` (line 44-47 — definirea `reuseExistingServer`).
 
+## 2026-05-29 — Playwright `--update-snapshots` default e `'changed'`, nu `'all'` (v1.50+)
+
+**Simptom:** Ran `npm run test:e2e:update` după modificare CSS (logo SVG swap Footer + ProductCard). Toate cele 24 teste raportate "screenshot matches baseline", zero diff în md5sum. Schimbarea era reală și vizibilă (qa-tester confirmed) dar nu s-a regenerat niciun baseline.
+**Cauză reală:** Playwright 1.50+ a schimbat default-ul pentru `--update-snapshots`: era `'all'` (regen tot), acum e `'changed'` (regen DOAR cele care eșuează compararea). Schimbarea logo-ului (Footer 100×100 + 10 medallions × 200×200) erau sub pragul `maxDiffPixelRatio: 0.02` (2%) pe fullpage screenshots de ~5M pixeli → Playwright considera "matching" și nu actualiza.
+**Fix folosit:** Explicit `--update-snapshots=all` forțează regen indiferent de match status:
+```bash
+# GREŞIT pentru schimbări sub-threshold:
+npx playwright test --update-snapshots ...
+
+# CORECT pentru regen complet:
+npx playwright test --update-snapshots=all ...
+```
+**Pattern preventiv:** Pentru orice schimbare vizuală care e VIZIBILĂ la ochi dar SMALL în pixeli (logo, icon swap, single-element color change pe fullpage), folosește `--update-snapshots=all`. Pentru schimbări mari (responsive overhaul, full redesign), default `'changed'` e OK.
+**Aplicabil la:** orice asset swap (image src, icon swap, font swap), color tweaks pe single elements, padding/margin sub 8px diff cumulativ.
+**Sugestie viitoare:** Update `package.json` scripts:
+```
+"test:e2e:update": "playwright test --workers=1 --update-snapshots=all --grep \"Visual regression\""
+```
+Decizie amânată (poate vrem comportament selectiv în viitor). Pentru moment manual `=all` în CLI.
+**Fişiere:** `package.json` (`test:e2e:update` script).
+
+## 2026-05-29 — Vercel SpeedInsights / analytics: ÎNTOTDEAUNA în root `app/layout.tsx`, NU în `[locale]/layout.tsx`
+
+**Simptom (anticipat de founder):** Dacă `<SpeedInsights />` e în `app/[locale]/layout.tsx`, atunci la switch locale (RO ↔ EN) — `router.push('/en/atelier')` — layout-ul `[locale]` se re-montează (cheie route param-uri schimbată) → SpeedInsights se re-montează → vitals init de DOUĂ ori per sesiune (sau mai mult la fiecare switch). Network tab ar arăta request-uri duplicate către `vitals.vercel-insights.com`.
+**Cauză reală:** Layouturile Next.js App Router se re-montează când părinții lor se schimbă. `app/[locale]/layout.tsx` se re-montează la fiecare schimbare a param-ului `locale`. `app/layout.tsx` (root) NU se re-montează — e părintele stabil.
+**Fix corect (după push verification):** Mută SpeedInsights în root `app/layout.tsx`. Acolo se mountează O SINGURĂ DATĂ per sesiune browser; locale switch nu îl afectează.
+```tsx
+// app/layout.tsx (root — passthrough cu SpeedInsights)
+import { SpeedInsights } from '@vercel/speed-insights/next';
+
+export default function RootLayout({ children }) {
+  return (
+    <>
+      {children}
+      <SpeedInsights />
+    </>
+  );
+}
+```
+**De ce funcționează în root passthrough chiar și fără `<body>`:** SpeedInsights e Client Component care returnează `null` și injectează scriptul prin `useEffect` direct în `document.head/body`. Nu are nevoie să fie randat IN `<body>` în React tree — important e doar să fie montat. Dacă root layout returnează fragment cu children + SpeedInsights, browserul vede `<html><body>...children...</body></html>` (din [locale] layout) plus un React node null sibling — DOM stays valid.
+**Verificare:** `curl http://localhost:PORT/ro | grep -c speed-insights` = 1. Same pe /en. Single chunk reference per page.
+**Aplicabil la:** ORICE analytics/monitoring/tracking script (SpeedInsights, Plausible, Google Analytics, Sentry init, etc.). Regula generală: tracking init care trebuie să persiste cross-navigation = ROOT LAYOUT, indiferent dacă root are sau nu `<body>`.
+**Fişiere:** `app/layout.tsx` (root, SpeedInsights mount), `app/[locale]/layout.tsx` (locale-specific html/body/fonts, NU SpeedInsights).
+
 ## 2026-05-29 — `.env.local` vs `.env.staging.local`: swap pattern pentru baselines cu DB staging
 
 **Simptom:** `npm run test:e2e:update -- --grep "tocatoare-"` raporta `6 passed` dar `md5sum *.png` diff = empty. Adică Playwright a rulat testele cu success dar `--update-snapshots` nu schimba nimic — implicit baseline-urile noi erau IDENTICE cu cele vechi.
