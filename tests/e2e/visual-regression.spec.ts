@@ -1,12 +1,14 @@
 import { test, expect, maskCanvas } from './fixtures';
 
 const PAGES = [
-  { path: '/ro',           name: 'home-ro' },
-  { path: '/en',           name: 'home-en' },
-  { path: '/ro/despre',    name: 'despre-ro' },
-  { path: '/en/about',     name: 'despre-en' },
-  { path: '/ro/atelier',   name: 'atelier-ro' },
-  { path: '/en/workshop',  name: 'atelier-en' },
+  { path: '/ro',                name: 'home-ro' },
+  { path: '/en',                name: 'home-en' },
+  { path: '/ro/despre',         name: 'despre-ro' },
+  { path: '/en/about',          name: 'despre-en' },
+  { path: '/ro/atelier',        name: 'atelier-ro' },
+  { path: '/en/workshop',       name: 'atelier-en' },
+  { path: '/ro/tocatoare',      name: 'tocatoare-ro' },
+  { path: '/en/cutting-boards', name: 'tocatoare-en' },
 ];
 
 test.describe('Visual regression', () => {

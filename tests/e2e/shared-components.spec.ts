@@ -55,14 +55,36 @@ test.describe('Navbar Atelier link (2026-05-27 — /atelier route)', () => {
     expect(new URL(page.url()).pathname).toBe('/ro/atelier');
   });
 
-  test('Atelier link has active state on /ro/atelier (oak-warm color)', async ({ page }) => {
+  test('Atelier link has active state on /ro/atelier (oak-warm after scrolling past dark hero)', async ({ page }) => {
     await page.goto('/ro/atelier');
+    // FIX 1 (2026-05-28): on /atelier, Navbar passes darkHero={true} so at
+    // scroll 0 the active color is copper (--copper, on-dark accent). Once
+    // scrolled past 100px the Navbar gets its own cream bg and the active
+    // color reverts to oak-warm. We scroll first to assert the default
+    // active-state mechanism (consistent across all routes).
+    await page.evaluate(() => window.scrollTo(0, 300));
+    await page.waitForTimeout(400); // wait for 0.3s color transition
     await openMobileMenuIfNeeded(page);
     const link = page.locator('header a[href="/ro/atelier"]:visible').first();
     await expect(link).toBeVisible();
-    // Active color is var(--oak-warm) = #8B5E3C → rgb(139, 94, 60)
+    // Active color after scroll is var(--oak-warm) = #8B5E3C → rgb(139, 94, 60)
     const color = await link.evaluate((el) => getComputedStyle(el).color);
     expect(color).toBe('rgb(139, 94, 60)');
+  });
+
+  test('Atelier link is copper at scroll 0 on /ro/atelier (FIX 1 darkHero adaptive)', async ({ page, viewport }) => {
+    // Mobile viewport: mobile menu is its own cream-bg context — active link
+    // stays oak-warm there regardless of darkHero. This test targets the
+    // VISIBLE desktop/tablet navbar where darkHero adapts.
+    test.skip((viewport?.width ?? 0) < 768, 'darkHero adaptive only affects visible nav, not opened mobile menu');
+    await page.goto('/ro/atelier');
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(400);
+    const link = page.locator('header nav a[href="/ro/atelier"]').first();
+    await expect(link).toBeVisible();
+    // FIX 1: at scroll 0 on /atelier, navAccent = var(--copper) → rgb(184,115,51)
+    const color = await link.evaluate((el) => getComputedStyle(el).color);
+    expect(color).toBe('rgb(184, 115, 51)');
   });
 
   test('Navbar no longer has homepage #atelier anchor (D1 decision)', async ({ page }) => {
