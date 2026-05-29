@@ -200,10 +200,21 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
               {nav.colBrand}
             </p>
 
-            {/* logo */}
-            <div style={{ width: 100, height: 100, borderRadius: '50%', overflow: 'hidden' }}>
+            {/* logo — clean SVG stencil on cream coin (consistent with Navbar
+                reference + ProductCard medallion). 2026-05-29 brand unification:
+                JPEG with green ring replaced by the SVG asset used throughout
+                the rest of the brand. */}
+            <div
+              style={{
+                width: 100,
+                height: 100,
+                borderRadius: '50%',
+                overflow: 'hidden',
+                background: 'var(--cream-warm)',
+              }}
+            >
               <Image
-                src="/WhatsApp_Image_2026-05-14_at_20.59.06.jpeg"
+                src="/3D_Cutting_Board_Model_Design.svg"
                 alt="Oak Fantasy logo"
                 width={100}
                 height={100}

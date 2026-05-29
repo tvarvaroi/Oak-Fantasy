@@ -37,10 +37,12 @@ export default function ProductCard({ product, content, locale }: ProductCardPro
       <div className={styles.medallion}>
         <span className={styles.photoBadge}>{content.card.photoBadge}</span>
         {/* Decorative placeholder until the product photo shoot ships;
-            see HANDOFF.md "Logo / product placeholders". */}
+            see HANDOFF.md "Logo / product placeholders". 2026-05-29: swapped
+            from the WhatsApp JPEG (green ring + raster pixelation) to the
+            clean SVG stencil used in Navbar + Footer — brand consistency. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/WhatsApp_Image_2026-05-14_at_20.59.06.jpeg"
+          src="/3D_Cutting_Board_Model_Design.svg"
           alt=""
           className={styles.medallionLogo}
           aria-hidden
