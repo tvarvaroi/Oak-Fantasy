@@ -244,3 +244,60 @@
 **Motiv:** Git history e permanent — un blob committat și push-uit rămâne în istorie chiar dacă fișierul e șters ulterior. 16MB inflate `git clone` time + CI bandwidth perpetuu. WebP la 243KB e sub orice budget rezonabil (~1% din PNG; tipic LCP impact <100ms pe 4G). Photo backdrop păstrat (pe care fondatorul l-a ales explicit peste SVG/gradient în iterația de design).
 **Lecție:** Orice binary asset >500KB trebuie evaluat ÎNAINTE de commit. NU „will optimize later" — git history permanent. ffmpeg `libwebp` e disponibil în mediu (8.0.1) — folosește pentru PNG→WebP. Pentru asset peste 1MB, conversia + size check înainte de `git add`.
 **Alternative respinse:** OPȚIUNEA B (gradient/SVG pur) — fondatorul a respins SVG explicit în iterația design după 7+ încercări; pierdem fotorealism agreat. OPȚIUNEA C (SVG hand-drawn) — același motiv. Keep PNG (commit + later compress) — git history permanent. `git filter-repo` / BFG cleanup post-push — mai mult overhead și nu salvează network bandwidth-ul push-ului.
+
+## 2026-05-28 — FIX 1: Navbar `darkHero` prop (adaptive text over dark hero)
+
+**Context:** /atelier hero are `background: var(--bark)` (dark). Navbar e `fixed top-0` cu fundal transparent până scroll>100. La scroll=0 textul ink al Navbar-ului era ilizibil pe dark bark.
+**Decizie:** Prop opt-in `darkHero?: boolean` pe Navbar; `AtelierContent` pasează `darkHero={true}`. Derive `onDark = darkHero && !scrolled` → swap text wordmark + nav links + hamburger + language toggle la `--cream-warm` și accent la `--copper`. CTA button neschimbat (self-contained). Mobile menu items neschimbate (au bg cream propriu). Tranziție `color 0.3s ease`, guarded pe `prefersReducedMotion`.
+**Motiv:** SSR-safe (zero FOUC), dead-simple (derive, nu state). Extensibil — orice viitoare pagină cu hero dark pasează prop. YAGNI vs IntersectionObserver: cazul mid-page nu există (la scroll>100 Navbar are bg cream propriu → text ink lizibil indiferent ce-i sub).
+**Alternative respinse:** IntersectionObserver pe `data-nav-theme="dark"` (complexitate fără caz real, risc FOUC mount-time). Prop-only fără scroll awareness (la scroll>100 textul cream pe bg cream = ilizibil).
+
+## 2026-05-28 — FIX 2 D1: Hero `/atelier` rămâne 1-col la tablet (768)
+
+**Context:** Hero pe `/atelier` are grid 2-col `1fr 1fr` cu collapse la 1024px. La 768 colapsează deja la 1-col. Întrebare: forțăm 2-col la 768?
+**Decizie:** Lăsăm 1-col la 768. 2-col la 768 = h1 cu `clamp(2.4rem, 5.2vw, 4.6rem)` + grid 3×3 ar concura într-un spațiu îngust → îmbulzit. 1024px e pragul corect.
+**Motiv:** Hero editorial cu typography mare are nevoie de respiraţie orizontală pe tablet. Stack vertical 1-col la 768 = h1 + paragraph respiră, grid 3×3 vine dedesubt clean.
+**Alternative respinse:** Forțare 2-col la 768 (overcrowded), grid 3×3 ascuns pe tablet (pierdem ornament editorial).
+
+## 2026-05-28 — FIX 2 D2: Mobile gutter `0 48px` → `0 24px` (universal)
+
+**Context:** Toate `*Wrap` din `atelier.module.css` au `padding: 0 48px`. La 375px viewport, 96px gutter lasă 279px content (74%).
+**Decizie:** Media query `@media (max-width: 640px)` reduce universal la `padding-left: 24px; padding-right: 24px` pe `.heroWrap, .toolsWrap, .placeWrap, .dayWrap, .procWrap, .condWrap, .seasonWrap, .articlesWrap`. CtaWrap special 20px (centered text, ceva mai strâns).
+**Motiv:** +17% content width pe phone (279px → 327px). Editorial spacing 48px desktop păstrat. Trade-off acceptat: mai puțină respiraţie laterală pe mobile, dar tipografie + carduri mai citibile.
+**Alternative respinse:** Păstrare 48px (cramped text pe phone), 0px gutter (text lipit de margine, ilizibil).
+
+## 2026-05-28 — FIX 2 D3: ProcessSummary + Conditions breakpoint 900→640
+
+**Context:** `.procWrap` (heading + 5 steps) și `.condHead + .condGrid` (2 carduri) erau 2-col desktop colapsând la 900px → 1-col. La tablet 768px = 1-col → spaţiu tablet irosit.
+**Decizie:** Coboară breakpoint la 640px. Tablet (768) primeşte layout-ul 2-col desktop. Mobile (<640) rămâne 1-col.
+**Motiv:** 768px are spaţiu pentru 2-col simetric — design intent original păstrat, doar spreadul pe tablet îmbunătăţit. Conditions = 2 carduri "Temperature + Humidity" pereche logică care apar mai bine side-by-side.
+**Alternative respinse:** Păstrare 900px (tablet underutilized), breakpoint 768px (margine prea fină — la 769px viewport-uri rare se sparge).
+
+## 2026-05-28 — FIX 2 D4: Navbar touch targets 44px (WCAG 2.5.5)
+
+**Context:** Hamburger button era `p-1` = 26px height. Mobile menu links erau `py-1 border-b` = 33px. Ambele sub minimul WCAG 2.5.5 de 44×44px touch target.
+**Decizie:** Hamburger → `p-3 min-w-[44px] min-h-[44px] flex items-center justify-center`. Mobile menu links → `py-3 border-b min-h-[44px] flex items-center` (ambele branches: route + anchor).
+**Motiv:** Brand-wide benefit (afectează toate paginile cu Navbar), zero design impact pe desktop (hamburger e `md:hidden`), baseline cost zero suplimentar (regeneram oricum). WCAG compliance.
+**Alternative respinse:** Doar p-3 (depinde de Tailwind default, fragil), 48px (over-sized), defer (refuz — touch UX prost pe deviceuri reale).
+
+## 2026-05-28 — FIX 2 D5: Footer Vecteezy link touch target amânat
+
+**Context:** Link "Tree PNGs by Vecteezy" din footer e 14px height (text mic).
+**Decizie:** Amânat. Nu fixed în FIX 2.
+**Motiv:** Attribution secundar (legal requirement, nu UX primar). Click-rate aşteptat = aproape zero. Fixing-ul ar fi adăugat min-height 44px care ar fi pus link-ul în propriul rând cu visual prominence ne-justificată.
+**Alternative respinse:** Force 44px target (visual noise nemerită pentru attribution).
+
+## 2026-05-29 — `tests/qa-screenshots/` = evidence temporară, ștersă la încheierea Etapei 1
+
+**Context:** Auditele qa-tester pentru FIX 1 (Navbar darkHero) + FIX 2 (responsive atelier + Navbar touch targets) au produs 37 screenshots (1 pierdut la conversie). Convertite PNG→WebP q80 (19MB → 2MB, 89% reducere) și committate în `tests/qa-screenshots/`. Fondatorul vrea acces pentru review FIX 2 acum, dar **nu** intenția păstrării lor permanente în repo.
+**Decizie:** Directorul rămâne committat pe durata Etapei 1 (până la finalizarea tuturor paginilor + Etapa 2 setup). La încheierea Etapei 1 (înainte de Etapa 2 commit) — ştergere completă `git rm -r tests/qa-screenshots/`. Reaplicabil pentru audituri viitoare: directorul se recrează la nevoie, committat temporar, șters la final de etapă.
+**Motiv:** Screenshots de audit = evidence efemer pentru revizuit decizii vizuale; după revizuire valoarea cade la zero (decizia e codificată în CSS/components + brain notes). Repo-ul nu trebuie să crească cu evidence trecut; 2MB acum, dar dacă păstrăm pattern-ul cumulativ vom avea 100MB+ în 6 luni.
+**Reminder:** La închiderea Etapei 1 — verifică `tests/qa-screenshots/` și șterge-l. Adaugă la checklistul de end-of-etapa.
+**Alternative respinse:** Permanent retention (repo bloat cumulativ), git LFS (overkill pentru evidence temporară), gitignore + nu commit (founder nu primește acces pentru review pe machine-uri diferite/fresh clone).
+
+## 2026-05-28 — FIX 1: Scroll listener trebuie să ruleze indiferent de `prefersReducedMotion`
+
+**Context:** `Navbar.tsx` avea `useEffect` care register-uia scroll listener doar dacă `!prefersReducedMotion`. Pentru user reduced-motion, `scrolled` rămânea `false` perpetuu → Navbar transparent forever, iar (post-FIX 1) pe /atelier text rămânea cream forever.
+**Decizie:** Scroll listener register-uit mereu, fără guard pe `prefersReducedMotion`. Hook-ul `prefersReducedMotion` rămâne folosit doar pentru CSS transitions (`colorTransition`), nu pentru state updates.
+**Motiv:** State logic (scrolled true/false) ≠ animation (CSS transition). Reduced motion suprimă DOAR animaţiile, nu starea funcţională. Bug pre-existing care a devenit vizibil cu FIX 1; rezolvarea îmbunătăţeşte UX pentru user-ii reduced-motion pe TOATE paginile.
+**Alternative respinse:** Lasă-l ca era (Navbar prost pentru reduced-motion users), elimină `useReducedMotion` total (pierdem transition guard).
