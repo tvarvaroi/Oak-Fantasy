@@ -195,3 +195,33 @@ useEffect(() => {
 **Lecție generală:** **Reduced motion suprimă animaţii, nu state functional.** Orice useEffect care actualizează state pe baza scroll/resize/intersection trebuie să ruleze indiferent de prefs reduced-motion. Animations din CSS/Framer-Motion sunt suprimate separat. Guarduri pe state updates = bug ascuns vizibil doar la utilizatori reduced-motion.
 **Aplicabil la:** orice useEffect cu `prefersReducedMotion` în dep array sau early-return. Verifică: e o ANIMAŢIE pe care vreau să o skipez, sau e STATE pe care îl actualizez?
 **Fişiere:** `components/Navbar.tsx:60-75` (FIX 1).
+
+## SECURITY_CHECKLIST.md maintenance protocol
+
+Document: `_brain/notes/SECURITY_CHECKLIST.md` (living document)
+
+După fiecare sprint cu task-uri sensibile, Claude Code TREBUIE să:
+
+1. Review codul nou adăugat în sprint:
+   - `process.env.NEW_VAR_NAME` folosit? → adaugă în Section 2 (Env Vars)
+   - Service extern nou integrat? → adaugă în Section 1 (API Keys)
+   - Endpoint public nou? → adaugă în Section 6 (Rate Limiting)
+   - DB schema schimbată? → review Section 8 (RLS audit)
+
+2. Update Section 14 (Jurnal Rotații) dacă vreo cheie a fost:
+   - Creată nouă în sprint
+   - Rotated/regenerated
+   - Expusă accidental (necesită rotire imediată)
+
+3. Update timestamp "Ultima actualizare:" la începutul documentului (line 5)
+
+4. Commit atomic: `docs(security): update checklist after Sprint X`
+
+Acest protocol e CRITICAL — fără el documentul devine stale și pierde
+valoarea de "living document".
+
+**Bonus rule pre-commit:** orice commit care touchează `SECURITY_CHECKLIST.md`
+trebuie să fie scanat de `grep -E "re_[A-Za-z0-9_]{20,}|sk_live_[A-Za-z0-9]{20,}|whsec_[A-Za-z0-9]{20,}|eyJ[A-Za-z0-9._-]{50,}" _brain/notes/SECURITY_CHECKLIST.md`
+înainte de `git add`. Repo e PUBLIC (`tvarvaroi/Oak-Fantasy`) → orice secret raw
+e scanat automat de GitHub + revocat de provider. Cheile de menționat în
+checklist trebuie să fie REDACTATE (ex: `re_GnEqPV...***REDACTED***`).

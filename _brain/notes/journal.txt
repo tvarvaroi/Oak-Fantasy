@@ -1,0 +1,34 @@
+## 2026-05-29 — Pre-launch Security Checklist added
+
+Living document creat de fondator pentru tracking comprehensive de
+security tasks pre-launch. Locație: _brain/notes/SECURITY_CHECKLIST.md
+
+Conținut (14 secțiuni):
+1. API Keys rotation list (Resend, Supabase, Stripe, OAuth, SmartBill)
+2. Environment variables audit (Production/Preview/Dev separation)
+3. Git history secrets audit
+4. Placeholder-uri legale (strategie lib/legal-info.ts centralized)
+5. Domain & DNS setup (SPF, DKIM, DMARC pentru Resend)
+6. Rate limiting (Upstash Redis pentru toate endpoint-urile public)
+7. Stripe security (PCI, fraud protection, 3D Secure)
+8. Database security (RLS audit, backup strategy)
+9. Monitoring (Sentry, Speed Insights, uptime)
+10. GDPR & legal compliance (DPA, data export, ANPC)
+11. Performance audit (Lighthouse targets)
+12. Final pre-launch checklist (Z-1 user journey test)
+13. Post-launch monitoring (primele 7 zile)
+14. Jurnal de rotații (tracking cronologic key rotations)
+
+Update protocol: Claude Code update-ează document după fiecare sprint
+cu task-uri sensibile descoperite. Special attention la Section 1
+(API keys) și Section 14 (jurnal) la fiecare sprint end.
+
+Pre-launch action: secțiunea TL;DR e checklist-ul minim înainte de a
+conecta domain-ul oakfantasy.ro public.
+
+NOTĂ Claude Code (commit-time): Section 1.1 (Resend API key) commit-uită
+cu cheia REDACTATĂ pe valori. Repo e public (`tvarvaroi/Oak-Fantasy`),
+GitHub Secret Scanning + Resend ar fi revocat automat cheia raw. Cheia
+istorică `re_GnEqPV...` trebuie totuși rotated de fondator (e expusă în
+chatul strategic anterior cu Claude). Workflow recomandat: rotire +
+update env var Vercel + entry în Section 14.
