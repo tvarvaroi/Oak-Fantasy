@@ -577,6 +577,32 @@ După primii 30 zile (când totul e stabil), începe rotația periodică:
 
 ---
 
+## 14. Jurnal Rotații — Tracking cronologic key rotations
+
+Format: `data | service | eveniment | key prefix (sau [TBD])`
+
+```
+2026-06-15 | resend | INITIAL key created (development purposes)        | re_GnEqPV...
+
+2026-06-15 | resend | INCIDENT — exposed in strategic chat with Claude  | re_GnEqPV...
+           |        | Document Section 1.1 redacted, repo safe
+           |        | DECISION: keep live, NU rotate acum
+           |        | Reasoning: site not live, zero traffic, no real risk
+           |        |   Pre-launch rotation already planned (Sprint 4 final)
+           |        |   Avoid duplicate work — would rotate again pre-launch
+           |        | Mitigation: redacted in repo, exists only in Vercel env vars
+
+[pre-launch] | resend | ROTATION 1 — replace with oak-fantasy-production | [TBD]
+```
+
+**Protocol pentru entry nou:**
+- La fiecare rotație/creare/revocare cheie → entry nou cu data ISO + service + acțiune + key prefix
+- Decizii conștiente (defer, accept risk, etc.) → multi-line entry cu reasoning + mitigation
+- Pre-launch placeholder `[pre-launch]` pentru rotații planificate la Sprint 4 final
+- Acest jurnal e source-of-truth pentru audit security post-launch
+
+---
+
 ## Anexă A: Comenzi utile pentru audit
 
 ```bash
