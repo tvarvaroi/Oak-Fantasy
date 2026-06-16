@@ -32,3 +32,84 @@ GitHub Secret Scanning + Resend ar fi revocat automat cheia raw. Cheia
 istorică `re_GnEqPV...` trebuie totuși rotated de fondator (e expusă în
 chatul strategic anterior cu Claude). Workflow recomandat: rotire +
 update env var Vercel + entry în Section 14.
+
+## 2026-06-16 — Sprint 1 Task 1.1 (Cleanup) închis cu detour 2h
+
+Task 1.1 original (Sprint 1 START):
+- Delete tests/qa-screenshots/ (72 files, ~3MB)
+- Rename `.from('waitlist')` → `.from('email_subscribers')` în lib/supabase.ts
+- Verify cu smoke test ca anon pe staging
+- Atomic commit + push
+
+Plan: ~30 min. Realitate: ~3 ore din cauza unei fantome.
+
+DETOUR — Spirală debug "42501 RLS regression":
+
+Smoke test cu `.from('email_subscribers').insert({email}).select()` ca
+anon returna 42501. Am presupus RLS regression după ALTER TABLE RENAME
+(migration 20260522090009). Am pushed 5 migrations debug:
+- 20260615180000 — "Allow anon subscribe" WITH CHECK true (ghost fix)
+- 20260615190000 — drop+recreate "Anyone can subscribe"
+- 20260615200000 — alter WITH CHECK true
+- 20260615210000 — explicit grants + NOTICEs
+- 20260615220000 — NOTIFY pgrst reload
+
+Niciuna n-a rezolvat. Audit detaliat al pg_policies arăta state corect.
+Service role INSERT funcţiona. Anon JWT verified pentru proiectul corect.
+
+ROOT CAUSE (descoperit 2026-06-16 după restart proiect + retry):
+
+`supabase-js .insert(entry).select()` cere PostgREST să returneze rândul
+inserat printr-un SELECT post-INSERT. Anon NU are SELECT policy pe
+email_subscribers — by design, doar service_role citeşte subscribers.
+PostgREST mapează "INSERT succeeds but SELECT-back blocked" la cod
+42501 misleading. Producţia foloseşte `.insert(entry)` fără chain
+`.select()`. Producţia n-a fost niciodată broken.
+
+CLEANUP final (canonical restore):
+
+1. Migration nouă `20260616120000_restore_canonical_email_subscribers_policies.sql`:
+   - Idempotent drop "Allow anon subscribe" + "Anyone can subscribe"
+   - Recreate "Anyone can subscribe" cu canonical WITH CHECK email format
+   - Defense-in-depth alongside Zod app-layer validation
+
+2. `supabase migration repair --status reverted` pe toate 5 ghost migrations
+   (180000, 190000, 200000, 210000, 220000). Tracking sincronizat cu disk.
+
+3. Şters ghost fix `20260615180000_restore_anon_insert_email_subscribers.sql`
+   din disk local. Repo 100% clean pentru prod fresh deploy.
+
+4. Smoke test corect (scripts/smoke-canonical.mjs):
+   - T1: production path `.insert()` fără `.select()` → PASS 201
+   - T2: invalid email → 42501 (WITH CHECK enforcing) → PASS
+   - Cleanup test rows via service_role
+
+Schema final pe `juuozsjvuikdtjqhdylw`:
+   policyname: "Anyone can subscribe"
+   roles: {anon, authenticated}
+   cmd: INSERT
+   permissive: PERMISSIVE
+   with_check: ((email IS NOT NULL) AND (length(email) > 3) AND (email LIKE '%@%'))
+
+Reality clarification (added în brain + SECURITY_CHECKLIST):
+- Un singur proiect Supabase real azi: `juuozsjvuikdtjqhdylw`
+- "fgeubbsxucppypyjbdpg" era plan, NU implementare
+- Site-ul Vercel rulează pe singurul proiect
+- Pre-launch: create proiect prod nou, apply canonical migrations clean
+
+Lessons recorded în `_brain/notes/gotchas.md`:
+1. Single Supabase project, not staging+prod (reality clarification)
+2. Supabase Free Plan auto-pause + PostgREST cache post-restore
+3. RLS policies NU se migrează automat la ALTER TABLE RENAME
+4. `.insert().select()` cu RLS — 42501 e misleading ← CRITICAL gotcha
+
+Section 8 SECURITY_CHECKLIST expandat cu:
+- 8.4 Supabase plan decision (Free vs Pro pre-launch)
+- 8.5 Create prod project workflow + canonical state verification
+- 8.6 RLS smoke test per tabel pre-launch + correct INSERT pattern
+
+Time: detour 2h, cleanup ~30 min, brain docs ~30 min. Total ~3h
+vs plan 30 min. Tradeoff: 4 gotchas durabile + workflow corect
+documentat pentru future Supabase work pre-launch.
+
+Next: Sprint 1 Task 1.2 (/contact page implementation).
