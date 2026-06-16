@@ -113,3 +113,95 @@ vs plan 30 min. Tradeoff: 4 gotchas durabile + workflow corect
 documentat pentru future Supabase work pre-launch.
 
 Next: Sprint 1 Task 1.2 (/contact page implementation).
+
+## 2026-06-16 — Sprint 1 Task 1.2 (/contact) închis
+
+Scope: pagină /contact bilingvă cu form + Resend integration test mode
++ admin notification + auto-reply (skipped în sandbox) + sidebar
+LEGAL_INFO + Footer Contact link.
+
+Decizii lock founder:
+- D1 content-map inline (mirror About pattern, NOT messages/*.json)
+- D2 install resend + react-email
+- D3 prima rută API /api/contact
+- D4 test mode logic + admin email TEST MODE warning banner
+- D5 Footer refactor pentru page links
+- D6 memory rate-limit cu HONEST threat model warning
+- Q1-Q5 aprobate
+
+Foundation creat:
+- lib/legal-info.ts: single source of truth pentru date legale +
+  contact. Toate [PLACEHOLDER] swap pre-launch via Vercel env.
+- lib/schemas/contact.ts: Zod cu 5-subject enum, honeypot website,
+  elapsedMs timing-check optional, SUBJECT_LABELS bilingv.
+- lib/rate-limit.ts: in-process Map cu WARNING explicit că Vercel
+  serverless invalidează persistence — pre-launch BLOCKER Upstash.
+
+Templates React Email (Cream/paper palette, Caudex/Lora):
+- emails/ContactAdminEmail.tsx cu conditional TEST MODE banner naming
+  user email + missing-domain reason
+- emails/ContactAutoReplyEmail.tsx bilingv cu Caveat handwritten
+  signature + LEGAL_INFO footer
+
+API route app/api/contact/route.ts workflow:
+  1. rate-limit per-IP (5/h memory)
+  2. Zod validate -> 400 per-field errors
+  3. honeypot drop silent (200)
+  4. timing-check elapsedMs < 2000 -> silent drop
+  5. Resend admin email mandatory
+  6. Resend auto-reply skipped în test mode cu console.warn
+  Env: RESEND_API_KEY (required), RESEND_FROM_EMAIL,
+       RESEND_ADMIN_EMAIL (default tvarvaroi@gmail.com)
+
+UI:
+- app/[locale]/contact/page.tsx cu generateMetadata + ContactPage JSON-LD
+- components/contact/content.ts (CONTACT_CONTENT[locale] bilingv)
+- ContactHero: Caudex headline + Caveat handwritten -1deg
+- ContactForm: react-hook-form + zodResolver, full box-border inputs
+  (mirror EmailForm), label-caps deasupra, message counter, hidden
+  honeypot, timing elapsedMs, per-field errors, success state
+  personalizat cu name + small leaf SVG ornament
+- ContactInfo: paper-aged card cu lucide icons + LEGAL_INFO + placeholder
+  banner când isPlaceholderMode + Caveat signature
+- ContactPage: lg:grid-cols-12 split (form 7 / info 5), stacked mobile
+- lib/i18n-routes.ts: PATHNAMES adăugat contact (same slug ro/en)
+
+Footer:
+- Adăugat Contact link în navLinks (page link, locale-aware)
+- Email cross-site unificat la LEGAL_INFO.contactEmail
+  (default info@oakfantasy.ro)
+
+SECURITY_CHECKLIST updates:
+- §4.1 TODO email final founder decide pre-launch
+- §6.3 timing-check defense layer
+- §6.4 (new) HONEST threat model: memory rate-limit near-zero on Vercel
+- §6.5 (new) Resend monthly alert + upgrade path
+
+BLOCKER hit în timpul build smoke test (RESOLVED):
+- Functions în CONTACT_CONTENT (successHeadline, errorRate) → server
+  component → client prop pass crash (Next 14 RSC nu serializează fn).
+- Build static prerender /ro/contact + /en/contact timeout după 3 tries.
+- Fix: template strings cu {name}/{minutes} placeholders + String.replace
+  client-side + plural { one, many } map.
+- Gotcha durabilă scrisă: "Funcții în copy map → server→client component
+  pasează crash la build" — regula generală: orice prop server→client
+  trebuie să fie JSON-serializable.
+
+Verificat:
+- npm run typecheck GREEN
+- npm run lint GREEN (0 warnings)
+- npm run check:i18n GREEN (5 content maps now)
+- npm run build SUCCESS (/[locale]/contact 28.9 kB ro+en SSG'd,
+  /api/contact dynamic)
+
+Hand-off manual către founder:
+- Submit form pe Vercel preview cu tvarvaroi@gmail.com (Resend test
+  mode acceptă doar acel email)
+- Verifică admin notification primit cu TEST MODE warning banner
+- Verifică log Vercel: "[contact] TEST MODE: auto-reply to ... skipped"
+- Pre-launch: setup oakfantasy.ro domain Resend + flip ON auto-reply
+
+8 commits atomic, Vercel deploy automat la push.
+
+Next: Sprint 1 Task 1.3 (pagini legale: termeni + confidentialitate + retur)
+sau Task 1.4 (homepage updates) — așteptăm direcție founder.

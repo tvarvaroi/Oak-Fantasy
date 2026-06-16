@@ -310,6 +310,48 @@ cu calea producţie înainte de a ataca DB-ul.
 `supabase/migrations/20260616120000_restore_canonical_email_subscribers_policies.sql`
 (canonical restore), `scripts/smoke-canonical.mjs` (test corect).
 
+## 2026-06-16 — Funcții în copy map → server→client component pasează crash la build
+
+**Simptom:** `npm run build` eșuează la static prerender de `/ro/contact` și
+`/en/contact` cu eroarea:
+```
+Error: Functions cannot be passed directly to Client Components unless you
+explicitly expose it by marking it with "use server". Or maybe you meant
+to call this function rather than return it.
+  { ..., successHeadline: function successHeadline, ... }
+```
++ `Static page generation for /ro/contact is still timing out after 3 attempts`.
+**Cauză:** `components/contact/content.ts` exporta câmpuri ca funcții
+(`successHeadline: (name: string) => string`, `errorRate: (minutes: number) => string`)
+în obiectul `CONTACT_CONTENT[locale]`. Server component
+(`app/[locale]/contact/page.tsx`) pasa obiectul întreg ca prop la client
+component (`ContactPage`). Next 14 RSC serializează prop-urile prin
+`stringify` — funcțiile NU sunt serializabile, throw în render, page hangs,
+build fail.
+**Fix folosit:** Înlocuiește funcții cu template strings:
+```ts
+// înainte (BROKEN):
+successHeadline: (name) => `Mulțumim, ${name}!`,
+errorRate: (m) => `Încearcă din nou peste ${m} ${m===1?'minut':'minute'}.`,
+
+// după (works):
+successHeadlineTemplate: 'Mulțumim, {name}!',
+errorRateTemplate: { one: '... {minutes} minut.', many: '... {minutes} minute.' },
+```
+Și `String.replace('{name}', actual)` în client component. Plural ales
+runtime din `minutes === 1`.
+**Lecție generală:** **Orice prop care traversează granița server→client
+trebuie să fie JSON-serializable.** Asta înseamnă fără funcții, fără
+Date instances, fără Map/Set, fără class instances. Template strings +
+helper functions client-side. Această regulă se aplică retroactiv la
+toate `<route>_CONTENT[locale]` patterns din proiect.
+**Aplicabil la:** orice content map nou care expune copy bilingv. Dacă
+există nevoie de logică (plural, format dată, format număr), păstrezi
+template + extragi în helper client. Verifică: `npm run build` PE LOCAL
+înainte de commit pentru pagini noi care folosesc content-map pattern.
+**Fișiere:** `components/contact/content.ts:42-58`,
+`components/contact/ContactForm.tsx:148-155`.
+
 ## SECURITY_CHECKLIST.md maintenance protocol
 
 Document: `_brain/notes/SECURITY_CHECKLIST.md` (living document)
