@@ -24,10 +24,13 @@ export interface ContactCopy {
     submit: {
       idle: string;
       loading: string;
-      successHeadline: (name: string) => string;
+      // Template with literal `{name}` placeholder — server components
+      // cannot pass functions to client components (Next 14 RSC).
+      successHeadlineTemplate: string;
       successBody: string;
       errorGeneric: string;
-      errorRate: (minutes: number) => string;
+      // Template with literal `{minutes}` placeholder + plural forms.
+      errorRateTemplate: { one: string; many: string };
     };
   };
   info: {
@@ -76,14 +79,16 @@ export const CONTACT_CONTENT: Record<Locale, ContactCopy> = {
       submit: {
         idle: 'Trimite mesajul',
         loading: 'Se trimite…',
-        successHeadline: (name) =>
-          `Mulțumim, ${name}! Mesajul tău a ajuns în atelier.`,
+        successHeadlineTemplate:
+          'Mulțumim, {name}! Mesajul tău a ajuns în atelier.',
         successBody:
           'Răspundem în cel mult 24 de ore (zile lucrătoare), direct de la masă.',
         errorGeneric:
           'Ceva nu a mers bine. Te rugăm să încerci din nou peste câteva minute.',
-        errorRate: (minutes) =>
-          `Ai trimis mai multe mesaje recent. Încearcă din nou peste ${minutes} ${minutes === 1 ? 'minut' : 'minute'}.`,
+        errorRateTemplate: {
+          one: 'Ai trimis mai multe mesaje recent. Încearcă din nou peste {minutes} minut.',
+          many: 'Ai trimis mai multe mesaje recent. Încearcă din nou peste {minutes} minute.',
+        },
       },
     },
     info: {
@@ -131,14 +136,16 @@ export const CONTACT_CONTENT: Record<Locale, ContactCopy> = {
       submit: {
         idle: 'Send message',
         loading: 'Sending…',
-        successHeadline: (name) =>
-          `Thank you, ${name}! Your message made it to the workshop.`,
+        successHeadlineTemplate:
+          'Thank you, {name}! Your message made it to the workshop.',
         successBody:
           "We'll get back to you within 24 hours on business days, straight from the bench.",
         errorGeneric:
           'Something went wrong. Please try again in a few minutes.',
-        errorRate: (minutes) =>
-          `You've sent a few messages recently. Try again in ${minutes} ${minutes === 1 ? 'minute' : 'minutes'}.`,
+        errorRateTemplate: {
+          one: "You've sent a few messages recently. Try again in {minutes} minute.",
+          many: "You've sent a few messages recently. Try again in {minutes} minutes.",
+        },
       },
     },
     info: {

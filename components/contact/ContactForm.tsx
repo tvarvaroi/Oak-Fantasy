@@ -150,8 +150,12 @@ export default function ContactForm({ copy, locale }: ContactFormProps) {
           retryAfter?: number;
         };
         const minutes = Math.max(1, Math.round((data.retryAfter ?? 60) / 60));
+        const template =
+          minutes === 1
+            ? copy.submit.errorRateTemplate.one
+            : copy.submit.errorRateTemplate.many;
         setStatus('error');
-        setServerError(copy.submit.errorRate(minutes));
+        setServerError(template.replace('{minutes}', String(minutes)));
         return;
       }
 
@@ -212,7 +216,7 @@ export default function ContactForm({ copy, locale }: ContactFormProps) {
             marginBottom: 10,
           }}
         >
-          {copy.submit.successHeadline(successName)}
+          {copy.submit.successHeadlineTemplate.replace('{name}', successName)}
         </p>
         <p
           className="font-lora"
