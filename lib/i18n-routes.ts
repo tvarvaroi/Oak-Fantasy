@@ -21,6 +21,10 @@ export const PATHNAMES = {
   despre: { ro: 'despre', en: 'about' },
   atelier: { ro: 'atelier', en: 'workshop' },
   tocatoare: { ro: 'tocatoare', en: 'cutting-boards' },
+  // `contact` slug intentionally identical across locales — same word
+  // in RO and EN. Codified explicitly so the route is registered with
+  // the middleware audit and shows up in localizedPath().
+  contact: { ro: 'contact', en: 'contact' },
 } as const;
 
 export type RouteKey = keyof typeof PATHNAMES;
