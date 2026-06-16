@@ -196,6 +196,120 @@ useEffect(() => {
 **Aplicabil la:** orice useEffect cu `prefersReducedMotion` în dep array sau early-return. Verifică: e o ANIMAŢIE pe care vreau să o skipez, sau e STATE pe care îl actualizez?
 **Fişiere:** `components/Navbar.tsx:60-75` (FIX 1).
 
+## 2026-06-15 — Single Supabase project, not staging+prod (reality clarification)
+
+**Simptom:** Brain anterior + commit-uri menționau două proiecte Supabase:
+"staging juuozsjvuikdtjqhdylw" şi "prod fgeubbsxucppypyjbdpg". `.env.local`
+pointa la `fgeubbsxucppypyjbdpg` care a returnat NXDOMAIN; `.env.staging.local`
+pointa la `juuozsjvuikdtjqhdylw` care funcţiona după restore.
+**Cauză:** `fgeubbsxucppypyjbdpg` nu a fost niciodată creat ca proiect — era
+parte din planul pre-launch (vezi `_brain/notes/SECURITY_CHECKLIST.md`
+Section 8 TODO), NU implementare. Site-ul Vercel rulează ÎN PRODUCŢIE pe
+unicul proiect real (`juuozsjvuikdtjqhdylw`).
+**Fix folosit:** Acceptăm realitatea: un singur proiect Supabase până la
+pre-launch. La pre-launch creem proiect prod nou (oakfantasy-prod), apply
+canonical migrations din repo (inclusiv `20260616120000_restore_canonical_email_subscribers_policies.sql`),
+update Vercel env vars Production, test E2E pe prod project ÎNAINTE de
+switch domain `oakfantasy.ro`.
+**Lecție generală:** "Plan menţionat în brain" ≠ "implementat". Înainte
+de a presupune două environment-uri, verifică **realitatea practică**:
+`grep -E "SUPABASE_URL" .env.local .env.staging.local | sed 's/=.*\\(.\\{20\\}\\)$/=...\\1/'`.
+**Fişiere:** `.env.local`, `.env.staging.local`, `_brain/notes/SECURITY_CHECKLIST.md`
+Section 8 (TODOs prod creation).
+
+## 2026-06-15 — Supabase Free Plan auto-pause după 7 zile + PostgREST cache post-restore
+
+**Simptom 1:** Project URL devine NXDOMAIN (`Non-existent domain`) la
+`supabase db push` / smoke test fetch. Cauză: Free Plan auto-paused
+proiectul după 7 zile fără activitate.
+**Simptom 2 (după restore):** INSERT ca anon returnează 42501 RLS, dar
+schema/policy/grants par corecte la audit. PostgREST schema cache poate
+rămâne stale post-restore.
+**Cauză:** Supabase Free Plan oprește proiecte după 7 zile inactivitate
+(read/write zero). La restore, conexiunile DB nu sunt reciclate complet
+şi PostgREST poate continua să cacheze schema veche pentru câteva minute.
+**Fix folosit:**
+1. Dashboard → restore from pause (durează ~2 min, project ref neschimbat)
+2. Apply orice migrations pending: `npx supabase db push`
+3. Dashboard → Settings → General → Restart project (forţează PostgREST
+   reload + connection pool reset)
+4. Smoke test ca rol anon înainte de a presupune că totul merge
+**Lecţie generală:** Free Plan = bun pentru dev, riscant pentru orice
+demo/staging cu uptime aşteptat. Pre-launch: upgrade Pro ($25/lună) ca
+să avem no-pause + daily automated backups + 28d point-in-time recovery.
+Vezi `_brain/notes/SECURITY_CHECKLIST.md` Section 8 TODO Free vs Pro.
+**Fişiere:** niciunul (operaţional dashboard).
+
+## 2026-06-15 — RLS policies NU se migrează automat la `ALTER TABLE … RENAME TO`
+
+**Simptom:** După `ALTER TABLE waitlist RENAME TO email_subscribers`
+(migration `20260522090009_extend_waitlist_to_email_subscribers.sql`),
+policy "Anyone can join the waitlist" e preservată prin rename + renamed
+explicit în acea migration la "Anyone can subscribe". Toate operaţiile
+subsequente trebuie să referenţeze noul nume.
+**Cauză:** Postgres preservă policies attached la table prin RENAME
+(table OID rămâne acelaşi), DAR orice debug migration sau diagnostic
+care referenţiază vechiul nume (`waitlist`) va eşua silenţios sau va
+opera pe state neexistent.
+**Fix folosit:** După ORICE `RENAME TO`, audit obligatoriu:
+```sql
+SELECT policyname, roles, cmd, with_check
+FROM pg_policies
+WHERE tablename = '{new_name}';
+```
++ Smoke test ca rol anon pe toate endpoint-urile public INSERT/SELECT.
++ În comentariile migration-ului, documentează explicit care policies
+migrează automat vs care necesită re-create.
+**Lecţie generală:** RENAME table = OID preservat = policies preserve.
+RENAME column nu afectează policies (referenţiază numele nou). DROP +
+CREATE table = policies pierdute. Audit policies după orice schimbare
+de schema care touchează RLS-enabled tables.
+**Fişiere:** `supabase/migrations/20260522090009_extend_waitlist_to_email_subscribers.sql`.
+
+## 2026-06-15 — `.insert(entry).select()` cu RLS — 42501 e misleading
+
+**🚨 CRITICAL gotcha. Acesta a cauzat o spirală de debug de ~2 ore.**
+
+**Simptom:** Smoke test `supabase.from('email_subscribers').insert({email}).select()`
+ca rol anon returnează `42501 new row violates row-level security policy`,
+DAR producţia (`lib/supabase.ts addToWaitlist`) care foloseşte
+`.from('email_subscribers').insert(entry)` (fără `.select()`) funcţionează
+perfect (returnează `201 Created`, rândul e inserat).
+**Cauză:** `supabase-js .insert(...).select()` setează implicit
+`Prefer: return=representation` pe request. PostgREST execută:
+1. INSERT — verificat contra INSERT policy (PASS pentru anon)
+2. SELECT pe rândul inserat — verificat contra SELECT policy
+   (FAIL: anon NU are SELECT policy pe `email_subscribers` — by design,
+   doar `service_role` citeşte subscribers)
+
+PostgREST mapează "INSERT succeeds but cannot SELECT-back" la **acelaşi
+cod 42501** ca un INSERT denied real. Niciun indiciu în error code/message
+că pasul 2 a eşuat, nu pasul 1.
+**Fix folosit:** Pentru smoke tests pe tabele cu doar INSERT policy
+(no SELECT pentru rol-ul testat), foloseşte `.insert(entry)` fără chain
+`.select()`. Dacă ai nevoie să confirmi inserarea, foloseşte service_role
+client separat pentru SELECT verification.
+**Diagnostic question înainte de orice debug RLS 42501:** "Care e EXACT
+lanţul `.insert()` folosit în producţie vs în test-ul tău? Producţia
+foloseşte `.select()` chained?"
+**Exemplu Oak Fantasy:**
+- `email_subscribers` are INSERT policy pentru anon (abonaţii submit)
+- `email_subscribers` NU are SELECT policy pentru anon (doar service_role citeşte)
+- `.insert({email})` → 201 ✓
+- `.insert({email}).select()` → 42501 ✗ (SELECT blocat, mesaj înşelător)
+
+**Documentat pentru posterity.** Au fost create 5 migrations debug
+(20260615180000 + 190000-220000) chasing această fantomă. Toate au
+fost marcate `reverted` via `supabase migration repair` şi restorate
+la canonical via `20260616120000_restore_canonical_email_subscribers_policies.sql`.
+**Lecţie generală:** "RLS error" în PostgREST ≠ neapărat "INSERT denied".
+Întotdeauna compară EXACT calea producţie vs cea de test. Dacă diferă
+în chained methods (`.select()`, `.single()`, etc), reproduce mai întâi
+cu calea producţie înainte de a ataca DB-ul.
+**Fişiere:** `lib/supabase.ts:14-27` (production path),
+`supabase/migrations/20260616120000_restore_canonical_email_subscribers_policies.sql`
+(canonical restore), `scripts/smoke-canonical.mjs` (test corect).
+
 ## SECURITY_CHECKLIST.md maintenance protocol
 
 Document: `_brain/notes/SECURITY_CHECKLIST.md` (living document)
