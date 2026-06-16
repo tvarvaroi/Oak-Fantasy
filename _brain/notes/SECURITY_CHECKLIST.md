@@ -242,6 +242,10 @@ Lista exhaustivă (de actualizat pe măsură ce Claude Code adaugă):
                     → Footer
                     → email templates Resend
                     → variabilă env RESEND_ADMIN_EMAIL
+  TODO 2026-06-16:    founder decide email final (info@ vs alt) înainte
+                    de a popula NEXT_PUBLIC_CONTACT_EMAIL pe Vercel.
+                    Curent: LEGAL_INFO.contactEmail default
+                    'info@oakfantasy.ro'.
 
 [TELEFON_CONTACT]   → /contact page (optional)
                     → Footer (optional)
@@ -362,9 +366,48 @@ export const contactRateLimit = new Ratelimit({
 
 ### 6.3 CAPTCHA pentru endpoints public
 
-- **Contact form:** honeypot field (invizibil, dacă e completat = bot)
+- **Contact form:** honeypot field (invizibil, dacă e completat = bot) +
+  timing check (min 2s elapsed between mount și submit — vezi
+  `lib/schemas/contact.ts` `elapsedMs`)
 - **Auth pages:** Cloudflare Turnstile (gratuit) sau hCaptcha
 - **Newsletter signup:** honeypot
+
+### 6.4 Honest threat model — current state (added 2026-06-16)
+
+**STATUS ACTUAL `/api/contact`:** rate limit este `lib/rate-limit.ts`
+in-process `Map<string, RateLimitEntry>`. **Pe Vercel serverless asta NU
+oferă defense reală cross-invocation** — fiecare cold start primește
+proces nou, bucket-ul reset. Doar un atacator care nimerește același
+warm instance e blocat.
+
+Ce avem efectiv real azi (apel `/api/contact`):
+- ✅ Honeypot field `website` (capturează majoritatea bot-urilor naive)
+- ✅ Timing check min 2 secunde de la page mount la submit
+- ⚠️ Memory rate-limit (eficacitate near-zero pe Vercel serverless)
+- ❌ Persistent rate-limit cross-IP/global
+- ❌ CAPTCHA Turnstile / hCaptcha
+- ❌ Bot detection avansat (User-Agent heuristics, etc.)
+
+**Pre-launch BLOCKER (nu nice-to-have):**
+- [ ] **Upstash Redis sliding-window rate-limit** pe `/api/contact`
+      (5/h/IP) + `/api/subscribe` (3/h/IP) + `/api/auth/*`. Înlocuiește
+      complet `lib/rate-limit.ts`. Estimat 30 min effort.
+- [ ] **Cloudflare Turnstile** pe contact form ca defense layer 3.
+      Estimat 45 min effort + 5 min DNS.
+- [ ] Update `lib/rate-limit.ts` cu deprecation banner sau șterge după
+      migrare.
+
+### 6.5 Email throttling (added 2026-06-16)
+
+Contact form trimite 2 emailuri/submit prin Resend (admin notification +
+auto-reply). Free plan Resend = 3000 emailuri/lună. Calcul: dacă rate
+limit Upstash blochează la 5 req/h/IP global → max ~720 submits/zi (în
+practică sub 10/zi pre-launch).
+
+- [ ] Setup Resend monthly usage alert la 80% (2400/luna) → email
+      tvarvaroi@gmail.com
+- [ ] Dacă launch crește volumul, upgrade la Resend Pro ($20/lună,
+      50K emailuri)
 
 ---
 
