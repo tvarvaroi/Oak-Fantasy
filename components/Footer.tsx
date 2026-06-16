@@ -4,6 +4,9 @@ import Image from 'next/image';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useRef, useEffect, useState } from 'react';
 
+import { LEGAL_INFO } from '@/lib/legal-info';
+import { localizedPath } from '@/lib/i18n-routes';
+
 /* ─── Bottom decorative branch ───────────────────────────────────
    A wide oak-leaf-branch SVG that draws across the full width
    as it enters the viewport.
@@ -134,9 +137,10 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
         { label: 'Produse', href: '#products' },
         { label: 'Povestea noastră', href: '#story' },
         { label: 'Lista de așteptare', href: '#waitlist' },
+        { label: 'Contact', href: localizedPath('contact', 'ro') },
       ],
       contactLines: [
-        'atelier@oakfantasy.ro',
+        LEGAL_INFO.contactEmail,
         'Transilvania, România',
         'Program: Luni–Vineri, 9–17',
       ],
@@ -154,9 +158,10 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
         { label: 'Products', href: '#products' },
         { label: 'Our Story', href: '#story' },
         { label: 'Waitlist', href: '#waitlist' },
+        { label: 'Contact', href: localizedPath('contact', 'en') },
       ],
       contactLines: [
-        'atelier@oakfantasy.ro',
+        LEGAL_INFO.contactEmail,
         'Transylvania, Romania',
         'Hours: Mon–Fri, 9–17',
       ],
