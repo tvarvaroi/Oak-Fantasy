@@ -434,6 +434,64 @@ SELECT * FROM email_subscribers  -- DENY pentru anonymous
 - [ ] Test all migrations pe staging înainte de prod
 - [ ] Versioning corect (timestamp prefix)
 
+### 8.4 Supabase plan decision (added 2026-06-15 după Sprint 1)
+
+- [ ] Decide: Free Plan + restore on-demand vs Pro Plan ($25/lună)
+      pentru no-pause guarantee
+- [ ] Dacă rămânem Free: implementează cron ping (Vercel Cron sau
+      GitHub Action) la fiecare 6 zile pe `juuozsjvuikdtjqhdylw` (sau
+      proiect prod nou) ca să prevenim auto-pause
+- [ ] Dacă upgrade Pro: validate point-in-time recovery + 28-day
+      retention configurate corect; review billing alert threshold
+- [ ] Document choice în `_brain/notes/decisions.md` cu motivaţia
+
+### 8.5 Create prod project (added 2026-06-15)
+
+Singurul proiect Supabase real azi e `juuozsjvuikdtjqhdylw` care e
+folosit ca dev/staging. Vezi gotcha "Single Supabase project, not
+staging+prod" în `_brain/notes/gotchas.md`.
+
+- [ ] Create new Supabase project "oakfantasy-prod" în regiune Frankfurt
+- [ ] Apply TOATE migrations din `supabase/migrations/` (clean state,
+      fără debug migrations propagate)
+- [ ] Re-seed produse iniţiale din `supabase/seeds/01_products.sql`
+- [ ] Update Vercel env vars (Production) cu URL + keys prod project
+- [ ] Test E2E (WaitlistSection, /contact form, eventual checkout)
+      pe URL Vercel prod ÎNAINTE de a conecta domain `oakfantasy.ro`
+- [ ] Manual verify RLS policies pe prod match canonical state:
+      ```sql
+      SELECT policyname, roles, cmd, with_check
+      FROM pg_policies WHERE schemaname='public';
+      ```
+      Expected pe `email_subscribers`: o singură policy
+      "Anyone can subscribe" INSERT anon+authenticated WITH CHECK
+      email format
+
+### 8.6 RLS smoke test per tabel pre-launch (added 2026-06-15)
+
+Pentru fiecare tabel public RLS-enabled, smoke test ca rol `anon`
+înainte de launch ca să confirmăm policies aplică corect:
+
+- [ ] `email_subscribers` — INSERT policy verified (canonical restored
+      2026-06-16, vezi migration `20260616120000_*`)
+- [ ] `products` — SELECT WHERE status='active' permis pentru anon;
+      INSERT denied pentru anon
+- [ ] `profiles` — own user only (după Sprint 2 Auth) — pending
+- [ ] `orders` — own user + admin only (după Sprint 3 Checkout) — pending
+- [ ] `order_items` — same as orders — pending
+- [ ] `inventory` — anon SELECT denied; service_role only — pending
+- [ ] `stock_movements` — admin only — pending
+- [ ] `order_status_history` — own order user + admin — pending
+
+Smoke test pattern pentru INSERT-only tables (`email_subscribers`):
+**NU folosi `.insert().select()`** — chained `.select()` cere SELECT
+policy şi va returna 42501 misleading. Foloseşte:
+```js
+const { error } = await supabase.from('TABLE').insert(entry);
+```
+Vezi `scripts/smoke-canonical.mjs` ca referinţă. Gotcha complet în
+`_brain/notes/gotchas.md` `.insert().select() cu RLS — 42501 e misleading`.
+
 ---
 
 ## 9. Monitoring & Alerting Setup
