@@ -220,11 +220,17 @@ Thumbs.db
 Lista exhaustivă (de actualizat pe măsură ce Claude Code adaugă):
 
 ```
-[DENUMIRE_SRL]      → app/[locale]/termeni/page.tsx
-                    → app/[locale]/confidentialitate/page.tsx
-                    → app/[locale]/retur/page.tsx
-                    → app/[locale]/contact/page.tsx
+[DENUMIRE_SRL]      → app/[locale]/termeni/page.tsx          [SLOT FILLED 2026-06-18 skeleton]
+                    → app/[locale]/confidentialitate/page.tsx [SLOT FILLED 2026-06-18 skeleton]
+                    → app/[locale]/retur/page.tsx             [SLOT FILLED 2026-06-18 skeleton]
+                    → app/[locale]/contact/page.tsx           [SLOT FILLED 2026-06-16]
                     → components/Footer.tsx (legal info block)
+  Sprint 1 closure:   All 4 legal/contact pages now ship as skeletons.
+                    Pre-launch task: populate NEXT_PUBLIC_COMPANY_NAME
+                    + the 10 other env vars below; lawyer fills
+                    the section bodies in components/legal/*/content.ts
+                    (LegalPlaceholder bodies). No code change required
+                    once env vars + content land.
 
 [CUI]               → toate paginile legale + Footer
 
@@ -576,6 +582,20 @@ Vezi `scripts/smoke-canonical.mjs` ca referinţă. Gotcha complet în
 - [ ] Speed Insights = "necessary" (poate funcționa fără consent, dar de discutat cu juristul)
 - [ ] User poate revoca consent oricând
 - [ ] Cookie policy linkată în banner
+
+### 10.1.b Cookie policy page (deferred post-Sprint 1)
+
+Status azi: site-ul NU setează cookies non-essential. Doar
+preferințele de locale și (eventual post-Sprint 2) sesiunea de auth.
+Atât. Deci pagină dedicată `/cookie-policy` ar fi prematur acum.
+
+- [ ] Adaugă `cookie` la PATHNAMES + skeleton page când:
+  - Vercel Analytics / Google Analytics / Plausible activat (orice
+    analytics non-essential)
+  - Banner Cookie Consent intră în UI
+  - Sub-procesatori cu cookies third-party (Stripe checkout iframe etc.)
+- [ ] Întâi banner consent + analytics, APOI pagină — invers degeaba
+- [ ] Foloseşte aceeași `LegalLayout` infrastructure ca termeni/privacy/retur
 
 ### 10.2 Data Processing Agreement (DPA)
 
