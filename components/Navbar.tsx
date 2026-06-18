@@ -13,28 +13,31 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-type NavLink =
-  | { label: string; type: 'anchor'; anchor: string }
-  | { label: string; type: 'route'; routeKey: 'despre' | 'atelier' | 'tocatoare' };
+type NavRouteKey = 'despre' | 'atelier' | 'tocatoare' | 'contact';
+type NavLink = { label: string; type: 'route'; routeKey: NavRouteKey };
 
-// 2026-05-27: replaced the homepage #atelier anchor with a route link to
-// /atelier (D1). 2026-05-23: replaced the dead #tocatoare anchor with a
-// route link to /tocatoare (D5 — same pattern). Homepage sections still
-// reachable via natural scroll only.
+// 2026-06-18 (Task 1.4 — IA Foundation): primary nav reduced to 4 clean
+// route links. The homepage-only anchors "Povestea noastră" (#poveste) and
+// "Îngrijire" (#ingrijire) were stripped from the primary nav — clicking
+// them from an interior page meant a full-page reload + scroll, which reads
+// as "go home and scroll" rather than the user's intent. The section IDs
+// remain in the homepage DOM, so direct #anchor URLs / external shares still
+// work. "Contact" added (was reachable only via Footer — UX gap found in
+// the post-Sprint-1 smoke test).
+//   Earlier: 2026-05-27 #atelier -> /atelier route; 2026-05-23 #tocatoare
+//   -> /tocatoare route.
 const NAV_LINKS_RO: NavLink[] = [
-  { label: 'Povestea noastră', type: 'anchor', anchor: '#poveste' },
-  { label: 'Despre', type: 'route', routeKey: 'despre' },
   { label: 'Atelier', type: 'route', routeKey: 'atelier' },
   { label: 'Tocătoare', type: 'route', routeKey: 'tocatoare' },
-  { label: 'Îngrijire', type: 'anchor', anchor: '#ingrijire' },
+  { label: 'Despre', type: 'route', routeKey: 'despre' },
+  { label: 'Contact', type: 'route', routeKey: 'contact' },
 ];
 
 const NAV_LINKS_EN: NavLink[] = [
-  { label: 'Our Story', type: 'anchor', anchor: '#poveste' },
-  { label: 'About', type: 'route', routeKey: 'despre' },
   { label: 'Workshop', type: 'route', routeKey: 'atelier' },
   { label: 'Cutting Boards', type: 'route', routeKey: 'tocatoare' },
-  { label: 'Care', type: 'anchor', anchor: '#ingrijire' },
+  { label: 'About', type: 'route', routeKey: 'despre' },
+  { label: 'Contact', type: 'route', routeKey: 'contact' },
 ];
 
 interface NavbarProps {
@@ -196,48 +199,25 @@ export default function Navbar({
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8">
           {links.map((link) => {
-            if (link.type === 'route') {
-              const href = localizedPath(link.routeKey, language);
-              const isActive = pathname === href;
-              return (
-                <Link
-                  key={link.label}
-                  href={href}
-                  onClick={() => setMenuOpen(false)}
-                  className="font-lora text-sm transition-colors duration-200 hover:text-oak-warm relative group"
-                  style={{
-                    color: isActive ? navAccent : navInk,
-                    fontFamily: 'var(--font-lora)',
-                    transition: colorTransition,
-                  }}
-                >
-                  {link.label}
-                  <span
-                    className={`absolute -bottom-0.5 left-0 h-px ${
-                      isActive ? 'w-full' : 'w-0 group-hover:w-full'
-                    } transition-all duration-300`}
-                    style={{ backgroundColor: navAccent }}
-                  />
-                </Link>
-              );
-            }
-            // anchor link
-            const href = `${homePath}${link.anchor}`;
+            const href = localizedPath(link.routeKey, language);
+            const isActive = pathname === href;
             return (
               <Link
                 key={link.label}
                 href={href}
-                onClick={(e) => handleAnchorClick(e, link.anchor)}
+                onClick={() => setMenuOpen(false)}
                 className="font-lora text-sm transition-colors duration-200 hover:text-oak-warm relative group"
                 style={{
-                  color: navInk,
+                  color: isActive ? navAccent : navInk,
                   fontFamily: 'var(--font-lora)',
                   transition: colorTransition,
                 }}
               >
                 {link.label}
                 <span
-                  className="absolute -bottom-0.5 left-0 h-px w-0 group-hover:w-full transition-all duration-300"
+                  className={`absolute -bottom-0.5 left-0 h-px ${
+                    isActive ? 'w-full' : 'w-0 group-hover:w-full'
+                  } transition-all duration-300`}
                   style={{ backgroundColor: navAccent }}
                 />
               </Link>
@@ -329,37 +309,19 @@ export default function Navbar({
       >
         <nav className="flex flex-col px-6 py-4 gap-4">
           {links.map((link) => {
-            if (link.type === 'route') {
-              const href = localizedPath(link.routeKey, language);
-              const isActive = pathname === href;
-              return (
-                <Link
-                  key={link.label}
-                  href={href}
-                  onClick={() => setMenuOpen(false)}
-                  className="font-lora text-base py-3 border-b min-h-[44px] flex items-center"
-                  style={{
-                    color: isActive ? 'var(--oak-warm)' : 'var(--ink)',
-                    fontFamily: 'var(--font-lora)',
-                    borderColor: 'rgba(139,94,60,0.12)',
-                    fontWeight: isActive ? 600 : 400,
-                  }}
-                >
-                  {link.label}
-                </Link>
-              );
-            }
-            const href = `${homePath}${link.anchor}`;
+            const href = localizedPath(link.routeKey, language);
+            const isActive = pathname === href;
             return (
               <Link
                 key={link.label}
                 href={href}
-                onClick={(e) => handleAnchorClick(e, link.anchor)}
+                onClick={() => setMenuOpen(false)}
                 className="font-lora text-base py-3 border-b min-h-[44px] flex items-center"
                 style={{
-                  color: 'var(--ink)',
+                  color: isActive ? 'var(--oak-warm)' : 'var(--ink)',
                   fontFamily: 'var(--font-lora)',
                   borderColor: 'rgba(139,94,60,0.12)',
+                  fontWeight: isActive ? 600 : 400,
                 }}
               >
                 {link.label}
