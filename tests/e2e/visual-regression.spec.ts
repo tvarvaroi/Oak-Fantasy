@@ -1,14 +1,22 @@
 import { test, expect, maskCanvas } from './fixtures';
 
 const PAGES = [
-  { path: '/ro',                name: 'home-ro' },
-  { path: '/en',                name: 'home-en' },
-  { path: '/ro/despre',         name: 'despre-ro' },
-  { path: '/en/about',          name: 'despre-en' },
-  { path: '/ro/atelier',        name: 'atelier-ro' },
-  { path: '/en/workshop',       name: 'atelier-en' },
-  { path: '/ro/tocatoare',      name: 'tocatoare-ro' },
-  { path: '/en/cutting-boards', name: 'tocatoare-en' },
+  { path: '/ro',                   name: 'home-ro' },
+  { path: '/en',                   name: 'home-en' },
+  { path: '/ro/despre',            name: 'despre-ro' },
+  { path: '/en/about',             name: 'despre-en' },
+  { path: '/ro/atelier',           name: 'atelier-ro' },
+  { path: '/en/workshop',          name: 'atelier-en' },
+  { path: '/ro/tocatoare',         name: 'tocatoare-ro' },
+  { path: '/en/cutting-boards',    name: 'tocatoare-en' },
+  { path: '/ro/contact',           name: 'contact-ro' },
+  { path: '/en/contact',           name: 'contact-en' },
+  { path: '/ro/termeni',           name: 'termeni-ro' },
+  { path: '/en/terms',             name: 'termeni-en' },
+  { path: '/ro/confidentialitate', name: 'confidentialitate-ro' },
+  { path: '/en/privacy',           name: 'confidentialitate-en' },
+  { path: '/ro/retur',             name: 'retur-ro' },
+  { path: '/en/returns',           name: 'retur-en' },
 ];
 
 test.describe('Visual regression', () => {
