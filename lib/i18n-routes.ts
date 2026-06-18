@@ -25,6 +25,12 @@ export const PATHNAMES = {
   // in RO and EN. Codified explicitly so the route is registered with
   // the middleware audit and shows up in localizedPath().
   contact: { ro: 'contact', en: 'contact' },
+  // Legal pages. RO/EN slugs differ to match natural reading
+  // conventions in each market. Folder names follow RO slug per the
+  // PATHNAMES contract above.
+  terms: { ro: 'termeni', en: 'terms' },
+  privacy: { ro: 'confidentialitate', en: 'privacy' },
+  returns: { ro: 'retur', en: 'returns' },
 } as const;
 
 export type RouteKey = keyof typeof PATHNAMES;
