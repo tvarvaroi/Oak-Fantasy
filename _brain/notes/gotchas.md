@@ -352,6 +352,79 @@ template + extragi în helper client. Verifică: `npm run build` PE LOCAL
 **Fișiere:** `components/contact/content.ts:42-58`,
 `components/contact/ContactForm.tsx:148-155`.
 
+## 2026-06-18 — New Page Accessibility Checklist (IA 5-tier system, Task 1.4)
+
+**Context:** Post-Sprint-1 smoke test a descoperit că /contact (și implicit
+cele 3 pagini legale) erau accesibile DOAR via Footer — niciun link primary
+în Navbar. Cauza: la Task 1.2/1.3 am adăugat paginile dar n-am verificat
+TOATE căile de navigare. Fix-ul (Task 1.4) a stabilit acest sistem de
+tier-uri ca să nu se mai întâmple.
+
+**REGULA: La fiecare pagină publică nouă, verifică explicit în ce tier
+intră și actualizează navigarea corespunzătoare ÎNAINTE de a zice "done".**
+
+### Tier 1 — Navbar primary navigation
+Pagini la maxim 1 click de homepage. Visitor browse flow, primary CTA.
+Curent (Sprint 1 closed): **Atelier, Tocătoare, Despre, Contact** (4 links).
+Fișier: `components/Navbar.tsx` (`NAV_LINKS_RO` / `NAV_LINKS_EN`).
+Future triggers:
+- Cart icon → Sprint 3 (conditional pe cart_items_count > 0)
+- Cont link → Sprint 2 (conditional pe auth state)
+
+### Tier 2 — Footer NAVIGARE column
+Mirror Tier 1 pentru redundancy + better mobile UX.
+Curent: Atelier, Tocătoare, Despre, Contact (mirror Navbar).
+Fișier: `components/Footer.tsx` (`nav.navLinks`).
+**IMPORTANT:** folosește page links (`localizedPath`), NU #anchors.
+Anchors în Footer NAVIGARE erau dead pe paginile interior (bug fixat
+Task 1.4 — `#workshop`/`#products`/`#story` nu existau decât pe homepage).
+
+### Tier 3 — Footer fine print row
+Legal compliance only. ANPC + SAL/SOL badges.
+Curent: Termeni, Confidențialitate, Retur (+ Cookie Policy la Sprint 4
+după analytics decision — vezi SECURITY_CHECKLIST §10.1.b).
+Fișier: `components/Footer.tsx` (`nav.legalLinks` + ANPC/SAL/SOL row).
+
+### Tier 4 — Contextual / hidden navigation
+Accesibil DOAR din alte pagini sau flow-uri, NU din Navbar/Footer general.
+Examples (current + future):
+- /admin/* (post-login admin — Sprint 2)
+- /account/* sau /cont/* (post-login user — Sprint 2)
+- /tocatoare/[slug] (din catalog card click)
+- /cos, /checkout/* (din add-to-cart — Sprint 3)
+- /multumim/[orderId] (post-checkout — Sprint 3)
+- /parola-uitata, /reset-parola (din login flow — Sprint 2)
+
+### Tier 5 — Future expansion (Sprint 4)
+Footer column nouă "PENTRU CLIENȚI" sau extindere NAVIGARE:
+- FAQ, Livrare și plată, Garanție, Cum gravăm
+Decizie IA globală la Sprint 4 (sub-nav strategy dacă nav primary > 5 items).
+
+### Checklist obligatoriu la pagină nouă — ASK:
+- [ ] Tier 1 (Navbar)? — primary CTA pentru visitor browse
+- [ ] Tier 2 (Footer NAVIGARE)? — mirror Navbar pentru redundancy
+- [ ] Tier 3 (Footer fine print)? — doar legal/compliance
+- [ ] Tier 4 (Hidden contextual)? — auth-required sau flow-specific
+- [ ] Cross-links internal — ce alte pagini trebuie să linkuie aici?
+- [ ] Active state highlighting în navigation (pathname match)?
+- [ ] Mobile drawer reflection (Navbar)?
+- [ ] Sitemap (auto-generated de Next.js dacă rută publică)
+- [ ] SEO meta + canonical URL + JSON-LD
+- [ ] Visual regression entry în tests/e2e/visual-regression.spec.ts
+
+### Decizii IA viitoare documentate (Task 1.4)
+- **D2 — Navbar pe /admin/* (Sprint 2):** Hide Navbar primary, show admin
+  top bar dedicat. Admin lucrează în app shell separat. Logo → home always
+  (logical exit point). NU implementat acum — doar documentat aici.
+- **Cart icon:** added Sprint 3, hidden complet până atunci.
+- **Cont link:** added Sprint 2, hidden complet până atunci. Footer COL3
+  "CONT / Account" e deja slot vizibil cu "În curând" placeholder (artisan
+  voice, nu enterprise) — Sprint 2 înlocuiește placeholder-ul cu link-uri
+  reale, zero layout shift.
+- **Search bar:** skip până la Sprint 4+, doar dacă catalog > 20-30 produse.
+
+**Fișiere:** `components/Navbar.tsx`, `components/Footer.tsx`.
+
 ## SECURITY_CHECKLIST.md maintenance protocol
 
 Document: `_brain/notes/SECURITY_CHECKLIST.md` (living document)
