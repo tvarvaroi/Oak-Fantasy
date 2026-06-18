@@ -205,3 +205,162 @@ Hand-off manual către founder:
 
 Next: Sprint 1 Task 1.3 (pagini legale: termeni + confidentialitate + retur)
 sau Task 1.4 (homepage updates) — așteptăm direcție founder.
+
+## 2026-06-18 — Sprint 1 Task 1.3 (/termeni + /confidentialitate + /retur) închis
+
+Scope: 3 pagini legale ca SCHELET STRUCTURAL — rute, metadata, JSON-LD,
+layout, navigare, footer integration. NICIUN conținut juridic generat
+de mine; toate secțiunile poartă același placeholder italic care anunță
+"în pregătire". Avocatul completează pre-launch.
+
+Decizii lock founder (Option A vs B/C):
+- A locked: skeleton, NU draft starter copy (B blocked: risc juridic;
+  C blocked: text final nedisponibil)
+- A1 Commit order PATHNAMES + shared în Commit 1 (typecheck consistency)
+- A2 Footer fine print row, NU coloana nouă (safer scope)
+- A3 NO sticky TOC pe skeleton (Caudex/Lora prose 720px curat)
+- A4 LegalCompanyInfo end-of-page (convenție juridică RO + mobile-first)
+- A5 Text label "ACEST DOCUMENT ESTE ÎN PREGĂTIRE", NU emoji
+- Skip /cookie-policy → deferred în SECURITY §10.1.b post-analytics decision
+
+Foundation creat:
+- lib/i18n-routes.ts: PATHNAMES expandat cu terms/privacy/returns
+  (slug-uri diferite RO/EN, codified explicit)
+- components/legal/ shared infrastructure:
+    LegalLayout (wrapper full-page)
+    LegalHero (Caudex headline + Caveat last-updated)
+    LegalBanner (cream-warm "în pregătire" cu copper border)
+    LegalSection (numbered heading 01..NN + default placeholder body
+                  + sectionOverrides slot pentru statutory notes)
+    LegalPlaceholder (acelaşi italic body pe TOATE secțiunile —
+                     0% conținut juridic generat de mine)
+    LegalCompanyInfo (paper-aged end-of-page card cu LEGAL_INFO pull)
+    LegalStatutoryNote (citare statutorie cu eyebrow "Notă legală")
+    content.ts (shared LegalContent / LegalSectionMeta types)
+
+Content maps (titles bilingual, ids locale-agnostic English kebab-case
+pentru deep-link stability):
+- terms/content.ts: 14 secțiuni (parties, definitions, subject-of-contract,
+                                  ordering, prices-payment, delivery,
+                                  right-of-withdrawal, warranty,
+                                  liability-force-majeure, dispute-resolution,
+                                  personal-data-protection, amendments,
+                                  acceptance, contact-info)
+- privacy/content.ts: 14 secțiuni GDPR Articles 13-22 (data-controller,
+                                  dpo, data-types, processing-purposes,
+                                  legal-basis, recipients,
+                                  international-transfer, retention,
+                                  data-subject-rights, cookies, security,
+                                  changes, gdpr-contact, complaint-right)
+- returns/content.ts: 10 secțiuni OUG 34/2014 + RETURNS_STATUTORY export
+                     pentru art. 16 lit. c citare în secțiunea exceptions
+
+Pagini:
+- app/[locale]/termeni/page.tsx (server component, metadata + WebPage
+                                JSON-LD identic /despre + /contact contract)
+- app/[locale]/confidentialitate/page.tsx
+- app/[locale]/retur/page.tsx (foloseşte sectionOverrides pentru a
+                              injecta LegalStatutoryNote sub
+                              LegalPlaceholder în 'exceptions')
+
+Footer:
+- Fine print row sub copyright: 3 legal links cu bullet separators,
+  page-level via localizedPath('terms'|'privacy'|'returns', locale)
+- ANPC + SAL (ADR) + SOL (ODR) badges în copper accent label-caps,
+  linkate la anpc.ro şi ec.europa.eu/consumers/odr
+
+SECURITY_CHECKLIST updates:
+- §4.1: toate 4 page slots (3 legale + contact) marcate [SLOT FILLED]
+  cu hand-off clar pre-launch (env vars + lawyer copy = ready)
+- §10.1.b (new): cookie policy page deferred until analytics lands;
+  triggere documentate; LegalLayout infrastructure deja existentă
+
+i18n checker GOTCHA discovered (workaround applied):
+scripts/check-i18n.mjs foloseşte regex naiv pe array de obiecte —
+multi-line entries cu id:/title: pe linii separate sunt detectate ca
+top-level keys; single-line entries nu sunt. Asymmetric formatting
+RO vs EN producea false positive "Missing EN key 'id'". Fix:
+normalizat single-line consistent pentru toate array entries.
+Considerăm îmbunătățire checker drept tehnical-debt minor (skip
+known-array fields), nu blocker.
+
+RSC blocker prevented (gotcha 2026-06-16 aplicată):
+banner.bodyTemplate string cu placeholder `{contactEmail}` în loc de
+funcție — substituire la render în LegalBanner client-side. Server→client
+prop pass JSON-serializable.
+
+Verificat:
+- npm run typecheck GREEN
+- npm run lint GREEN (0 warnings)
+- npm run check:i18n GREEN (9 content maps now)
+- npm run build SUCCESS (toate 3 pagini SSG ro+en, 844 B fiecare)
+
+Visual regression test entries adăugate (8 noi: 2 contact catch-up + 6 legal).
+Baseline regeneration HAND-OFF la founder — local .env.local pointează
+la fgeubbsxucppypyjbdpg (proiect inexistent post-Task 1.1 reality
+clarification), Playwright webServer ar fi rulat dev cu Supabase
+broken pe homepage/catalog → corrupt batch. Founder rulează după
+restore .env.local: npm run test:e2e:update -- --grep 'Visual regression'.
+
+8 commits atomic:
+1. feat(legal): foundation - PATHNAMES + shared components
+2. feat(legal): /termeni + /terms skeleton (14 sections)
+3. feat(legal): /confidentialitate + /privacy skeleton (14 sections GDPR)
+4. feat(legal): /retur + /returns skeleton (10 sections + OUG 34/2014 cite)
+5. feat(footer): add legal fine print row + ANPC/SAL-ADR/SOL-ODR badges
+6. test(visual): add visual regression entries (8 new)
+7. docs(security): legal slots filled + cookie-policy deferred TODO
+8. docs(brain): Sprint 1 CLOSURE (acest entry)
+
+═══════════════════════════════════════════════════════════════════
+SPRINT 1 CLOSURE — Etapa 1 (Foundation) complete
+═══════════════════════════════════════════════════════════════════
+
+Period: 2026-06-15 → 2026-06-18 (~3 zile calendar, ~10h hands-on)
+
+Tasks delivered:
+- Task 1.1 ✓ Cleanup (qa-screenshots + waitlist→email_subscribers rename
+                       + Supabase reality clarification)
+- Task 1.2 ✓ /contact page cu Resend test-mode integration
+                       + lib/legal-info.ts centralized placeholders
+                       + lib/schemas/contact.ts Zod + bilingual labels
+                       + lib/rate-limit.ts memory fallback cu HONEST warning
+                       + emails/Contact*Email.tsx React Email templates
+                       + Footer.tsx Contact link + email unify la LEGAL_INFO
+- Task 1.3 ✓ Pagini legale skeleton (termeni, confidentialitate, retur)
+                       + components/legal/ shared infrastructure
+                       + Footer fine print row + ANPC/SAL/SOL badges
+
+Stats Sprint 1 (from 307f7b4 baseline → c76267c HEAD pre-closure):
+- 21 commits atomic
+- 117 files changed
+- 4481 insertions / 31 deletions (mostly new code, minimal churn)
+
+Pre-launch BLOCKERS catalogued în SECURITY_CHECKLIST:
+- §1.1 Resend API key rotation (cheia veche din chat strategic)
+- §1 Setup Resend custom domain oakfantasy.ro + flip auto-reply ON
+- §4.1 Populate NEXT_PUBLIC_COMPANY_* env vars în Vercel
+- §6.4 Upstash Redis pentru rate-limit real (memory cache near-zero pe
+       Vercel serverless)
+- §6.3 Cloudflare Turnstile pe contact form ca defense layer 3
+- §6.5 Resend monthly usage alert la 80%
+- §8.4 Supabase Free vs Pro plan decision (auto-pause 7 zile)
+- §8.5 Create prod project oakfantasy-prod + apply canonical migrations
+- §8.6 RLS smoke test per tabel pre-launch
+- §10.1.b /cookie-policy page (după analytics decision)
+- Legal: lawyer review + fill components/legal/*/content.ts placeholders
+
+Brain assets durabile create în Sprint 1:
+- 4 noi gotchas (Task 1.1: 4) + 1 RSC functions gotcha (Task 1.2: 1)
+  = 5 gotchas durabile totale. i18n-checker quirk on multi-line array
+  entries noted dar nu scris ca gotchas separat (e checker-specific).
+- _brain/notes/SECURITY_CHECKLIST.md: expandat substanțial cu §4.1
+  slot tracking, §6.4-6.5 honest threat model, §8.4-8.6 Supabase
+  pre-launch, §10.1.b cookie policy deferred, §14 rotații cu Resend
+  decision.
+- _brain/notes/journal.txt: 4 entries cronologice (Bootstrap,
+  Pre-launch Security Checklist, Task 1.1 closure, Task 1.2 closure,
+  Sprint 1 closure aici)
+
+Next: Sprint 2 (Auth + Admin shell + CRUD Produse) sau revizuire
+Sprint 1 deliverables cu founder înainte de Sprint 2 kick-off.
