@@ -92,6 +92,47 @@ function FooterLink({ href, children }: FooterLinkProps) {
   );
 }
 
+/* ─── Footer info row (label-caps micro-label + value) ───────────── */
+
+function FooterInfoRow({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span
+        className="label-caps"
+        style={{ color: 'rgba(245,235,216,0.4)', fontSize: '0.56rem' }}
+      >
+        {label}
+      </span>
+      {children}
+    </div>
+  );
+}
+
+/* Renders a LEGAL_INFO value; placeholders ([...]) shown dimmed + italic. */
+function FooterValue({ value }: { value: string }) {
+  const isPlaceholder = value.startsWith('[');
+  return (
+    <span
+      className="font-lora"
+      style={{
+        display: 'block',
+        fontSize: '0.92rem',
+        color: isPlaceholder ? 'rgba(245,235,216,0.38)' : 'rgba(245,235,216,0.6)',
+        fontStyle: isPlaceholder ? 'italic' : 'normal',
+        lineHeight: 1.5,
+      }}
+    >
+      {value}
+    </span>
+  );
+}
+
 /* ─── Social icon ────────────────────────────────────────────────── */
 
 function InstagramIcon() {
@@ -129,25 +170,32 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
 
   const nav = {
     ro: {
-      colBrand: 'Brand',
       colNav: 'Navigare',
       colContact: 'Contact',
+      colCont: 'Cont',
+      colCompany: 'Companie',
+      // Mirror Navbar primary (Tier 2 — see _brain/notes/gotchas.md IA tiers).
       navLinks: [
-        { label: 'Atelierul nostru', href: '#workshop' },
-        { label: 'Produse', href: '#products' },
-        { label: 'Povestea noastră', href: '#story' },
-        { label: 'Lista de așteptare', href: '#waitlist' },
+        { label: 'Atelier', href: localizedPath('atelier', 'ro') },
+        { label: 'Tocătoare', href: localizedPath('tocatoare', 'ro') },
+        { label: 'Despre', href: localizedPath('despre', 'ro') },
         { label: 'Contact', href: localizedPath('contact', 'ro') },
       ],
-      contactLines: [
-        LEGAL_INFO.contactEmail,
-        'Transilvania, România',
-        'Program: Luni–Vineri, 9–17',
-      ],
+      contactEmailLabel: 'Email',
+      contactPhoneLabel: 'Telefon',
+      contactAddressLabel: 'Atelier',
+      contactHoursLabel: 'Program',
+      contactRegion: 'Transilvania, România',
+      // COL3 — Sprint 2 slot. Artisan voice, not enterprise "Coming Soon".
+      contEyebrow: 'În curând',
+      contBody: 'Cont personal, istoric comenzi și liste de dorințe — pe drum.',
       tagline: 'Făcut cu drag în România.',
       copy: `© ${new Date().getFullYear()} Oak Fantasy. Toate drepturile rezervate.`,
       brandDesc: 'Tocătoare din stejar românesc, lucrate manual în atelierul nostru din inima Transilvaniei.',
       microTagline: 'stejar · manual · România',
+      operatorLabel: 'Operator',
+      cuiLabel: 'CUI',
+      signature: 'Lucrăm cu drag\npentru voi.',
       legalLinks: [
         { label: 'Termeni și condiții', href: localizedPath('terms', 'ro') },
         { label: 'Confidențialitate', href: localizedPath('privacy', 'ro') },
@@ -158,25 +206,30 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
       solLabel: 'SOL',
     },
     en: {
-      colBrand: 'Brand',
       colNav: 'Navigation',
       colContact: 'Contact',
+      colCont: 'Account',
+      colCompany: 'Company',
       navLinks: [
-        { label: 'Our Workshop', href: '#workshop' },
-        { label: 'Products', href: '#products' },
-        { label: 'Our Story', href: '#story' },
-        { label: 'Waitlist', href: '#waitlist' },
+        { label: 'Workshop', href: localizedPath('atelier', 'en') },
+        { label: 'Cutting Boards', href: localizedPath('tocatoare', 'en') },
+        { label: 'About', href: localizedPath('despre', 'en') },
         { label: 'Contact', href: localizedPath('contact', 'en') },
       ],
-      contactLines: [
-        LEGAL_INFO.contactEmail,
-        'Transylvania, Romania',
-        'Hours: Mon–Fri, 9–17',
-      ],
+      contactEmailLabel: 'Email',
+      contactPhoneLabel: 'Phone',
+      contactAddressLabel: 'Workshop',
+      contactHoursLabel: 'Hours',
+      contactRegion: 'Transylvania, Romania',
+      contEyebrow: 'Coming soon',
+      contBody: 'Personal account, order history and wishlists — on the way.',
       tagline: 'Made with love in Romania.',
       copy: `© ${new Date().getFullYear()} Oak Fantasy. All rights reserved.`,
       brandDesc: 'Romanian oak cutting boards, handcrafted in our workshop in the heart of Transylvania.',
       microTagline: 'oak · handmade · Romania',
+      operatorLabel: 'Operator',
+      cuiLabel: 'VAT ID',
+      signature: 'Made with care\nfor you.',
       legalLinks: [
         { label: 'Terms and Conditions', href: localizedPath('terms', 'en') },
         { label: 'Privacy', href: localizedPath('privacy', 'en') },
@@ -187,6 +240,10 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
       solLabel: 'ODR',
     },
   }[language];
+
+  // Hours line localised from LEGAL_INFO (single source of truth).
+  const hours =
+    language === 'ro' ? LEGAL_INFO.workingHours : LEGAL_INFO.workingHoursEn;
 
   return (
     <footer
@@ -203,10 +260,10 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
         className="mx-auto"
         style={{ maxWidth: 1200, padding: '72px 32px 0' }}
       >
-        {/* ── Three column grid ──────────────────────────────────── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16 pb-14">
+        {/* ── Four column grid (Task 1.4 IA) ─────────────────────── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-14 pb-14">
 
-          {/* col 1 — Brand */}
+          {/* col 1 — Navigare (Tier 2: mirror Navbar primary) */}
           <motion.div
             className="flex flex-col gap-6"
             initial={prefersReduced ? false : { opacity: 0, y: 16 }}
@@ -214,83 +271,7 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
             viewport={{ once: true }}
             transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
           >
-            <p
-              className="label-caps"
-              style={{ color: 'var(--copper)', fontSize: '0.6rem' }}
-            >
-              {nav.colBrand}
-            </p>
-
-            {/* logo — clean SVG stencil on cream coin (consistent with Navbar
-                reference + ProductCard medallion). 2026-05-29 brand unification:
-                JPEG with green ring replaced by the SVG asset used throughout
-                the rest of the brand. */}
-            <div
-              style={{
-                width: 100,
-                height: 100,
-                borderRadius: '50%',
-                overflow: 'hidden',
-                background: 'var(--cream-warm)',
-              }}
-            >
-              <Image
-                src="/3D_Cutting_Board_Model_Design.svg"
-                alt="Oak Fantasy logo"
-                width={100}
-                height={100}
-              />
-            </div>
-
-            {/* brand name */}
-            <div>
-              <p
-                className="font-caudex"
-                style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--cream-warm)', lineHeight: 1.1 }}
-              >
-                Oak Fantasy
-              </p>
-              <p
-                className="font-caveat"
-                style={{ fontSize: '0.9rem', color: 'var(--copper)', marginTop: 2 }}
-              >
-                {nav.microTagline}
-              </p>
-            </div>
-
-            <p
-              className="font-lora"
-              style={{ fontSize: '0.88rem', lineHeight: 1.7, color: 'rgba(245,235,216,0.45)', maxWidth: 260 }}
-            >
-              {nav.brandDesc}
-            </p>
-
-            {/* instagram */}
-            <a
-              href="https://instagram.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 transition-opacity duration-200 hover:opacity-80"
-              style={{ color: 'rgba(245,235,216,0.5)', textDecoration: 'none', width: 'fit-content' }}
-              aria-label="Instagram"
-            >
-              <InstagramIcon />
-              <span className="font-lora" style={{ fontSize: '0.82rem' }}>@oakfantasy.ro</span>
-            </a>
-          </motion.div>
-
-          {/* col 2 — Navigation */}
-          <motion.div
-            className="flex flex-col gap-6"
-            initial={prefersReduced ? false : { opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.65, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <p
-              className="label-caps"
-              style={{ color: 'var(--copper)', fontSize: '0.6rem' }}
-            >
+            <p className="label-caps" style={{ color: 'var(--copper)', fontSize: '0.6rem' }}>
               {nav.colNav}
             </p>
             <nav className="flex flex-col gap-3" aria-label="Footer navigation">
@@ -302,7 +283,72 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
             </nav>
           </motion.div>
 
-          {/* col 3 — Contact */}
+          {/* col 2 — Contact (channels grouped: details + Instagram) */}
+          <motion.div
+            className="flex flex-col gap-6"
+            initial={prefersReduced ? false : { opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.65, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <p className="label-caps" style={{ color: 'var(--copper)', fontSize: '0.6rem' }}>
+              {nav.colContact}
+            </p>
+            <div className="flex flex-col gap-3.5">
+              <FooterInfoRow label={nav.contactEmailLabel}>
+                <a
+                  href={`mailto:${LEGAL_INFO.contactEmail}`}
+                  className="font-lora"
+                  style={{ fontSize: '0.92rem', color: 'rgba(245,235,216,0.6)', textDecoration: 'none', lineHeight: 1.5 }}
+                  onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = 'rgba(245,235,216,0.9)')}
+                  onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = 'rgba(245,235,216,0.6)')}
+                >
+                  {LEGAL_INFO.contactEmail}
+                </a>
+              </FooterInfoRow>
+
+              <FooterInfoRow label={nav.contactPhoneLabel}>
+                <FooterValue value={LEGAL_INFO.contactPhone} />
+              </FooterInfoRow>
+
+              <FooterInfoRow label={nav.contactAddressLabel}>
+                <FooterValue value={LEGAL_INFO.workshopAddress} />
+                <span
+                  className="font-lora"
+                  style={{ display: 'block', fontSize: '0.82rem', color: 'rgba(245,235,216,0.4)', lineHeight: 1.5 }}
+                >
+                  {nav.contactRegion}
+                </span>
+              </FooterInfoRow>
+
+              <FooterInfoRow label={nav.contactHoursLabel}>
+                <span className="font-lora" style={{ display: 'block', fontSize: '0.88rem', color: 'rgba(245,235,216,0.55)', lineHeight: 1.55 }}>
+                  {hours.weekdays}
+                </span>
+                <span className="font-lora" style={{ display: 'block', fontSize: '0.88rem', color: hours.saturday.includes('[') ? 'rgba(245,235,216,0.35)' : 'rgba(245,235,216,0.55)', fontStyle: hours.saturday.includes('[') ? 'italic' : 'normal', lineHeight: 1.55 }}>
+                  {hours.saturday}
+                </span>
+                <span className="font-lora" style={{ display: 'block', fontSize: '0.88rem', color: 'rgba(245,235,216,0.55)', lineHeight: 1.55 }}>
+                  {hours.sunday}
+                </span>
+              </FooterInfoRow>
+
+              {/* instagram — channel of communication, grouped here (D6) */}
+              <a
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 transition-opacity duration-200 hover:opacity-80"
+                style={{ color: 'rgba(245,235,216,0.5)', textDecoration: 'none', width: 'fit-content', marginTop: 2 }}
+                aria-label="Instagram"
+              >
+                <InstagramIcon />
+                <span className="font-lora" style={{ fontSize: '0.82rem' }}>@oakfantasy.ro</span>
+              </a>
+            </div>
+          </motion.div>
+
+          {/* col 3 — Cont (Sprint 2 slot, artisan "În curând" voice) */}
           <motion.div
             className="flex flex-col gap-6"
             initial={prefersReduced ? false : { opacity: 0, y: 16 }}
@@ -310,28 +356,78 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
             viewport={{ once: true }}
             transition={{ duration: 0.65, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
           >
-            <p
-              className="label-caps"
-              style={{ color: 'var(--copper)', fontSize: '0.6rem' }}
-            >
-              {nav.colContact}
+            <p className="label-caps" style={{ color: 'var(--copper)', fontSize: '0.6rem' }}>
+              {nav.colCont}
             </p>
             <div className="flex flex-col gap-3">
-              {nav.contactLines.map((line, i) => (
-                <p
-                  key={i}
-                  className="font-lora"
-                  style={{ fontSize: '0.92rem', color: 'rgba(245,235,216,0.55)', lineHeight: 1.55 }}
-                >
-                  {line}
-                </p>
-              ))}
+              <p
+                className="label-caps"
+                style={{ color: 'rgba(245,235,216,0.5)', fontSize: '0.6rem' }}
+              >
+                {nav.contEyebrow}
+              </p>
+              <p
+                className="font-caveat"
+                style={{
+                  fontSize: '1.3rem',
+                  color: 'rgba(245,235,216,0.4)',
+                  transform: 'rotate(-1deg)',
+                  transformOrigin: 'left center',
+                  lineHeight: 1.4,
+                  maxWidth: 220,
+                }}
+              >
+                {nav.contBody}
+              </p>
+            </div>
+          </motion.div>
+
+          {/* col 4 — Companie (brand + operator + signature) */}
+          <motion.div
+            className="flex flex-col gap-5"
+            initial={prefersReduced ? false : { opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.65, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <p className="label-caps" style={{ color: 'var(--copper)', fontSize: '0.6rem' }}>
+              {nav.colCompany}
+            </p>
+
+            {/* logo coin */}
+            <div
+              style={{ width: 72, height: 72, borderRadius: '50%', overflow: 'hidden', background: 'var(--cream-warm)' }}
+            >
+              <Image src="/3D_Cutting_Board_Model_Design.svg" alt="Oak Fantasy logo" width={72} height={72} />
+            </div>
+
+            <div>
+              <p className="font-caudex" style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--cream-warm)', lineHeight: 1.1 }}>
+                Oak Fantasy
+              </p>
+              <p className="font-caveat" style={{ fontSize: '0.9rem', color: 'var(--copper)', marginTop: 2 }}>
+                {nav.microTagline}
+              </p>
+            </div>
+
+            <p className="font-lora" style={{ fontSize: '0.85rem', lineHeight: 1.7, color: 'rgba(245,235,216,0.45)', maxWidth: 260 }}>
+              {nav.brandDesc}
+            </p>
+
+            {/* operator legal info — pulls from LEGAL_INFO (placeholder-aware) */}
+            <div className="flex flex-col gap-1.5">
+              <FooterInfoRow label={nav.operatorLabel}>
+                <FooterValue value={LEGAL_INFO.companyName} />
+              </FooterInfoRow>
+              <FooterInfoRow label={nav.cuiLabel}>
+                <FooterValue value={LEGAL_INFO.cui} />
+              </FooterInfoRow>
             </div>
 
             {/* copper divider */}
             <div style={{ width: 32, height: 1, backgroundColor: 'var(--copper)', opacity: 0.3 }} aria-hidden />
 
-            {/* craft note */}
+            {/* signature (moved from Contact col, D6) */}
             <p
               className="font-caveat"
               style={{
@@ -340,9 +436,10 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
                 transform: 'rotate(-1deg)',
                 transformOrigin: 'left center',
                 lineHeight: 1.3,
+                whiteSpace: 'pre-line',
               }}
             >
-              {language === 'ro' ? 'Lucrăm cu drag\npentru voi.' : 'Made with care\nfor you.'}
+              {nav.signature}
             </p>
           </motion.div>
         </div>
