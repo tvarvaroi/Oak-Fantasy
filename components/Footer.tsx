@@ -148,6 +148,14 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
       copy: `© ${new Date().getFullYear()} Oak Fantasy. Toate drepturile rezervate.`,
       brandDesc: 'Tocătoare din stejar românesc, lucrate manual în atelierul nostru din inima Transilvaniei.',
       microTagline: 'stejar · manual · România',
+      legalLinks: [
+        { label: 'Termeni și condiții', href: localizedPath('terms', 'ro') },
+        { label: 'Confidențialitate', href: localizedPath('privacy', 'ro') },
+        { label: 'Retur', href: localizedPath('returns', 'ro') },
+      ],
+      anpcLabel: 'ANPC',
+      salLabel: 'SAL',
+      solLabel: 'SOL',
     },
     en: {
       colBrand: 'Brand',
@@ -169,6 +177,14 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
       copy: `© ${new Date().getFullYear()} Oak Fantasy. All rights reserved.`,
       brandDesc: 'Romanian oak cutting boards, handcrafted in our workshop in the heart of Transylvania.',
       microTagline: 'oak · handmade · Romania',
+      legalLinks: [
+        { label: 'Terms and Conditions', href: localizedPath('terms', 'en') },
+        { label: 'Privacy', href: localizedPath('privacy', 'en') },
+        { label: 'Returns', href: localizedPath('returns', 'en') },
+      ],
+      anpcLabel: 'ANPC',
+      salLabel: 'ADR',
+      solLabel: 'ODR',
     },
   }[language];
 
@@ -371,6 +387,110 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
           >
             {nav.copy}
           </p>
+
+          {/* Legal links — fine print row. Page-level links (not anchors)
+              so they survive on any route. Bullet separators between. */}
+          <nav
+            aria-label={language === 'ro' ? 'Documente legale' : 'Legal documents'}
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '6px 12px',
+              marginTop: 8,
+            }}
+          >
+            {nav.legalLinks.map((link, i) => (
+              <span
+                key={link.href}
+                className="font-lora"
+                style={{
+                  fontSize: '0.74rem',
+                  color: 'rgba(245,235,216,0.45)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 10,
+                }}
+              >
+                <a
+                  href={link.href}
+                  style={{ color: 'inherit', textDecoration: 'none' }}
+                  onMouseEnter={(e) =>
+                    ((e.currentTarget as HTMLAnchorElement).style.color =
+                      'rgba(245,235,216,0.85)')
+                  }
+                  onMouseLeave={(e) =>
+                    ((e.currentTarget as HTMLAnchorElement).style.color = 'inherit')
+                  }
+                >
+                  {link.label}
+                </a>
+                {i < nav.legalLinks.length - 1 ? (
+                  <span aria-hidden style={{ opacity: 0.4 }}>·</span>
+                ) : null}
+              </span>
+            ))}
+          </nav>
+
+          {/* ANPC + SAL/SOL row — required by ANPC for RO e-commerce sites.
+              Three small linked labels with copper accent dot separators. */}
+          <div
+            aria-label={language === 'ro' ? 'Protecția consumatorului' : 'Consumer protection'}
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '6px 14px',
+              marginTop: 4,
+            }}
+          >
+            <a
+              href="https://anpc.ro"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="label-caps"
+              style={{
+                color: 'var(--copper)',
+                fontSize: '0.6rem',
+                opacity: 0.7,
+                textDecoration: 'none',
+              }}
+            >
+              {nav.anpcLabel}
+            </a>
+            <span aria-hidden style={{ color: 'var(--copper)', opacity: 0.4 }}>·</span>
+            <a
+              href="https://anpc.ro/ce-este-sal/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="label-caps"
+              style={{
+                color: 'var(--copper)',
+                fontSize: '0.6rem',
+                opacity: 0.7,
+                textDecoration: 'none',
+              }}
+            >
+              {nav.salLabel}
+            </a>
+            <span aria-hidden style={{ color: 'var(--copper)', opacity: 0.4 }}>·</span>
+            <a
+              href="https://ec.europa.eu/consumers/odr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="label-caps"
+              style={{
+                color: 'var(--copper)',
+                fontSize: '0.6rem',
+                opacity: 0.7,
+                textDecoration: 'none',
+              }}
+            >
+              {nav.solLabel}
+            </a>
+          </div>
 
           {/* Vecteezy attribution — REQUIRED by their free-PNG license for the
               treeline.webp hero backdrop used on /tocatoare (and future pages). */}
