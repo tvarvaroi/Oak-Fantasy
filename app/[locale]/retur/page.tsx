@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import LegalLayout from '@/components/legal/LegalLayout';
+import LegalShell from '@/components/legal/LegalShell';
 import LegalPlaceholder from '@/components/legal/LegalPlaceholder';
 import LegalStatutoryNote from '@/components/legal/LegalStatutoryNote';
 import {
@@ -113,11 +114,13 @@ export default function Page({ params }: { params: { locale: string } }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: ldSafe(buildJsonLd(locale)) }}
       />
-      <LegalLayout
-        content={RETURNS_CONTENT[locale]}
-        locale={locale}
-        sectionOverrides={overrides}
-      />
+      <LegalShell routeKey="returns" locale={locale}>
+        <LegalLayout
+          content={RETURNS_CONTENT[locale]}
+          locale={locale}
+          sectionOverrides={overrides}
+        />
+      </LegalShell>
     </>
   );
 }

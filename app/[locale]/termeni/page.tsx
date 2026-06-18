@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import LegalLayout from '@/components/legal/LegalLayout';
+import LegalShell from '@/components/legal/LegalShell';
 import { TERMS_CONTENT } from '@/components/legal/terms/content';
 import { LEGAL_INFO } from '@/lib/legal-info';
 import { isLocale, localizedPath, type Locale } from '@/lib/i18n-routes';
@@ -89,7 +90,9 @@ export default function Page({ params }: { params: { locale: string } }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: ldSafe(buildJsonLd(locale)) }}
       />
-      <LegalLayout content={TERMS_CONTENT[locale]} locale={locale} />
+      <LegalShell routeKey="terms" locale={locale}>
+        <LegalLayout content={TERMS_CONTENT[locale]} locale={locale} />
+      </LegalShell>
     </>
   );
 }
