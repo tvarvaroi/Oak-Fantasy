@@ -352,6 +352,60 @@ template + extragi în helper client. Verifică: `npm run build` PE LOCAL
 **Fișiere:** `components/contact/content.ts:42-58`,
 `components/contact/ContactForm.tsx:148-155`.
 
+## 2026-06-18 — Navbar + Footer NU sunt în layout global; se montează per-pagină
+
+**🚨 BUG CRITIC (Task 1.5). /contact + cele 3 pagini legale erau dead-ends:
+fără Navbar, fără Footer, user blocat (doar browser back funcționa).**
+
+**Simptom:** User ajunge pe /contact (sau /termeni, /confidentialitate,
+/retur) și nu are NICIO navigare — nici Navbar sus, nici Footer jos.
+Singura ieșire = browser back button. UX inacceptabil.
+
+**Cauză:** `app/[locale]/layout.tsx` NU conține Navbar + Footer — doar
+fonts + PageTransition wrapper. **Fiecare pagină își montează propriul
+Navbar + Footer** prin client wrapper-ul ei:
+- Homepage: `app/[locale]/page.tsx`
+- /despre: `components/about/AboutContent.tsx` (Navbar + main + Footer)
+- /atelier: `components/atelier/AtelierContent.tsx`
+- /tocatoare: `components/tocatoare/TocatoareContent.tsx`
+
+Paginile noi din Sprint 1 au RATAT pattern-ul:
+- /contact: `components/contact/ContactPage.tsx` renderiza doar `<main>`
+- /termeni|confidentialitate|retur: `components/legal/LegalLayout.tsx`
+  (server component) renderiza doar `<main>`
+
+**Fix folosit:**
+- ContactPage (deja `'use client'`): adăugat `Navbar` + `Footer` + toggle
+  `useRouter` direct (pattern AboutContent identic).
+- Legal: `LegalLayout` e server component (ca să păstreze `sectionOverrides`
+  server-rendered pentru OUG 34/2014 statutory note). Creat
+  `components/legal/LegalShell.tsx` (`'use client'`) = Navbar + children +
+  Footer + toggle. Paginile legale wrap `<LegalShell routeKey locale>
+  <LegalLayout/></LegalShell>`. Pattern canonic "server component drept
+  children al unui client component" — zero RSC serialization risk.
+
+**Verificare fix (proof la build):** First Load JS sare la paginile fixed —
+legal 127kB→190kB, contact 155kB→217kB. Creșterea = exact chunk-urile
+Navbar (GSAP/ScrollTrigger) + Footer (framer-motion) acum bundled. Dacă
+NU crește First Load, Navbar/Footer NU s-au montat.
+
+**Lecție generală / prevention:** Acest proiect NU are Navbar/Footer în
+layout global (decizie istorică — fiecare pagină controlează `darkHero`
+prop al Navbar-ului + toggle-ul de limbă specific rutei). Deci ORICE
+pagină nouă TREBUIE să-și monteze explicit Navbar + Footer prin client
+wrapper. Adăugat la checklist-ul din [[New Page Accessibility Checklist]]
+ca verificare obligatorie #0.
+
+**De ce nu mutăm în layout global?** Navbar are nevoie de `darkHero` prop
+(per-pagină) + `onToggleLanguage` care navighează la slug-ul localizat
+AL RUTEI CURENTE (diferit per pagină). Un layout global ar trebui să
+deducă routeKey din pathname — refactor mai mare, deferred. Pattern
+per-pagină rămâne, dar checklist-ul îl face explicit.
+
+**Fișiere:** `components/contact/ContactPage.tsx`,
+`components/legal/LegalShell.tsx` (nou),
+`app/[locale]/{termeni,confidentialitate,retur}/page.tsx`.
+
 ## 2026-06-18 — New Page Accessibility Checklist (IA 5-tier system, Task 1.4)
 
 **Context:** Post-Sprint-1 smoke test a descoperit că /contact (și implicit
@@ -401,6 +455,11 @@ Footer column nouă "PENTRU CLIENȚI" sau extindere NAVIGARE:
 Decizie IA globală la Sprint 4 (sub-nav strategy dacă nav primary > 5 items).
 
 ### Checklist obligatoriu la pagină nouă — ASK:
+- [ ] **#0 GLOBAL CHROME (cel mai important — vezi gotcha 2026-06-18
+      layout):** pagina montează Navbar + Footer? Acest proiect NU le are
+      în layout global — fiecare client wrapper le montează explicit.
+      TEST: poți naviga AWAY de pagină FĂRĂ browser back? Verifică la build:
+      First Load JS include chunk-urile Navbar+Footer (~+60kB)?
 - [ ] Tier 1 (Navbar)? — primary CTA pentru visitor browse
 - [ ] Tier 2 (Footer NAVIGARE)? — mirror Navbar pentru redundancy
 - [ ] Tier 3 (Footer fine print)? — doar legal/compliance
