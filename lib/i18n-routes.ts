@@ -31,6 +31,12 @@ export const PATHNAMES = {
   terms: { ro: 'termeni', en: 'terms' },
   privacy: { ro: 'confidentialitate', en: 'privacy' },
   returns: { ro: 'retur', en: 'returns' },
+  // Auth pages (Task 2.2). `login` shared across locales; the rest use
+  // natural EN slugs. Folder names follow the RO slug.
+  login: { ro: 'login', en: 'login' },
+  register: { ro: 'inregistrare', en: 'register' },
+  forgotPassword: { ro: 'parola-uitata', en: 'forgot-password' },
+  resetPassword: { ro: 'reset-parola', en: 'reset-password' },
 } as const;
 
 export type RouteKey = keyof typeof PATHNAMES;
