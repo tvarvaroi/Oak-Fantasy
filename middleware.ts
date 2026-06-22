@@ -19,6 +19,17 @@ function getLocaleFromPathname(pathname: string): Locale | null {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // ── Skip /auth/* route handlers (Task 2.2.1 hotfix) ────────────────────
+  // /auth/callback + /auth/signout live OUTSIDE [locale] and manage their own
+  // Supabase client. They MUST bypass the locale catch-all below — otherwise a
+  // no-locale path like /auth/signout gets 307-redirected to /ro/auth/signout
+  // (a non-existent route), the handler never runs, and the user lands on a
+  // broken page (white screen + React #418/#423 hydration crash). The matcher
+  // also excludes /auth, so this is belt-and-suspenders.
+  if (pathname.startsWith('/auth')) {
+    return NextResponse.next();
+  }
+
   // ── Supabase auth session refresh (Task 2.1) ───────────────────────────
   // Runs FIRST so an expiring token is refreshed on every matched request.
   // refreshSession returns the cookies that must be written; we apply them to
@@ -72,5 +83,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next|api|.*\\..*).*)'],
+  // Exclude _next, api, auth (route handlers outside [locale]), and static
+  // files. `auth` added in Task 2.2.1 — see the in-function guard above.
+  matcher: ['/((?!_next|api|auth|.*\\..*).*)'],
 };

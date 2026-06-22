@@ -567,6 +567,49 @@ Task 2.1 ocolește gate-ul — de aia smoke 2.1 a trecut dar 2.2 nu.)
 
 **Fișiere:** niciunul (config dashboard). Smoke: `scripts/smoke-auth-flow.mjs`.
 
+## 2026-06-18 — Middleware locale catch-all redirectează route handlers non-locale (/auth/*) → white screen #418
+
+**🚨 BUG CRITIC (Task 2.2.1). Logout → white screen + React #418/#423 +
+HierarchyRequestError "Only one element on document allowed".**
+
+**Simptom:** Click "Ieși" (logout) → white screen complet. Console:
+React #418 (hydration mismatch), #423 (hydration recovery error),
+HierarchyRequestError appendChild, NotFoundError removeChild, AggregateError.
+
+**Root cause (NU era race condition React):** `middleware.ts` are un
+catch-all la final: orice path FĂRĂ locale → `redirect(/ro${path})`. Asta e
+corect pentru pagini (`/despre` → `/ro/despre`). DAR route handler-ele auth
+(`/auth/signout`, `/auth/callback`) trăiesc ÎN AFARA `[locale]` și matcher-ul
+middleware NU le excludea (excludea doar `_next|api|static`).
+
+Flow rupt:
+1. POST `/auth/signout` (form logout)
+2. Middleware: path fără locale → 307 redirect la `/ro/auth/signout`
+3. `/ro/auth/signout` nu există ca rută → render broken sub [locale]
+4. White screen + hydration crash. Handler-ul signout NU rulează niciodată.
+
+Confirmat cu curl: POST /auth/signout → `307 -> /ro/auth/signout` (înainte),
+`303 -> /ro` (după fix). Același bug lovea /auth/callback (reset + OAuth).
+
+**Fix:** exclude `/auth` din middleware:
+- matcher: `/((?!_next|api|auth|.*\\..*).*)` (adăugat `auth`)
+- guard defensiv în funcție: `if (pathname.startsWith('/auth')) return NextResponse.next();`
+
+**Lecție generală:** Când adaugi route handlers (`app/**/route.ts`) SAU
+orice rute ÎN AFARA structurii `[locale]`, verifică INTOTDEAUNA că
+middleware-ul i18n le exclude — altfel catch-all-ul locale le sparge.
+Bug-ul a fost introdus la Task 2.2 (am adăugat /auth/* fără update matcher);
+descoperit la primul logout real. Adaugă la mental model: matcher-ul
+middleware e un allowlist invers — fiecare familie nouă de rute non-locale
+(/auth, future /api extern, webhooks) trebuie exclusă explicit.
+
+**Verificare obligatorie:** test în PRODUCTION build (`npm run start`),
+nu doar dev — #418/#423 sunt minified prod-only. curl pe status codes
+e suficient pentru a confirma că handler-ul rulează (303/307 corect)
+vs redirect greșit.
+
+**Fișiere:** `middleware.ts` (matcher + guard).
+
 ## SECURITY_CHECKLIST.md maintenance protocol
 
 Document: `_brain/notes/SECURITY_CHECKLIST.md` (living document)
