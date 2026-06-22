@@ -6,19 +6,29 @@ import { isLocale } from '@/lib/i18n-routes';
 export const dynamic = 'force-dynamic';
 
 // Server-side sign out. POST so it isn't triggerable by a stray GET/prefetch.
-// Reads `locale` from the form body to redirect back to the right homepage.
+// Redirect target:
+//   - `redirectTo` (relative path only — open-redirect guard) wins; used by
+//     the admin area to land on /admin/login after sign out (Task 2.3 D5).
+//   - else `locale` form field -> that locale's homepage.
+//   - else /ro.
 export async function POST(request: NextRequest) {
   const supabase = getServerSupabase();
   await supabase.auth.signOut();
 
-  let locale = 'ro';
+  let target = '/ro';
   try {
     const form = await request.formData();
-    const l = form.get('locale');
-    if (typeof l === 'string' && isLocale(l)) locale = l;
+
+    const redirectTo = form.get('redirectTo');
+    if (typeof redirectTo === 'string' && redirectTo.startsWith('/') && !redirectTo.startsWith('//')) {
+      target = redirectTo;
+    } else {
+      const l = form.get('locale');
+      if (typeof l === 'string' && isLocale(l)) target = `/${l}`;
+    }
   } catch {
-    // no body — fall back to ro
+    // no body — fall back to /ro
   }
 
-  return NextResponse.redirect(new URL(`/${locale}`, request.url), { status: 303 });
+  return NextResponse.redirect(new URL(target, request.url), { status: 303 });
 }
