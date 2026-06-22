@@ -8,6 +8,7 @@ import { useReducedMotion } from 'framer-motion';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 import { localizedPath, type Locale } from '@/lib/i18n-routes';
+import { createClient } from '@/lib/supabase-client';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -63,7 +64,20 @@ export default function Navbar({
   const prefersReducedMotion = useReducedMotion();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [authed, setAuthed] = useState(false);
   const pathname = usePathname() ?? '';
+
+  // Minimal auth-state awareness (Task 2.2): show a Sign-out affordance when
+  // logged in. Browser client reads the cookie session + subscribes to
+  // changes so login/logout reflect without a hard refresh.
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => setAuthed(!!data.user));
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAuthed(!!session);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
 
   const links = language === 'ro' ? NAV_LINKS_RO : NAV_LINKS_EN;
   const homePath = `/${language}`;
@@ -261,6 +275,25 @@ export default function Navbar({
             )}
           </button>
 
+          {/* Sign out — only when authenticated (Task 2.2 minimal logout) */}
+          {authed && (
+            <form action="/auth/signout" method="post" className="hidden md:block">
+              <input type="hidden" name="locale" value={language} />
+              <button
+                type="submit"
+                className="label-caps text-xs font-caudex transition-colors duration-200 hover:text-oak-warm"
+                style={{
+                  color: navInkSoft,
+                  fontFamily: 'var(--font-caudex)',
+                  letterSpacing: '0.15em',
+                  transition: colorTransition,
+                }}
+              >
+                {language === 'ro' ? 'Ieși' : 'Sign out'}
+              </button>
+            </form>
+          )}
+
           {/* CTA */}
           <Link
             href={waitlistHref}
@@ -342,6 +375,22 @@ export default function Navbar({
           >
             {language === 'ro' ? 'Pre-comandă' : 'Pre-order'}
           </Link>
+          {authed && (
+            <form action="/auth/signout" method="post" className="mt-1">
+              <input type="hidden" name="locale" value={language} />
+              <button
+                type="submit"
+                className="w-full text-center py-3 font-caudex text-sm min-h-[44px]"
+                style={{
+                  color: 'var(--ink-soft)',
+                  fontFamily: 'var(--font-caudex)',
+                  letterSpacing: '0.04em',
+                }}
+              >
+                {language === 'ro' ? 'Ieși din cont' : 'Sign out'}
+              </button>
+            </form>
+          )}
         </nav>
       </div>
     </header>
