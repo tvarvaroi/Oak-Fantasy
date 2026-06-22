@@ -466,6 +466,42 @@ INSERT INTO email_subscribers  -- OK pentru anonymous (signup)
 SELECT * FROM email_subscribers  -- DENY pentru anonymous
 ```
 
+### 8.1.b RLS policies BUILT + AUDITED (status 2026-06-18, Task 2.1)
+
+Toate policies există din migrațiile 2026-05-22 (090010) + sunt applied pe
+remote. Smoke-tested la Task 2.1 (scripts/smoke-auth.mjs):
+
+- [x] **profiles** — "Users read own" + "Users update own" + "Admin full".
+      🔒 `guard_profile_role()` trigger blochează self-promotion la admin
+      pentru useri autentificați (P0001 exception); exempt când
+      `auth.uid() IS NULL` (SQL editor / service-role) ca primul admin să
+      poată fi setat manual. VERIFIED: self-promotion blocked.
+- [x] **orders** — "Users read own" (profile_id=auth.uid()) + "Admin full".
+      Inserts DOAR via service-role (guest orders prin API). No anon INSERT.
+- [x] **order_items / order_status_history** — owner reads via parent order
+      join + admin full.
+- [x] **addresses** — owner CRUD (profile_id=auth.uid()) + admin full.
+- [x] **products** — public reads active (anon+auth) + admin full.
+- [x] **inventory / stock_movements** — admin only. Mutații via
+      reserve/release/fulfill_stock (SECURITY DEFINER, audit în stock_movements).
+- [x] **email_subscribers** — anon INSERT (canonical, Task 1.1) + admin reads.
+- [x] **is_admin()** SECURITY DEFINER — evită recursion pe profiles policy.
+- [x] **handle_new_user** trigger — profile auto-created la signup
+      (role=customer default). VERIFIED.
+
+Re-audit pre-launch: rulează `scripts/smoke-auth.mjs` pe proiectul prod nou
+(§8.5) după ce-l creezi.
+
+### 8.1.c HAND-OFF founder — Supabase Auth settings (Task 2.1)
+
+- [ ] Dashboard → Auth → Providers → Email → **"Confirm email" OFF**
+      (founder decision: signup fără email verification). Nu e în cod
+      (no supabase/config.toml local; settings în dashboard).
+- [ ] DUPĂ ce founder face signup (Task 2.2): promovare admin via SQL editor:
+      `UPDATE profiles SET role='admin' WHERE email='tvarvaroi@gmail.com';`
+      (guard_profile_role exempt când auth.uid() IS NULL în SQL editor)
+- [ ] Google OAuth provider — configurat la Task 2.3 (Google Cloud Console nou)
+
 ### 8.2 Backup strategy
 
 - [ ] Supabase auto-backup activ (daily snapshots, retenție 7 zile pe Free plan)

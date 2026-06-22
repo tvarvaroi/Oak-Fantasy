@@ -419,3 +419,52 @@ Spot-check așteptat: diff DOAR în Navbar/Footer zones, page bodies identice.
 3. docs(brain): New Page Accessibility Checklist + 5-tier IA system
 
 Sprint 1 FULLY CLOSED (cu hotfix IA). Ready Sprint 2 (Auth + Admin).
+
+## 2026-06-18 — Sprint 2 Task 2.1 (Auth foundation wiring) închis
+
+FINDING MAJOR la brainstorming: schema/RLS/trigger/functions auth EXISTĂ
+DEJA din migrațiile 2026-05-22 (090001-090011, toate applied pe remote).
+Premisa task-ului ("creem de la zero") obsoletă. ~85% deja livrat:
+profiles (role CHECK customer/admin), orders (profile_id + guest, bani
+integer, status enum 9 stări), order_items, addresses, products, inventory,
+stock_movements, order_status_history, RLS complet, is_admin() SECURITY
+DEFINER, guard_profile_role() anti-self-promotion, handle_new_user trigger,
+generate_order_number (OF-YYYY-NNNN), reserve/release/fulfill_stock,
+lib/supabase-server.ts, types/supabase.ts, @supabase/ssr installed.
+
+Scope redus la 3 piese auth wiring genuin lipsă (decizii D1-D7 lock founder):
+- lib/supabase-client.ts: createBrowserClient (auth browser client, session
+  în cookies). Separat de lib/supabase.ts (waitlist anon) — D1.
+- middleware.ts + lib/supabase-middleware.ts: session refresh compus cu
+  i18n existing. refreshSession colectează cookies, applyCookies le pune pe
+  fiecare return (next/redirect/rewrite) → Set-Cookie supraviețuiește
+  redirect-urilor i18n. getUser() swallowed errors → anonymous OK. D4.
+- lib/auth/get-user.ts (getUser → user+profile+role, isAdmin) +
+  require-admin.ts (requireAdmin/requireUser cu redirect). D3.
+
+STRATEGIC NOTE (founder): waitlist NU dispare — evoluează la newsletter
+pre-launch. lib/supabase.ts (waitlist anon, neatins) coexistă cu
+lib/supabase-client.ts (auth). Public-anon writes vs cookie-bound auth.
+
+Smoke tests (scripts/smoke-auth.mjs, service-role + cleanup):
+- T1 handle_new_user trigger → profile auto-created ✓
+- T2 default role=customer ✓
+- T3 guard_profile_role → self-promotion blocked (P0001) ✓
+- cleanup: deleteUser → profile cascade ✓
+
+Middleware runtime (prod server + curl): root→307 /ro, /en/despre→308
+/en/about, /en/about→200 rewrite, /ro/contact→200, /ro→200. i18n intact.
+
+Verificat: typecheck + lint + check:i18n + build GREEN. Middleware bundle
+26.8kB→81.9kB (ssr client). Zero migrații noi. Types regen skip (D5).
+
+HAND-OFF FOUNDER:
+- Supabase Dashboard → Auth → Providers → Email → toggle "Confirm email"
+  OFF (founder decision: signup fără email verification). Nu pot din cod
+  (no supabase/config.toml local, settings în dashboard). D6.
+- Promovare admin se face DUPĂ ce founder face signup (Task 2.2):
+  UPDATE profiles SET role='admin' WHERE email='tvarvaroi@gmail.com';
+  (din SQL editor — guard_profile_role exempt când auth.uid() IS NULL)
+
+4 commits. Next: Task 2.2 (Customer auth pages /login, /inregistrare,
+/parola-uitata, /reset-parola).

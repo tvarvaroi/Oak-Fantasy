@@ -484,6 +484,62 @@ Decizie IA globală la Sprint 4 (sub-nav strategy dacă nav primary > 5 items).
 
 **Fișiere:** `components/Navbar.tsx`, `components/Footer.tsx`.
 
+## 2026-06-18 — Schema pre-existed din 2026-05-22 (verifică ÎNTÂI existing state)
+
+**Al doilea caz după "single project reality" (Task 1.1) când o premisă de
+task s-a dovedit greșită la audit. Pattern recurent — verifică realitatea.**
+
+**Simptom:** Task 2.1 cerea "creem profiles + orders + RLS + trigger de la
+zero" pentru auth foundation. Audit a descoperit că TOATĂ schema există deja
+din migrațiile 20260522090001-090011 (applied pe remote): profiles cu role
+CHECK, orders (profile_id + guest, bani integer, status enum bogat),
+order_items, addresses, products, inventory, stock_movements,
+order_status_history, RLS complet, is_admin(), guard_profile_role(),
+handle_new_user, generate_order_number (OF-YYYY-NNNN global seq), stock funcs.
+Plus lib/supabase-server.ts (getServerSupabase + getServiceSupabase),
+types/supabase.ts, @supabase/ssr installed.
+
+**Cauză:** Munca de schema fusese făcută într-o sesiune anterioară (Bolt sau
+sesiune timpurie 2026-05-22) dar planul de task strategic presupunea
+greenfield. ~85% din Task 2.1 era deja livrat.
+
+**Fix:** Scope redus la 3 piese auth wiring care GENUIN lipseau (browser
+client, middleware session, auth helpers). Zero migrații noi.
+
+**Lecție generală (REGULA):** Înainte de ORICE task care presupune "creem X
+de la zero", rulează audit: `ls supabase/migrations/`, `grep CREATE TABLE`,
+`ls lib/`, `npx supabase migration list --linked`. Premisa task-ului
+strategic poate fi stale. Vezi și [[single-project-reality]]. Cost audit:
+5 min. Cost re-creare peste existing: ore + conflict migrații.
+
+**Fișiere:** toate `supabase/migrations/20260522*`.
+
+## 2026-06-18 — Middleware: compose Supabase session refresh cu i18n (Set-Cookie pe redirects)
+
+**Context Task 2.1.** Supabase SSR auth cere middleware care refreshează
+token-ul la fiecare request. Proiectul are deja middleware i18n (redirects
+locale-slug + rewrites). Compunerea lor are un gotcha real.
+
+**Gotcha:** Dacă session refresh setează cookies pe un response, dar apoi
+logica i18n returnează ALT response object (redirect/rewrite), Set-Cookie
+se pierde — sesiunea nu se mai refreshează niciodată pe rutele care
+redirectează.
+
+**Soluție folosită:** `lib/supabase-middleware.ts`:
+- `refreshSession(request)` NU returnează response — colectează cookies pe
+  care refresh-ul vrea să le seteze și le returnează ca array.
+- `applyCookies(response, cookies)` aplică array-ul pe ORICE response.
+- `middleware.ts` rulează refreshSession ÎNTÂI, apoi wrap-uiește FIECARE
+  return (next/redirect/rewrite) cu applyCookies(..., authCookies).
+- `getUser()` (nu getSession) — validează token cu auth server, triggers
+  refresh. Erori swallowed → anonymous browsing nu se sparge niciodată.
+
+**Verificare:** middleware bundle 26.8kB→81.9kB (ssr client bundled).
+Runtime curl: root→307 /ro, /en/despre→308 /en/about, /en/about→200 rewrite,
+/ro/contact→200. i18n intact + anonymous browsing OK.
+
+**Fișiere:** `middleware.ts`, `lib/supabase-middleware.ts`.
+
 ## SECURITY_CHECKLIST.md maintenance protocol
 
 Document: `_brain/notes/SECURITY_CHECKLIST.md` (living document)
