@@ -56,3 +56,4 @@ _brain/inbox/*
 supabase/.temp/
 supabase/.branches/
 .claude/agent-memory/
+.env.local*
