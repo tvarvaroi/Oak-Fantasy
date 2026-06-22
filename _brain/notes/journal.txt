@@ -468,3 +468,69 @@ HAND-OFF FOUNDER:
 
 4 commits. Next: Task 2.2 (Customer auth pages /login, /inregistrare,
 /parola-uitata, /reset-parola).
+
+## 2026-06-18 — Sprint 2 Task 2.2 (Customer auth pages) închis
+
+4 pagini auth + route handlers + logout minimal. Decizii lock D1-D6.
+
+Routing (PATHNAMES): login (login/login), register (inregistrare/register),
+forgotPassword (parola-uitata/forgot-password), resetPassword
+(reset-parola/reset-password).
+
+Foundation:
+- lib/schemas/auth.ts: 4 Zod schemas (login, register cu confirm match +
+  phone optional, forgotPassword, resetPassword cu confirm match). min 6
+  parolă (Supabase default).
+- components/auth/content.ts: AUTH_CONTENT[locale], RSC-safe (zero funcții),
+  key parity ro/en. errors block anti-enumeration.
+- components/auth/fields.tsx: shared primitives (inputBaseStyle,
+  FieldLabel, FieldError, ServerError, SubmitButton) — consistency ContactForm.
+- components/auth/AuthShell.tsx: Navbar + centered card (max 440px) + Footer
+  + toggle (check #0 Task 1.5 — chrome global pe toate 4).
+
+Forms (RHF + zodResolver, lib/supabase-client browser auth):
+- LoginForm: signInWithPassword → redirect /[locale]. Anti-enumeration
+  "Email sau parolă greșite" (nu dezvăluie care).
+- RegisterForm: signUp(full_name metadata) → profile update full_name+phone
+  (D3 A, RLS own update) → redirect home. Email-exists/weak-password mapping.
+- ForgotPasswordForm: resetPasswordForEmail(redirectTo /auth/callback?next=
+  reset) → MEREU success UI (anti-enumeration).
+- ResetPasswordForm: getSession check (hasSession) → updateUser(password).
+  Invalid/expired link → invalidLink message.
+
+Route handlers:
+- app/auth/callback/route.ts: exchangeCodeForSession → redirect next
+  (open-redirect guard: doar relative /). Reused de reset + Google OAuth 2.3.
+- app/auth/signout/route.ts: POST signOut → redirect /[locale] (locale din
+  form body).
+
+Navbar (D5 logout minimal): auth-state via browser client (getUser +
+onAuthStateChange subscription). Când logat: "Ieși"/"Sign out" form POST la
+/auth/signout (desktop lângă language toggle + mobile menu).
+
+Pages (server): login + inregistrare cu redirect-away (getUser → redirect
+home dacă logat, force-dynamic). forgot + reset SSG. robots noindex pe toate.
+
+Verificat: typecheck + lint + check:i18n (10 maps) + build GREEN. Auth
+pages First Load ~278kB (Navbar+Footer+supabase client).
+
+BLOCKER (dashboard, nu cod): smoke-auth-flow.mjs → "Email signups are
+disabled". Founder a făcut Confirm email OFF dar provider email signup /
+"Allow new users to sign up" e încă OFF. Cod corect (eroare config
+server-side). Vezi gotcha. Smoke live re-rulabil după ce founder enable.
+
+Visual regression: 8 entries noi (4 pagini × 2 locale). Baselines =
+hand-off founder.
+
+HAND-OFF FOUNDER (prioritar — blochează acceptanța 2.2):
+1. Supabase Dashboard → Auth → Providers → Email → ENABLE provider +
+   "Allow new users to sign up" ON (+ Confirm email OFF deja făcut).
+2. Auth → URL Configuration → Redirect URLs: adaugă
+   http://localhost:3000/auth/callback + <vercel-url>/auth/callback
+   (necesar reset password + OAuth Task 2.3).
+3. DUPĂ signup tvarvaroi@gmail.com: SQL editor
+   UPDATE profiles SET role='admin' WHERE email='tvarvaroi@gmail.com';
+4. Regen visual baselines local + smoke-auth-flow.mjs (după gate-uri ON).
+
+6 commits. Next: Task 2.3 (Google OAuth + /admin/login + middleware
+protected routes).

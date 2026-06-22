@@ -492,14 +492,21 @@ remote. Smoke-tested la Task 2.1 (scripts/smoke-auth.mjs):
 Re-audit pre-launch: rulează `scripts/smoke-auth.mjs` pe proiectul prod nou
 (§8.5) după ce-l creezi.
 
-### 8.1.c HAND-OFF founder — Supabase Auth settings (Task 2.1)
+### 8.1.c HAND-OFF founder — Supabase Auth settings (Task 2.1 + 2.2)
 
-- [ ] Dashboard → Auth → Providers → Email → **"Confirm email" OFF**
-      (founder decision: signup fără email verification). Nu e în cod
-      (no supabase/config.toml local; settings în dashboard).
+- [x] Dashboard → Auth → Providers → Email → **"Confirm email" OFF**
+      (founder a făcut). Signup fără email verification.
+- [ ] **⚠️ BLOCKER 2.2:** Dashboard → Auth → Providers → Email → **ENABLE
+      provider** + **"Allow new users to sign up" ON**. Fără asta `signUp()`
+      eșuează cu "Email signups are disabled" (setare separată de Confirm
+      email — vezi gotcha 2026-06-18). Blochează acceptanța Task 2.2.
+- [ ] **Auth → URL Configuration → Redirect URLs:** adaugă
+      `http://localhost:3000/auth/callback` + `<vercel-url>/auth/callback`
+      (necesar pentru reset password + Google OAuth Task 2.3).
 - [ ] DUPĂ ce founder face signup (Task 2.2): promovare admin via SQL editor:
       `UPDATE profiles SET role='admin' WHERE email='tvarvaroi@gmail.com';`
       (guard_profile_role exempt când auth.uid() IS NULL în SQL editor)
+- [ ] Pre-launch: branded auth email templates (acum default Supabase OK).
 - [ ] Google OAuth provider — configurat la Task 2.3 (Google Cloud Console nou)
 
 ### 8.2 Backup strategy

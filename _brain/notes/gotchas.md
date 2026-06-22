@@ -540,6 +540,33 @@ Runtime curl: root→307 /ro, /en/despre→308 /en/about, /en/about→200 rewrit
 
 **Fișiere:** `middleware.ts`, `lib/supabase-middleware.ts`.
 
+## 2026-06-18 — "Email signups are disabled" ≠ "Confirm email OFF" (Supabase Auth)
+
+**Context Task 2.2.** Smoke test register flow (anon `signUp`) a eșuat cu
+`Email signups are disabled` deși founder făcuse "Confirm email" OFF.
+
+**Cauză:** Sunt DOUĂ setări separate în Supabase Dashboard:
+1. **Auth → Providers → Email → "Enable Email provider"** + în unele versiuni
+   **Auth → Sign In/Providers → "Allow new users to sign up"** — controlează
+   dacă `signUp()` e permis DELOC.
+2. **"Confirm email"** (OFF) — controlează dacă userul trebuie să confirme
+   email-ul după signup ÎNAINTE de a avea sesiune.
+
+Founder a setat (2) OFF dar (1) era încă OFF → signup blocat complet.
+
+**Fix:** Hand-off founder — Dashboard → Authentication:
+- Providers → Email → **Enable** (provider ON)
+- "Allow new users to sign up" → **ON**
+- "Confirm email" → **OFF** (deja făcut)
+
+**Lecție:** signup flow are 2 gate-uri dashboard independente. Codul
+`signUp()` poate fi 100% corect și tot să eșueze pe config. Eroarea
+"Email signups are disabled" = gate (1), NU bug de cod. Smoke test live
+necesită ambele gate-uri setate. (Admin API `auth.admin.createUser` din
+Task 2.1 ocolește gate-ul — de aia smoke 2.1 a trecut dar 2.2 nu.)
+
+**Fișiere:** niciunul (config dashboard). Smoke: `scripts/smoke-auth-flow.mjs`.
+
 ## SECURITY_CHECKLIST.md maintenance protocol
 
 Document: `_brain/notes/SECURITY_CHECKLIST.md` (living document)
