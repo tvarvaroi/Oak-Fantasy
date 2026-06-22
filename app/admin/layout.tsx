@@ -16,8 +16,12 @@ const caudex = Caudex({ subsets: ['latin'], weight: ['400', '700'], variable: '-
 const caveat = Caveat({ subsets: ['latin'], weight: ['400', '600'], variable: '--font-caveat', display: 'swap' });
 const lora = Lora({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-lora', display: 'swap' });
 
+// SECURITY: neutral title (no "Admin") so the 404 for /admin and any probe
+// is indistinguishable from a normal page — the <title> must not confirm an
+// admin area exists. Individual admin pages keep this neutral title; they're
+// reached only by knowing the URL. robots noindex on the whole segment.
 export const metadata: Metadata = {
-  title: 'Admin — Oak Fantasy',
+  title: 'Oak Fantasy',
   robots: { index: false, follow: false },
 };
 

@@ -646,6 +646,51 @@ un bug fantomă în cod. Verifică cu debug header ce vede efectiv runtime-ul.
 **Fișiere:** niciunul (test methodology). Relevant: orice smoke curl viitor
 cu paths.
 
+## 2026-06-18 — 404 ascuns nu trebuie să dezvăluie zona protejată (2 leak-uri)
+
+**Security review founder la Task 2.3.** Scopul 404-ului pe /admin = să
+ascundă că zona admin există. Două leak-uri anulau scopul:
+
+**Leak 1 — link explicit în 404:** `app/admin/not-found.tsx` avea
+"Mergi la autentificare" → /admin/login. Un atacator care da /admin vedea
+DIRECT calea spre login admin. Fix: 404 generic, link DOAR la "/", zero
+mențiune admin/login/administrare. Indistinguibil de un 404 normal.
+
+**Leak 2 (mai subtil) — RSC payload + title:** chiar și după ce am curățat
+textul vizibil, HTML-ul răspunsului /admin (status 404) conținea inline:
+`"children":"Administrare"` + `"name":"redirectTo","value":"/admin/login"`
+(payload-ul dashboard-ului) + `<title>Admin — Oak Fantasy</title>`.
+
+Cauză Leak 2: **gate-ul era DOAR în layout** (`(protected)/layout.tsx`
+notFound()). În Next App Router, layout + page se randează ÎN PARALEL (RSC).
+notFound() în layout NU oprește pagina copil să-și construiască JSX-ul →
+payload-ul ei se scurge în flight stream-ul inline din HTML-ul 404.
+**Layout-ul NU e graniță de securitate pentru pagina copil** (documentat
+de Next: fă auth check în page / middleware / data-access layer, nu doar
+layout). Plus `<title>` din admin layout metadata zicea "Admin".
+
+Fix Leak 2:
+- Gate la nivel de PAGINĂ: `requireAdminOrNotFound()` (lib/auth/require-admin.ts)
+  apelat la TOPUL fiecărei pagini admin protejate, ÎNAINTE de orice JSX →
+  short-circuit, zero payload pentru non-admin.
+- Title neutru în `app/admin/layout.tsx` metadata ('Oak Fantasy', fără "Admin").
+- Layout gate păstrat ca defense-in-depth, dar NU e suficient singur.
+
+**Verificare:** curl pe HTML-ul randat (nu doar status code) +
+grep leak-uri. /admin non-admin → 404, title "Oak Fantasy", grep
+admin/login|administrare → ZERO.
+
+**Lecție generală:**
+1. 404 de pe o zonă hidden = GENERIC, fără link/text spre zona protejată.
+2. Auth gate care trebuie să PREVINĂ leak de conținut → în PAGINĂ (sau
+   middleware/DAL), NU doar în layout (RSC randează page paralel cu layout).
+3. Verifică leak-uri în HTML-ul COMPLET randat (RSC flight payload inline),
+   nu doar în textul vizibil sau status code. `curl <url> | grep <secret>`.
+4. `<title>` + metadata pot fi leak-uri — neutralizează-le pe zone ascunse.
+
+**Fișiere:** `app/admin/not-found.tsx`, `app/admin/(protected)/page.tsx`,
+`app/admin/layout.tsx`, `lib/auth/require-admin.ts` (requireAdminOrNotFound).
+
 ## SECURITY_CHECKLIST.md maintenance protocol
 
 Document: `_brain/notes/SECURITY_CHECKLIST.md` (living document)

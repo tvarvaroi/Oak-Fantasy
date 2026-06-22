@@ -1,14 +1,19 @@
-import { getUser } from '@/lib/auth/get-user';
+import { requireAdminOrNotFound } from '@/lib/auth/require-admin';
 
 // /admin dashboard — placeholder for Task 2.3. Full shell (sidebar, nav,
-// stats) arrives in Task 2.4. The (protected) layout already guaranteed an
-// admin; we re-read the user here only for the greeting name.
+// stats) arrives in Task 2.4.
+//
+// SECURITY: the gate runs HERE at the page top (not only in the layout). A
+// layout-only guard lets this page's RSC payload stream into the 404 HTML
+// (Task 2.3 review leak). requireAdminOrNotFound() short-circuits before any
+// dashboard JSX is built, so a non-admin gets a clean 404 with zero admin
+// content in the response.
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboardPage() {
-  const user = await getUser();
-  const name = user?.profile?.full_name || user?.email || 'admin';
+  const user = await requireAdminOrNotFound();
+  const name = user.profile?.full_name || user.email || 'admin';
 
   return (
     <main

@@ -4,9 +4,24 @@
 // dedicated /admin/login). RLS still enforces authorization at the DB even if
 // a guard is ever bypassed — these helpers are the UX/redirect layer.
 
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 import { getUser, type AuthUser } from './get-user';
+
+// Page-level admin gate that 404s non-admins. MUST be called at the TOP of
+// every protected admin PAGE (not just the layout). A layout-only guard does
+// NOT stop the child page from rendering its RSC payload in parallel — that
+// payload then leaks into the 404 HTML (found in Task 2.3 security review:
+// the dashboard's "Administrare" + "/admin/login" strings appeared in the
+// /admin 404 response even though the visible page was the 404). Calling this
+// at the page top short-circuits before any sensitive JSX is built.
+export async function requireAdminOrNotFound(): Promise<AuthUser> {
+  const user = await getUser();
+  if (!user || user.role !== 'admin') {
+    notFound();
+  }
+  return user;
+}
 
 // Server Component / layout guard. Redirects unauthenticated or non-admin
 // users to /admin/login (built in Etapa 2.3). Returns the admin AuthUser so
