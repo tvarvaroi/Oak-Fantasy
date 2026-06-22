@@ -38,6 +38,16 @@ export async function middleware(request: NextRequest) {
   // visitors just get an empty cookie list — browsing is unaffected.
   const authCookies = await refreshSession(request);
 
+  // ── /admin/* lives outside [locale] (Task 2.3) ─────────────────────────
+  // Skip the locale catch-all below — otherwise /admin would 307 to
+  // /ro/admin (same class of bug as /auth, Task 2.2.1). Session is still
+  // refreshed above so the admin gate in app/admin/(protected)/layout.tsx
+  // can read the role. The 404-for-non-admins gate is enforced there +
+  // by RLS, NOT here.
+  if (pathname.startsWith('/admin')) {
+    return applyCookies(NextResponse.next(), authCookies);
+  }
+
   const localeInPath = getLocaleFromPathname(pathname);
 
   if (localeInPath) {
