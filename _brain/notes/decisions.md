@@ -301,3 +301,28 @@
 **Decizie:** Scroll listener register-uit mereu, fără guard pe `prefersReducedMotion`. Hook-ul `prefersReducedMotion` rămâne folosit doar pentru CSS transitions (`colorTransition`), nu pentru state updates.
 **Motiv:** State logic (scrolled true/false) ≠ animation (CSS transition). Reduced motion suprimă DOAR animaţiile, nu starea funcţională. Bug pre-existing care a devenit vizibil cu FIX 1; rezolvarea îmbunătăţeşte UX pentru user-ii reduced-motion pe TOATE paginile.
 **Alternative respinse:** Lasă-l ca era (Navbar prost pentru reduced-motion users), elimină `useReducedMotion` total (pierdem transition guard).
+
+## 2026-06-22 — Task 2.4: admin CRUD architecture
+
+**Context:** Prima unealtă admin funcțională + primele server actions din proiect.
+
+**Decizii:**
+- **D-status — toggle binar mapat pe enum 3-stări:** UI toggle ON=`active`,
+  OFF=`archived`. Lista arată badge cu statusul real (draft/active/archived).
+  Form-ul are select cu toate 3. Niciodată DELETE (soft-delete, backend rule).
+- **D3 — CRUD = server actions** (`'use server'`, lib/admin/product-actions.ts).
+  Type-safe, re-validează cu Zod (safeParse) — nu se încrede în client.
+- **D4 — admin writes via getServerSupabase()** (cookie-bound, RLS "Admin full
+  access products" via is_admin()). NU service role — least privilege. Service
+  role rămâne doar pentru contexte fără sesiune (guest orders, stock fulfillment).
+- **D5 — preț RON în UI, ×100 → bani la salvare** (ronToBani), ÷100 la display.
+- **D8 — form complet de la început** (toate câmpurile bilingve + dimensions
+  jsonb asamblat din shape+length/width/thickness/diameter, SEO, engraving).
+- **Storage via migration SQL** (D2) — version-controlled, reproductibil pe prod,
+  nu manual din Dashboard. Bucket public read + admin write (is_admin()).
+- **Gate la nivel de PAGINĂ + layout** — requireAdminOrNotFound() în fiecare
+  page.tsx ȘI în (protected)/layout.tsx; shell-ul (chrome cu nav) se randează
+  doar după gate (lecția RSC-leak Task 2.3: layout-only gate scapă payload în 404).
+
+**Alternative respinse:** service role pentru admin (over-privileged), bucket din
+Dashboard (ne-reproductibil), form minimal (ar fi necesitat re-work la D8).

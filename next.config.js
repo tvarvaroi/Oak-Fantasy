@@ -3,6 +3,18 @@ const path = require('path');
 
 const nextConfig = {
   reactStrictMode: true,
+  images: {
+    // Supabase Storage public URLs for product images (Task 2.4). Bucket
+    // 'product-images' is public; objects are served from the project's
+    // *.supabase.co host under /storage/v1/object/public/**.
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '*.supabase.co',
+        pathname: '/storage/v1/object/public/**',
+      },
+    ],
+  },
   transpilePackages: [
     'three',
     '@react-three/fiber',

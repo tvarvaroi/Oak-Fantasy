@@ -603,3 +603,40 @@ HAND-OFF FOUNDER — smoke manual browser (security verification):
 
 Commits + push. Next: Task 2.4 (Admin shell + /admin/produse CRUD) —
 gate (protected) gata pentru drop-in pagini noi.
+
+═══════════════════════════════════════════════════════════════════════
+2026-06-22 — Task 2.4: Admin shell + /admin/produse CRUD (Sprint 2)
+═══════════════════════════════════════════════════════════════════════
+
+LIVRAT:
+- Admin shell reutilizabil: components/admin/AdminShell.tsx (server, chrome)
+  + AdminSidebar.tsx (client, usePathname active state). Sidebar 5 items:
+  Panou + Produse active; Abonați/Profil/Comenzi disabled muted (D1). Topbar
+  cu "Bun venit {nume}" + logout (form POST /auth/signout redirectTo=/admin/login).
+  Randate în app/admin/(protected)/layout.tsx DUPĂ requireAdminOrNotFound()
+  (gate la top → chrome-ul nu se construiește pentru non-admin; lecția RSC-leak 2.3).
+- Storage: supabase/migrations/20260622090000_product_images_storage.sql —
+  bucket 'product-images' (public read, 5MB, jpg/png/webp) + RLS pe storage.objects
+  (admin insert/update/delete via is_admin(), public select). HAND-OFF: trebuie
+  aplicată pe proiectul Supabase live (local nu poate aplica migrații).
+- Data: lib/schemas/product.ts (Zod, RON in UI → bani în action), lib/admin/products.ts
+  (fetchAllProducts = TOATE statusurile via admin RLS; fetchProductById),
+  lib/admin/product-actions.ts (PRIMELE server actions: createProduct/updateProduct/
+  toggleProductStatus, toate cu requireAdminOrNotFound + getServerSupabase RLS D4).
+- Pagini: /admin/produse (listă, ProductTable client cu toggle optimist),
+  /admin/produse/nou, /admin/produse/[id]/edit (ProductForm shared, toate câmpurile D8).
+- ImageUpload.tsx: upload direct din browser (client autentificat) în Storage,
+  hero + galerie, validare 5MB + format, șterge din Storage la remove (fără orfani).
+- next.config.js: images.remotePatterns *.supabase.co/storage/v1/object/public/**.
+
+GATES: typecheck ✓ · lint ✓ (0 warns) · check:i18n ✓ · build ✓ (doar warning-ul
+pre-existent webpack cache about.module.css). Toate rutele /admin = dynamic (ƒ).
+
+HAND-OFF FOUNDER:
+1. Aplică migrația 20260622090000 pe Supabase (creează bucket + RLS).
+2. Smoke: /admin/produse → vezi 10 seed-uri (toate draft) → adaugă produs cu
+   imagine → editează → toggle ON (active) → verifică apare pe /tocatoare public
+   → toggle OFF (archived) → dispare.
+3. Commit + push (eu nu fac commit-uri).
+
+NEXT: Task 2.5 (/admin/subscribers + CSV), apoi 2.6 (/admin/profile + 2FA).

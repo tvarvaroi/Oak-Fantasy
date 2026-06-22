@@ -3,7 +3,7 @@
 > **Document scop:** Audit complet de securitate înainte de lansare publică  
 > **Status:** Living document, actualizat la fiecare sprint  
 > **Owner:** Theodor + Claude Code (auto-update după task-uri sensibile)  
-> **Ultima actualizare:** 2026-XX-XX (TBD la creare în repo)
+> **Ultima actualizare:** 2026-06-22 (Task 2.4 — Storage RLS bucket product-images, §8.1.e)
 
 ---
 
@@ -491,6 +491,25 @@ remote. Smoke-tested la Task 2.1 (scripts/smoke-auth.mjs):
 
 Re-audit pre-launch: rulează `scripts/smoke-auth.mjs` pe proiectul prod nou
 (§8.5) după ce-l creezi.
+
+### 8.1.e Storage RLS — bucket product-images (status Task 2.4, 2026-06-22)
+
+Migrație `20260622090000_product_images_storage.sql`. RLS pe `storage.objects`:
+- [x] **Public read** — `SELECT` pentru anon+authenticated pe `bucket_id =
+      'product-images'`. Bucket public (CDN) → next/image fetch fără auth pe
+      /tocatoare.
+- [x] **Admin write** — `INSERT`/`UPDATE`/`DELETE` doar dacă `bucket_id =
+      'product-images' AND public.is_admin()`. Același model ca "Admin full
+      access products". Upload-ul se face din browser cu sesiunea admin
+      (lib/supabase-client.ts) — RLS e gate-ul real, nu service role (D4).
+- [x] Bucket constraints la nivel de bucket: `file_size_limit = 5MB`,
+      `allowed_mime_types = jpg/png/webp` (defense-in-depth peste validarea client).
+- [ ] **HAND-OFF:** migrația trebuie APLICATĂ pe Supabase live (bucket + policies
+      nu există până atunci). Verifică Dashboard → Storage → product-images existe
+      + policies. Re-audit: încearcă upload ca user non-admin → trebuie respins.
+
+⚠ Note: imaginile sunt PUBLICE (oricine cu URL-ul le vede). OK pentru catalog
+(sunt menite publice). Nu pune nimic sensibil în acest bucket.
 
 ### 8.1.d Admin access — 4-layer security model (status Task 2.3)
 

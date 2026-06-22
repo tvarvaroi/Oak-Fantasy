@@ -720,3 +720,36 @@ trebuie să fie scanat de `grep -E "re_[A-Za-z0-9_]{20,}|sk_live_[A-Za-z0-9]{20,
 înainte de `git add`. Repo e PUBLIC (`tvarvaroi/Oak-Fantasy`) → orice secret raw
 e scanat automat de GitHub + revocat de provider. Cheile de menționat în
 checklist trebuie să fie REDACTATE (ex: `re_GnEqPV...***REDACTED***`).
+
+## 2026-06-22 — zodResolver + schemă cu .transform() = mismatch de tip RHF
+
+**Simptom:** `useForm<Input, unknown, Output>({ resolver: zodResolver(schema) })`
+cu o schemă care folosește `.transform()` (string '380' → number 380) pică la
+typecheck: "Type 'string | number' is not assignable to type 'number'" pe
+câmpurile transformate.
+
+**Cauză:** zodResolver nu reușește să inferă cele 3 generice (input/context/output)
+când schema are transforms; întoarce semnătura de resolver generic ne-tipată.
+
+**Fix:** cast explicit pe resolver —
+`resolver: zodResolver(schema) as Resolver<Input, unknown, Output>`
+(import `type { Resolver }` din 'react-hook-form'). useForm rămâne cu 3 generice;
+handleSubmit livrează Output (numere coerced). Action-ul re-parsează cu safeParse
+(idempotent — transform pe number e tot number). Vezi components/admin/ProductForm.tsx.
+
+**Pattern transform vs preprocess:** folosește `.transform()` (nu `.preprocess()`)
+ca `z.input` să rămână o uniune utilizabilă (string|number) pentru RHF, nu `unknown`.
+
+## 2026-06-22 — check:i18n respinge diacriticele cedilla legacy (ş/ţ) chiar în cod
+
+**Simptom:** un map de slugify cu `'ş': 's', 'ţ': 't'` (cedilla, U+015F/U+0163)
+pică `npm run check:i18n` cu "Legacy Romanian cedilla diacritic — use ș/ț".
+
+**Cauză:** checker-ul scanează TOATE .tsx pentru caractere cedilla, indiferent
+de context (string literal, regex, comentariu). Nu deosebește text vizibil de cod.
+
+**Fix:** nu băga caractere cedilla literale în sursă. Pentru slugify e suficient
+să mapezi comma-below ș/ț → ASCII; orice alt non-ASCII (inclusiv cedilla rar)
+cade oricum pe pasul `.replace(/[^a-z0-9]+/g, '-')` și devine cratimă. Soluție mai
+simplă și conformă. (Editorul/tooling convertește \uXXXX înapoi în caracter, deci
+escape-urile nu ajută — pur și simplu elimină cazul.)
