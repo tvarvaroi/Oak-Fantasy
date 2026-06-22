@@ -492,6 +492,29 @@ remote. Smoke-tested la Task 2.1 (scripts/smoke-auth.mjs):
 Re-audit pre-launch: rulează `scripts/smoke-auth.mjs` pe proiectul prod nou
 (§8.5) după ce-l creezi.
 
+### 8.1.d Admin access — 4-layer security model (status Task 2.3)
+
+Decizie founder: admin protejat în 4 straturi. Status:
+- [x] **Layer 1 — middleware**: `/admin/*` skip locale catch-all + session
+      refresh (`middleware.ts`). Nu e gate-ul în sine, dar pregătește rolul.
+- [x] **Layer 2 — RLS**: `is_admin()` SECURITY DEFINER + policies "Admin full
+      access" pe toate tabelele (built 2026-05-22, audited 2.1). DB-level,
+      ține chiar dacă UI gate e ocolit.
+- [x] **Layer 4 — dedicated login**: `/admin/login` izolat (fără Navbar/
+      Footer customer), role-check post-signin (non-admin → signOut +
+      "Acces interzis").
+- [ ] **Layer 3 — 2FA TOTP**: Task 2.6.
+→ 3/4 active după Task 2.3.
+
+Gate UX/routing: `app/admin/(protected)/layout.tsx` → `notFound()` (404
+hidden) pentru non-admin SAU nelogat. Route group `(protected)` = single
+gate pentru toate paginile admin viitoare. `/admin/login` public (în afara
+grupului).
+
+**Google OAuth: deferred post-launch** (MVP fără). Foundation `/auth/callback`
+(exchangeCodeForSession) gata; la activare: Google Cloud Console nou +
+provider în Supabase Dashboard + redirect URL deja whitelistabil.
+
 ### 8.1.c HAND-OFF founder — Supabase Auth settings (Task 2.1 + 2.2)
 
 - [x] Dashboard → Auth → Providers → Email → **"Confirm email" OFF**

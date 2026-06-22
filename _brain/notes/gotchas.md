@@ -610,6 +610,42 @@ vs redirect greșit.
 
 **Fișiere:** `middleware.ts` (matcher + guard).
 
+## 2026-06-18 — Git Bash (MSYS) mutilează path-args în curl → teste false-fail
+
+**A costat ~45 min de debugging fantomă la Task 2.3.** Codul era corect;
+testul mințea.
+
+**Simptom:** smoke test cu `curl -X POST --data-urlencode "redirectTo=/admin/login"`
+către /auth/signout returna mereu /ro (nu /admin/login), iar
+`redirectTo=//evil.com` returna /evil.com. Reproductibil pe prod build ȘI
+dev ȘI port nou — părea bug de cod imposibil (logica mea nu putea produce
+/evil.com din //evil.com).
+
+**Cauză:** Git Bash pe Windows (MSYS2) face **automatic POSIX-path
+conversion** pe argumentele care arată a path Unix. `--data-urlencode
+"redirectTo=/admin/login"` → MSYS rescrie valoarea ÎNAINTE ca curl s-o
+trimită: `/admin/login` devine `C:/Program Files/Git/admin/login`;
+`//evil.com` devine `/evil.com` (colapsează leading //). Serverul primea
+valori mutilate → comportament "greșit" care era de fapt corect pentru
+input-ul mutilat.
+
+**Detectare:** debug header temporar care echo-a `form.get('redirectTo')`
+a arătat `rt=C:/Program Files/Git/admin/login` — smoking gun.
+
+**Fix test:** `export MSYS_NO_PATHCONV=1` înainte de curl (sau prefix
+`MSYS_NO_PATHCONV=1 curl ...`). După: /admin/login→/admin/login,
+//evil.com→/ro (guard OK), locale=en→/en. Toate corecte.
+
+**Lecție generală:** Pe acest mediu (Git Bash/Windows), ORICE argument
+curl/CLI care conține un path care începe cu `/` e suspect de MSYS
+mangling. Pentru teste cu paths în body/args: `MSYS_NO_PATHCONV=1`.
+Dacă un test dă rezultate "imposibile" cu codul sursă, suspectează
+ÎNTÂI mediul de test (shell mangling, server stale) înainte de a vâna
+un bug fantomă în cod. Verifică cu debug header ce vede efectiv runtime-ul.
+
+**Fișiere:** niciunul (test methodology). Relevant: orice smoke curl viitor
+cu paths.
+
 ## SECURITY_CHECKLIST.md maintenance protocol
 
 Document: `_brain/notes/SECURITY_CHECKLIST.md` (living document)

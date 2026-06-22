@@ -534,3 +534,72 @@ HAND-OFF FOUNDER (prioritar — blochează acceptanța 2.2):
 
 6 commits. Next: Task 2.3 (Google OAuth + /admin/login + middleware
 protected routes).
+
+## 2026-06-18 — Sprint 2 Task 2.2.1 (logout white screen hotfix) închis
+
+Vezi gotcha "Middleware locale catch-all redirectează route handlers
+non-locale". POST /auth/signout era 307-redirectat de middleware la
+/ro/auth/signout (rută inexistentă) → white screen + #418/#423. Fix:
+exclude /auth din matcher + guard în funcție. Verificat production build
+curl. 1 commit (e30ae81).
+
+## 2026-06-18 — Sprint 2 Task 2.3 (Admin protected routes) închis
+
+Scope REDUS (Google OAuth deferred post-launch; foundation /auth/callback
+ready). Doar admin auth + protected routes.
+
+2 finding-uri arhitecturale (prevenite din lecțiile 2.2.1):
+- /admin lovea catch-all locale (→ /ro/admin) → branch dedicat middleware
+  (skip catch-all + păstrează session refresh pentru gate).
+- /admin în afara [locale] → fără html/body → app/admin/layout.tsx propriu
+  (html/body + fonts Caudex/Lora/Caveat, RO-only, NU gate).
+
+Arhitectură (route group (protected) = single gate pentru toate paginile
+admin viitoare):
+- app/admin/layout.tsx — html/body + fonts (admin root, robots noindex)
+- app/admin/not-found.tsx — 404 admin-styled (AdminCard)
+- app/admin/login/page.tsx — PUBLIC, redirect /admin dacă deja admin
+- app/admin/(protected)/layout.tsx — GATE: getUser() → notFound() dacă !admin
+- app/admin/(protected)/page.tsx — dashboard placeholder "Bun venit, {nume}"
+  + logout (form POST /auth/signout redirectTo=/admin/login)
+- components/admin/AdminCard.tsx — centered card shared (login + 404)
+- components/admin/AdminLoginForm.tsx — signInWithPassword → query role →
+  admin? push /admin : signOut + "Acces interzis. Acest cont nu are
+  drepturi de administrator."
+
+Decizii lock D1-D6 + sub-decizie:
+- D1 admin RO-only · D2 placeholder la 2.3 · D3 customer login admin →
+  homepage · D4 notFound() idiomatic (NU middleware 404) · D5 /auth/signout
+  cu redirectTo whitelisted (relative only, open-redirect guard) · D6 fonts
+  replicate · sub: 404 hidden chiar și pt admin cu sesiune expirată.
+
+Security layers: 3/4 active (L1 middleware + L2 RLS is_admin/policies +
+L4 dedicated /admin/login izolat). L3 2FA TOTP → Task 2.6.
+
+Verificat (curl, production build + dev):
+- /admin nelogat → 404 ✓ (NU /ro/admin redirect)
+- /admin/login → 200 ✓
+- POST /auth/signout redirectTo=/admin/login → 303 /admin/login ✓
+- open-redirect guard //evil.com → /ro ✓
+- locale=en → /en ✓ · i18n intact (/en/despre → 308 /en/about) ✓
+- typecheck + lint + check:i18n (warning benign admin RO hardcoded) + build GREEN
+- /admin ƒ dynamic, /admin/login ƒ dynamic
+
+DEBUGGING DETOUR (~45 min, lecție): smoke curl părea să arate redirectTo
+ignorat (→/ro) + open-redirect leak (//evil.com→/evil.com). Root cause:
+Git Bash MSYS path-conversion mutila argumentele curl (/admin/login →
+C:/Program Files/Git/admin/login). Codul era corect tot timpul. Fix test:
+MSYS_NO_PATHCONV=1. Gotcha scris. Lecție: rezultat "imposibil" cu sursa →
+suspectează mediul de test (shell mangling / server stale) ÎNAINTE de cod;
+debug header arată ce vede runtime-ul.
+
+HAND-OFF FOUNDER — smoke manual browser (security verification):
+1. Nelogat → /admin → 404
+2. /admin/login → login page
+3. Login tvarvaroi@gmail.com (admin) → redirect /admin dashboard
+4. Cont customer test → /admin → 404
+5. Customer → /admin/login → submit → "Acces interzis"
+6. Admin logout → /admin/login → apoi /admin → 404
+
+Commits + push. Next: Task 2.4 (Admin shell + /admin/produse CRUD) —
+gate (protected) gata pentru drop-in pagini noi.
