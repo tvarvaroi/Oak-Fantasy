@@ -1,15 +1,16 @@
-import { notFound } from 'next/navigation';
+import { requireAdminOrNotFound } from '@/lib/auth/require-admin';
 
-import { getUser } from '@/lib/auth/get-user';
+import AdminShell from '@/components/admin/AdminShell';
 
-// THE admin gate. Wraps every protected /admin page (dashboard now; CRUD,
-// subscribers, etc. in Task 2.4+). Non-admins — unauthenticated OR logged-in
-// customers — get a 404 (notFound -> app/admin/not-found.tsx), so the routes
-// are fully hidden (no redirect that would confirm they exist). RLS is the
-// second, DB-level layer; this is the UX/routing layer.
+// THE admin gate + shell. Wraps every protected /admin page. The gate runs
+// here AND at each page top (requireAdminOrNotFound): a layout-only guard does
+// not stop a child page's RSC payload from streaming into the 404 HTML (Task
+// 2.3 leak). Gating here too means the shell chrome (sidebar nav, "Bun venit
+// {name}") is never built for a non-admin — notFound() short-circuits before
+// any sensitive JSX. RLS is the second, DB-level layer.
 //
-// Sub-decision (Task 2.3): even an admin with a fully expired session sees
-// 404 here (security > UX) — they refresh or go to /admin/login manually.
+// Sub-decision (Task 2.3): even an admin with a fully expired session sees 404
+// here (security > UX) — they refresh or go to /admin/login manually.
 
 export const dynamic = 'force-dynamic';
 
@@ -18,9 +19,8 @@ export default async function ProtectedAdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const user = await getUser();
-  if (!user || user.role !== 'admin') {
-    notFound();
-  }
-  return <>{children}</>;
+  const user = await requireAdminOrNotFound();
+  const name = user.profile?.full_name || user.email || 'admin';
+
+  return <AdminShell userName={name}>{children}</AdminShell>;
 }
