@@ -6,6 +6,7 @@ import {
   canonicalPath,
   type Locale,
 } from '@/lib/i18n-routes';
+import { refreshSession, applyCookies } from '@/lib/supabase-middleware';
 
 const LOCALES = ['ro', 'en'] as const;
 
@@ -15,17 +16,16 @@ function getLocaleFromPathname(pathname: string): Locale | null {
   return null;
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip Next.js internals and static files
-  if (
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/api') ||
-    pathname.includes('.') // static files
-  ) {
-    return NextResponse.next();
-  }
+  // ── Supabase auth session refresh (Task 2.1) ───────────────────────────
+  // Runs FIRST so an expiring token is refreshed on every matched request.
+  // refreshSession returns the cookies that must be written; we apply them to
+  // EVERY response below (next / redirect / rewrite) so Set-Cookie survives
+  // across i18n redirects (the "redirect drops Set-Cookie" gotcha). Anonymous
+  // visitors just get an empty cookie list — browsing is unaffected.
+  const authCookies = await refreshSession(request);
 
   const localeInPath = getLocaleFromPathname(pathname);
 
@@ -46,7 +46,7 @@ export function middleware(request: NextRequest) {
         const rest = segments.slice(3).join('/');
         const url = request.nextUrl.clone();
         url.pathname = localizedPath(routeKey, localeInPath) + (rest ? `/${rest}` : '');
-        return NextResponse.redirect(url, 308);
+        return applyCookies(NextResponse.redirect(url, 308), authCookies);
       }
 
       if (slug !== canonicalSlug) {
@@ -56,19 +56,19 @@ export function middleware(request: NextRequest) {
         const url = request.nextUrl.clone();
         url.pathname =
           canonicalPath(routeKey, localeInPath) + (rest ? `/${rest}` : '');
-        return NextResponse.rewrite(url);
+        return applyCookies(NextResponse.rewrite(url), authCookies);
       }
       // slug === canonicalSlug === expectedSlug (e.g. /ro/despre): fall through
     }
 
     // Homepage (/ro, /en) and any non-localized route: unchanged behaviour.
-    return NextResponse.next();
+    return applyCookies(NextResponse.next(), authCookies);
   }
 
   // Root "/" or any path without locale: redirect to /ro equivalent
   const url = request.nextUrl.clone();
   url.pathname = `/ro${pathname === '/' ? '' : pathname}`;
-  return NextResponse.redirect(url);
+  return applyCookies(NextResponse.redirect(url), authCookies);
 }
 
 export const config = {
