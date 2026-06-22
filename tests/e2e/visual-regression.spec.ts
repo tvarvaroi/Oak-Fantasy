@@ -17,6 +17,14 @@ const PAGES = [
   { path: '/en/privacy',           name: 'confidentialitate-en' },
   { path: '/ro/retur',             name: 'retur-ro' },
   { path: '/en/returns',           name: 'retur-en' },
+  { path: '/ro/login',             name: 'login-ro' },
+  { path: '/en/login',             name: 'login-en' },
+  { path: '/ro/inregistrare',      name: 'register-ro' },
+  { path: '/en/register',          name: 'register-en' },
+  { path: '/ro/parola-uitata',     name: 'forgot-password-ro' },
+  { path: '/en/forgot-password',   name: 'forgot-password-en' },
+  { path: '/ro/reset-parola',      name: 'reset-password-ro' },
+  { path: '/en/reset-password',    name: 'reset-password-en' },
 ];
 
 test.describe('Visual regression', () => {
