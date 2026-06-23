@@ -673,3 +673,11 @@ Concluzie: fix-ul SpeedInsights era COMPLET. Raportul founder = cache/propagare
 la momentul testului (hard refresh golește browser cache, nu edge/SW cache).
 Tip: pentru a confirma prod real, testează direct cu Playwright pageerror pe
 oak-fantasy.vercel.app, nu doar în browserul personal (poate avea cache/extensii).
+
+--- 2026-06-23 — Optimizare calitate imagine ProductCard ---
+Blur cauzat de q75 default + sizes ușor mic. Fix: quality={90}, sizes aliniat la
+layout real (400px desktop), next.config formats avif+webp. Verificat empiric:
+optimizator servește 828×462 @ q90 corect (naturalWidth=400 era artefact Playwright).
+Limită reziduală: sursa 16:9 landscape cropată pătrat rămâne ușor soft pe retina —
+soluția reală = upload PĂTRAT 1:1 ≥1500×1500 (documentat în gotchas + recomandare founder).
+Finding: fișier JPEG stocat ca .png (file.type greșit în ImageUpload) — nu strică, date murdare.

@@ -851,3 +851,33 @@ restul placeholder; hydration 0.
 verifică DACĂ le citește — placeholder-ul hardcodat maschează datele reale. Compară
 mereu componentul care merge (admin) cu cel care nu (public): aici diferența era
 că public nu folosea câmpul deloc, nu un fetch/mapare greșit.
+
+## 2026-06-23 — Calitate imagine ProductCard: q90 + sizes + AVIF; sursa trebuie PĂTRATĂ
+
+**Simptom:** poza produsului (1376×768) apărea blurată în cardul /tocatoare.
+
+**Investigație empirică (Playwright DPR2 + decodare output optimizator):**
+- next/image servea varianta 750w @ **q75** (default). → bumped la **q90**.
+- `sizes` era „360px"; real card desktop ≈ 360-390px (grid 3-col, container 1240px,
+  gap 40px). Aliniat la `(max-width:640px) 100vw, (max-width:1024px) 50vw, 400px`.
+- next.config: adăugat `formats: ['image/avif','image/webp']` (AVIF mai eficient).
+- Output optimizator verificat (decodat dims reale): w=828→828×462, w=1920→1376×768
+  (capat la sursă, fără upscale). Deci optimizatorul servește corect high-res.
+
+**Limita reală a clarității (calcul):** o sursă 16:9 landscape cropată în medalionul
+PĂTRAT (object-fit cover) lasă doar ~462px înălțime utilă din varianta 828w; un ecran
+retina (DPR2) la medalion 355px cere ~710px → rămâne ușor soft. Width-based `sizes`
+sub-servește înălțimea pentru surse landscape. A umfla `sizes` ca să forțezi varianta
+1920w ar repara DOAR sursele landscape, dar ar risipi bandă pe surse pătrate (corecte).
+**Decizie: sizes rămâne corect; soluția reală = upload imagini PĂTRATE.**
+
+**Recomandare poze produs (founder reference):**
+- **Aspect ratio: PĂTRAT 1:1** (medalionul e pătrat; landscape se crop-uiește pe centru).
+- **Rezoluție: min 1500×1500** (retina-sharp în card; cardul cere ~710px utili la DPR2).
+- Format: JPG sau WebP, q85-90, sub 5MB.
+
+**Finding secundar — JPEG numit .png:** fișierul „test" e JPEG (magic `ffd8ffe0`/JFIF)
+dar stocat ca `.png` cu `Content-Type: image/png`. Cauza: `ImageUpload.tsx` derivă
+extensia + contentType din `file.type` (raporta image/png pentru un JPEG). NU strică
+randarea (sharp sniff-uiește formatul real), dar e date murdare. TODO opțional: sniff
+magic bytes la upload în loc să te bazezi pe file.type. Vezi components/admin/ImageUpload.tsx.

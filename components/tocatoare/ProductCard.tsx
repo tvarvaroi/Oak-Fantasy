@@ -44,7 +44,13 @@ export default function ProductCard({ product, content, locale }: ProductCardPro
             src={product.hero_image_url}
             alt={name}
             fill
-            sizes="(max-width: 600px) 100vw, (max-width: 1024px) 50vw, 360px"
+            // Real card width: 3-col grid in a 1240px container (~390px),
+            // 2-col ≈50vw, 1-col full width. quality 90 — product photos are
+            // the catalog's hero asset. Best results with SQUARE (1:1) source
+            // images ≥1500×1500 (see _brain product-image guidance); landscape
+            // sources get center-cropped to the square medallion.
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
+            quality={90}
             className={styles.medallionPhoto}
           />
         ) : (
