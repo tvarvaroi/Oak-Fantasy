@@ -115,3 +115,14 @@ components/admin/SubscribersTable.tsx, lib/admin/subscribers.ts, migrația admin
 primea 0 rânduri până la migrația 20260623090000. Verifică RLS SELECT existent înainte
 de a presupune că getServerSupabase poate citi un tabel. Tabel display = server component
 (fără hidratare). Date RO = Intl ro-RO + timeZone Europe/Bucharest (null-safe).
+
+## 2026-06-23 — Task 2.6: /admin/profile schimbare parolă
+
+**Pattern descoperit:** Schimbare parolă sigură fără parola veche cerută de Supabase —
+reauth prin signInWithPassword(currentPassword) → dacă OK → updateUser(newPassword).
+signInWithPassword pe același user reîmprospătează sesiunea (rămâne logat). updateUser
+singur NU verifică parola veche — de aceea reauth-ul e obligatoriu.
+**Aplicat la:** components/admin/ChangePasswordForm.tsx, lib/schemas/auth.ts (changePasswordSchema).
+**De ce contează:** Pattern reutilizabil pentru orice „change password" cu user logat.
+2FA TOTP deferred la pre-launch (SECURITY_CHECKLIST §8.1.d). Admin RO-only → text hardcodat
+generează warnings i18n acceptate (nu errors).

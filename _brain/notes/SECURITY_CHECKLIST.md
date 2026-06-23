@@ -3,7 +3,7 @@
 > **Document scop:** Audit complet de securitate înainte de lansare publică  
 > **Status:** Living document, actualizat la fiecare sprint  
 > **Owner:** Theodor + Claude Code (auto-update după task-uri sensibile)  
-> **Ultima actualizare:** 2026-06-23 (Task 2.5 — email_subscribers admin SELECT policy, §8.1.b)
+> **Ultima actualizare:** 2026-06-23 (Task 2.6 — /admin/profile password change; 2FA Layer 3 deferred pre-launch, §8.1.d)
 
 ---
 
@@ -525,8 +525,12 @@ Decizie founder: admin protejat în 4 straturi. Status:
 - [x] **Layer 4 — dedicated login**: `/admin/login` izolat (fără Navbar/
       Footer customer), role-check post-signin (non-admin → signOut +
       "Acces interzis").
-- [ ] **Layer 3 — 2FA TOTP**: Task 2.6.
-→ 3/4 active după Task 2.3.
+- [ ] **Layer 3 — 2FA TOTP**: DEFERRED → **pre-launch task** (decizie Task 2.6).
+      Task 2.6 a fost redus la doar /admin/profile (schimbare parolă, reauth prin
+      signInWithPassword + updateUser). 2FA necesită app authenticator + recovery
+      codes setup; founder îl configurează când site-ul e aproape live. Supabase
+      suportă MFA TOTP (supabase.auth.mfa.*) — foundation de adăugat atunci.
+→ 3/4 active (middleware + RLS + dedicated login). 2FA = al 4-lea, pre-launch.
 
 Gate UX/routing: `app/admin/(protected)/layout.tsx` → `notFound()` (404
 hidden) pentru non-admin SAU nelogat. Route group `(protected)` = single

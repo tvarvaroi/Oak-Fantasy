@@ -702,3 +702,27 @@ VERIFICAT: typecheck/lint/i18n/build green. Rute generate (ƒ). Non-admin → 40
 Calea autentificată (listă cu date) = founder smoke după aplicarea migrației + login admin.
 
 NEXT: Task 2.6 (/admin/profile + 2FA TOTP — completează layer 3/4 securitate).
+
+═══════════════════════════════════════════════════════════════════════
+2026-06-23 — Task 2.6: /admin/profile (schimbare parolă, fără 2FA)
+═══════════════════════════════════════════════════════════════════════
+LIVRAT:
+- AdminSidebar: „Profil" → active (toate 5 items active acum? nu — Comenzi încă disabled).
+- app/admin/(protected)/profile/page.tsx — server, gate, info cont read-only (email/nume/rol
+  din getUser(), rol mapat RO: admin→Administrator) + ChangePasswordForm.
+- components/admin/ChangePasswordForm.tsx — client (RHF + zodResolver + supabase browser).
+  D1 reauth: signInWithPassword(email, currentPassword) → dacă OK → updateUser(newPassword).
+  Parolă curentă greșită → „Parola curentă e greșită". Rămâne logat (signin refresh sesiune, D3).
+  Success: mesaj „Parola a fost schimbată." + reset form.
+- lib/schemas/auth.ts: changePasswordSchema (current min1 + new min6 + confirm + refine match
+  + refine new≠current).
+- SECURITY_CHECKLIST §8.1.d: 2FA Layer 3 DEFERRED → pre-launch task (D6). 3/4 layers active.
+
+VERIFICAT: typecheck/lint/build green; i18n passed (4 warnings = text RO în formularele admin,
+RO-only prin decizie, ca AdminLoginForm). Ruta generată (ƒ). Non-admin → 404 generic; leak check
+riguros: ZERO conținut sensibil (email/parolă/rol/„Schimbă parola") în 404; singurul „profile"
+= segmentul de URL din router tree RSC (inerent, ne-sensibil). Title neutru.
+Calea autentificată (schimbare reală parolă) = founder smoke (login admin necesar).
+
+SPRINT 2 STATUS: 2.1 auth+schema, 2.2 customer auth, 2.3 admin routes, 2.4 produse CRUD,
+2.5 subscribers+CSV, 2.6 profile. Rămas: 2.7 dashboard stats, 2.8 comenzi placeholder.
