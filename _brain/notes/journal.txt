@@ -837,3 +837,33 @@ HYDRATION 0 pe tot flow-ul. typecheck/lint/build green, i18n exit 0 (12 content 
 
 NEXT: Task 3.3 — Checkout (formular guest: email/nume/telefon/adresă + shipping/lead-time).
 Butoanele „Finalizează" (drawer + /cos) arată acum „vine în curând" — de wired la /checkout.
+
+═══════════════════════════════════════════════════════════════════════
+2026-06-23 — Task 3.3: Checkout multistep (date livrare + metodă plată)
+═══════════════════════════════════════════════════════════════════════
+LIVRAT:
+- app/[locale]/checkout/page.tsx — server, force-dynamic (getUser prefill D7), noindex.
+- components/checkout/CheckoutContent.tsx — client orchestrator: Navbar+Footer + state machine
+  3 pași (React useState, NU persistat D6) + cart guard (useHydrated → coș gol → redirect /cos)
+  + RHF FormProvider; submit branch: step<3 → trigger(STEP_FIELDS) advance, step3 → handleSubmit placeholder.
+- Pași: ShippingStep (guest prominent + link login; email/nume/telefon required, adresă, județ-select 42,
+  cod poștal 6 cifre, observații; prefill profile dacă logat), PaymentStep (radio Card/Ramburs + cost
+  livrare + lead-time + free hint), ReviewStep (items+gravare, adresă, metodă, subtotal+transport+TOTAL,
+  checkbox termeni → /termeni). StepIndicator.
+- lib/schemas/checkout.ts (Zod, validare per pas via STEP_FIELDS), lib/data/counties.ts (42 județe),
+  lib/config/shipping.ts (25 RON / gratuit ≥500). components/checkout/content.ts (RO/EN).
+- CartDrawer + CartPageContent: butoanele „Finalizează" → Link /checkout (nu mai „coming soon").
+
+DECIZIE PLATĂ: „Plasează comanda" la 3.3 = placeholder onest „Plata vine în curând" (order+Stripe = 3.4/3.5).
+Cost livrare ≥500 = gratuit (logica `>=`; hint „peste 500" — generos standard, config 1 linie de flipat dacă vrei `>`).
+
+GOTCHA: force-dynamic page sub generateStaticParams ([locale]) apare ca ● (SSG) în build output,
+DAR header runtime = `Cache-Control: private, no-cache, no-store` → servit dinamic real (getUser per request,
+prefill funcționează). Header-ul runtime e autoritar, nu simbolul din build.
+
+VERIFICAT (prod build + Playwright): empty-cart guard → /cos; step1 validare blochează (8 erori);
+step1→2→3 cu date valide; total 500 (free shipping la prag 500); place fără termeni blocat; place cu
+termeni → placeholder. HYDRATION 0. typecheck/lint/build green, i18n exit 0 (13 content maps).
+
+NEXT: Task 3.4 — Stripe Checkout (hosted) + order creation real (service-role) + reserve_stock +
+revalidare preț/stoc. „Plasează comanda" de wired la Stripe.

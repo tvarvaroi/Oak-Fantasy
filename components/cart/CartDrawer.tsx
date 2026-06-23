@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { X } from 'lucide-react';
 
@@ -16,7 +16,6 @@ export default function CartDrawer({ locale }: { locale: Locale }) {
   const storeItems = useCartStore((s) => s.items);
   const storeOpen = useCartStore((s) => s.isOpen);
   const closeDrawer = useCartStore((s) => s.closeDrawer);
-  const [checkoutNotice, setCheckoutNotice] = useState(false);
 
   const c = CART_CONTENT[locale];
   // SSR + first client render = closed + empty, matching the server HTML.
@@ -125,9 +124,9 @@ export default function CartDrawer({ locale }: { locale: Locale }) {
               {c.shippingNote}
             </p>
 
-            <button
-              type="button"
-              onClick={() => setCheckoutNotice(true)}
+            <Link
+              href={localizedPath('checkout', locale)}
+              onClick={closeDrawer}
               className="font-caudex transition-all duration-200 hover:opacity-90 active:scale-[0.99]"
               style={{
                 backgroundColor: 'var(--oak-warm)',
@@ -141,12 +140,7 @@ export default function CartDrawer({ locale }: { locale: Locale }) {
               }}
             >
               {c.checkout}
-            </button>
-            {checkoutNotice ? (
-              <p className="font-lora text-center" style={{ fontSize: '0.8rem', color: 'var(--ink-soft)' }} role="status">
-                {c.checkoutComingSoon}
-              </p>
-            ) : null}
+            </Link>
 
             <Link
               href={localizedPath('cos', locale)}

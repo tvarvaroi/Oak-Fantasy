@@ -28,6 +28,8 @@ export const PATHNAMES = {
   // Cart (Task 3.2). RO /cos, EN /cart — middleware rewrites EN onto the
   // canonical /cos route folder.
   cos: { ro: 'cos', en: 'cart' },
+  // Checkout (Task 3.3). Same word RO/EN.
+  checkout: { ro: 'checkout', en: 'checkout' },
   // Legal pages. RO/EN slugs differ to match natural reading
   // conventions in each market. Folder names follow RO slug per the
   // PATHNAMES contract above.

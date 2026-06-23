@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -22,7 +21,6 @@ export default function CartPageContent({ locale }: { locale: Locale }) {
   const storeItems = useCartStore((s) => s.items);
   const items = hydrated ? storeItems : [];
   const c = CART_CONTENT[locale];
-  const [checkoutNotice, setCheckoutNotice] = useState(false);
 
   const subtotal = cartSubtotal(items);
 
@@ -98,10 +96,9 @@ export default function CartPageContent({ locale }: { locale: Locale }) {
                 <p className="font-lora" style={{ fontSize: '0.8rem', color: 'var(--ink-soft)' }}>
                   {c.shippingNote}
                 </p>
-                <button
-                  type="button"
-                  onClick={() => setCheckoutNotice(true)}
-                  className="font-caudex transition-all duration-200 hover:opacity-90 active:scale-[0.99]"
+                <Link
+                  href={localizedPath('checkout', locale)}
+                  className="font-caudex text-center transition-all duration-200 hover:opacity-90 active:scale-[0.99]"
                   style={{
                     backgroundColor: 'var(--oak-warm)',
                     color: 'var(--cream-warm)',
@@ -113,12 +110,7 @@ export default function CartPageContent({ locale }: { locale: Locale }) {
                   }}
                 >
                   {c.checkout}
-                </button>
-                {checkoutNotice ? (
-                  <p className="font-lora text-center" style={{ fontSize: '0.8rem', color: 'var(--ink-soft)' }} role="status">
-                    {c.checkoutComingSoon}
-                  </p>
-                ) : null}
+                </Link>
                 <Link
                   href={localizedPath('tocatoare', locale)}
                   className="font-caudex text-center"
