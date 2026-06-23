@@ -29,6 +29,17 @@ const nextConfig = {
       path.resolve(__dirname, 'node_modules'),
       'node_modules',
     ];
+    // tailwindcss 3.3.3's lib/util/validateConfig.js does an optional
+    // `require("@tailwindcss/line-clamp")` (wrapped in try/catch) just to warn
+    // if the now-built-in plugin is still in the config. We don't have that
+    // plugin installed (line-clamp is core since TW 3.3), but webpack can't
+    // tree-shake the optional require and emits "Module not found". Alias it to
+    // false so webpack resolves it to an empty module — the try/catch behaviour
+    // is unchanged. Eliminates the build warning (strict CI may treat it as fatal).
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@tailwindcss/line-clamp': false,
+    };
     return config;
   },
 };

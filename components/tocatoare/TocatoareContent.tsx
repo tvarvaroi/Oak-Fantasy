@@ -15,12 +15,13 @@ type Product = Database['public']['Tables']['products']['Row'];
 interface Props {
   locale: Locale;
   products: Product[];
+  outOfStockIds: string[];
 }
 
 // Client wrapper for /tocatoare: Navbar (with language toggle that preserves
 // the route key via localizedPath) + Hero + Catalog (filter/sort/grid) + CTA +
 // Footer. Mirrors the AtelierContent / AboutContent pattern.
-export default function TocatoareContent({ locale, products }: Props) {
+export default function TocatoareContent({ locale, products, outOfStockIds }: Props) {
   const router = useRouter();
   const content = TOCATOARE_CONTENT[locale];
 
@@ -34,7 +35,7 @@ export default function TocatoareContent({ locale, products }: Props) {
       <Navbar language={locale} onToggleLanguage={toggleLanguage} />
       <main>
         <TocatoareHero content={content} />
-        <TocatoareCatalog products={products} content={content} locale={locale} />
+        <TocatoareCatalog products={products} content={content} locale={locale} outOfStockIds={outOfStockIds} />
         <TocatoareBottomCTA content={content} />
       </main>
       <Footer language={locale} />

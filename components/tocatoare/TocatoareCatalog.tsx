@@ -15,9 +15,11 @@ interface CatalogProps {
   products: Product[];
   content: TocatoareContent;
   locale: Locale;
+  outOfStockIds: string[];
 }
 
-export default function TocatoareCatalog({ products, content, locale }: CatalogProps) {
+export default function TocatoareCatalog({ products, content, locale, outOfStockIds }: CatalogProps) {
+  const outOfStock = useMemo(() => new Set(outOfStockIds), [outOfStockIds]);
   const [filter, setFilter] = useState<FilterKey>('all');
   const [sort, setSort] = useState<SortKey>('default');
   const [sortOpen, setSortOpen] = useState(false);
@@ -154,7 +156,13 @@ export default function TocatoareCatalog({ products, content, locale }: CatalogP
           {visible.length > 0 ? (
             <div className={styles.grid} data-product-grid>
               {visible.map((p) => (
-                <ProductCard key={p.id} product={p} content={content} locale={locale} />
+                <ProductCard
+                  key={p.id}
+                  product={p}
+                  content={content}
+                  locale={locale}
+                  inStock={!outOfStock.has(p.id)}
+                />
               ))}
             </div>
           ) : (

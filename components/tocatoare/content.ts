@@ -26,6 +26,7 @@ export interface TocatoareContent {
     seeDetails: string;
     quickAddAria: string;
     priceUnit: string;
+    outOfStock: string;
   };
   tierDisplay: Record<Tier, string>;
   emptyState: { heading: string; body: string };
@@ -75,6 +76,7 @@ export const TOCATOARE_CONTENT: Record<Locale, TocatoareContent> = {
       seeDetails: 'Vezi detalii',
       quickAddAria: 'Adaugă în coș',
       priceUnit: 'RON',
+      outOfStock: 'Stoc epuizat',
     },
     tierDisplay: {
       entry: 'Pentru început',
@@ -132,6 +134,7 @@ export const TOCATOARE_CONTENT: Record<Locale, TocatoareContent> = {
       seeDetails: 'See details',
       quickAddAria: 'Add to cart',
       priceUnit: 'RON',
+      outOfStock: 'Out of stock',
     },
     tierDisplay: {
       entry: 'Starters',

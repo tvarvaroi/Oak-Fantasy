@@ -19,6 +19,9 @@ export interface ProductDetailContent {
   photoBadge: string;
   backToCatalog: string;
   galleryThumbAria: string;
+  inStock: string;
+  outOfStock: string;
+  outOfStockNote: string;
 }
 
 export const PRODUCT_DETAIL_CONTENT: Record<Locale, ProductDetailContent> = {
@@ -37,6 +40,9 @@ export const PRODUCT_DETAIL_CONTENT: Record<Locale, ProductDetailContent> = {
     photoBadge: 'Foto în pregătire',
     backToCatalog: 'Înapoi la tocătoare',
     galleryThumbAria: 'Vezi imaginea',
+    inStock: 'În stoc',
+    outOfStock: 'Stoc epuizat',
+    outOfStockNote: 'Acest produs s-a epuizat. Scrie-ne dacă vrei să-l refacem.',
   },
   en: {
     breadcrumbHome: 'Home',
@@ -53,5 +59,8 @@ export const PRODUCT_DETAIL_CONTENT: Record<Locale, ProductDetailContent> = {
     photoBadge: 'Photo coming soon',
     backToCatalog: 'Back to cutting boards',
     galleryThumbAria: 'View image',
+    inStock: 'In stock',
+    outOfStock: 'Out of stock',
+    outOfStockNote: 'This piece is sold out. Write to us if you’d like us to make it again.',
   },
 };
