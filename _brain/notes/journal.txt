@@ -726,3 +726,55 @@ Calea autentificată (schimbare reală parolă) = founder smoke (login admin nec
 
 SPRINT 2 STATUS: 2.1 auth+schema, 2.2 customer auth, 2.3 admin routes, 2.4 produse CRUD,
 2.5 subscribers+CSV, 2.6 profile. Rămas: 2.7 dashboard stats, 2.8 comenzi placeholder.
+
+═══════════════════════════════════════════════════════════════════════
+2026-06-23 — Task 2.7 + 2.8: Dashboard stats + Comenzi placeholder
+═══════════════════════════════════════════════════════════════════════
+LIVRAT:
+- lib/admin/dashboard.ts — fetchDashboardStats() (produse agregate JS, abonați total/activi
+  + serie lunară 6 luni, comenzi count head). Toate degradează grațios.
+- app/admin/(protected)/page.tsx — rescris: 4 StatCards (produse status breakdown, abonați,
+  comenzi=0, produse fără poză) + SubscribersChart.
+- components/admin/StatCard.tsx (server), SubscribersChart.tsx (recharts, MOUNTED-GUARD →
+  server + first client render = placeholder same height → swap post-mount, zero #418).
+- lib/admin/orders.ts (fetchOrders + formatOrderDate), components/admin/OrderStatusBadge.tsx
+  (9 stări reale: pending_payment/pending_cod/confirmed/in_production/packed/shipped/delivered/
+  cancelled/refunded — reutilizabil Sprint 3).
+- app/admin/(protected)/comenzi/page.tsx — tabel structură (Nr/Client/Dată/Status/Total/Acțiuni)
+  + empty state „Comenzile vor apărea aici după lansare".
+- AdminSidebar: „Comenzi" active → SIDEBAR COMPLET (toate 5 items active).
+VERIFICAT: typecheck/lint/build green; i18n exit 0 (4 warns admin RO-only). Rute (ƒ). Non-admin
+→ 404 pe /admin + /admin/comenzi, zero leak conținut, title neutru. recharts compilează (build OK,
+/admin force-dynamic deci fără SSR static). Dashboard autentificat + grafic = founder smoke.
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║ SPRINT 2 — CLOSURE (2026-06-23). Auth + Admin complet.                 ║
+╚═══════════════════════════════════════════════════════════════════════╝
+TASK-URI:
+- 2.1 Auth foundation + audit schema (DB pre-existentă descoperită, prebuilt 2026-05-22)
+- 2.2 Customer auth pages (login/register/forgot/reset) + 2.2.1 hotfix logout white screen (#418/#423,
+  middleware catch-all → /auth exclus)
+- 2.3 Admin protected routes (4-layer model, /admin/login, 404 hidden) + security fix RSC leak
+  (requireAdminOrNotFound la page-top, nu doar layout)
+- 2.4 Admin shell + /admin/produse CRUD (server actions, Storage upload) + 3 debug saga:
+  (a) imagini „404" = de fapt next/image remotePatterns necommis + CDN cache tranzitoriu (getPublicUrl corect);
+  (b) ProductCard nu randa hero_image_url (placeholder hardcodat);
+  (c) calitate imagine q75→q90 + sizes + AVIF; sursă landscape vs medalion pătrat → recomandare poze PĂTRATE
+- 2.5 /admin/subscribers + CSV export (route handler, BOM UTF-8)
+- 2.6 /admin/profile schimbare parolă (reauth signInWithPassword→updateUser); 2FA deferred pre-launch
+- 2.7+2.8 Dashboard stats + grafic recharts + /admin/comenzi placeholder
+
+GOTCHA DURABIL MAJOR (saga): #418/#423 GLOBAL = <SpeedInsights/> (v2.0.0 = <Suspense> intern) randat
+ca frate al <html> în root layout → mutat în <body>. Lecție: nimic cu DOM/Suspense în afara <html>;
+re-verifică hidratarea pe PROD build (Playwright pageerror) după orice bump de pachet la nivel de layout.
+
+SECURITY: 3/4 layers active (middleware + RLS + dedicated login). 2FA = pre-launch.
+
+⚠️ HAND-OFF FOUNDER (DB migrations de aplicat pe Supabase LIVE — altfel features degradează la gol):
+- 20260622090000_product_images_storage.sql (bucket + RLS) — /admin/produse upload imagini
+- 20260623090000_email_subscribers_admin_read.sql (admin SELECT) — /admin/subscribers + dashboard abonați
+Plus: Supabase Auth URL Configuration redirect URLs; promovare admin SQL (dacă nu e făcută);
+recomandare poze produs PĂTRATE 1:1 ≥1500×1500.
+
+NEXT: Sprint 3 — Stripe + email tranzacționale (prima vânzare reală). OrderStatusBadge + tabel
+comenzi gata pentru date reale.

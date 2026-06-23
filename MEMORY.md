@@ -126,3 +126,15 @@ singur NU verifică parola veche — de aceea reauth-ul e obligatoriu.
 **De ce contează:** Pattern reutilizabil pentru orice „change password" cu user logat.
 2FA TOTP deferred la pre-launch (SECURITY_CHECKLIST §8.1.d). Admin RO-only → text hardcodat
 generează warnings i18n acceptate (nu errors).
+
+## 2026-06-23 — Task 2.7+2.8: Dashboard + Comenzi (SPRINT 2 CLOSED)
+
+**Pattern descoperit:** recharts în App Router = MOUNTED-GUARD obligatoriu (useState mounted +
+useEffect; server + first client render = placeholder same height → swap post-mount) ca să eviți
+#418 din ResponsiveContainer. Dashboard stats = fetch + agregare JS (counts mici), force-dynamic.
+OrderStatusBadge cu 9 stări reale pregătit pentru Sprint 3.
+**Aplicat la:** components/admin/{SubscribersChart,StatCard,OrderStatusBadge}.tsx,
+lib/admin/{dashboard,orders}.ts, app/admin/(protected)/{page,comenzi/page}.tsx.
+**De ce contează:** Sprint 2 (auth + admin) COMPLET — sidebar 5 items active. Sprint 3 = Stripe.
+2 migrații DB de aplicat pe live (Storage 2.4 + subscribers SELECT 2.5). 2FA = pre-launch.
+Gotcha durabil major al sprintului: SpeedInsights ca frate al <html> = #418 global (mutat în body).

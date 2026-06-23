@@ -1,61 +1,70 @@
-import Link from 'next/link';
-import { Package } from 'lucide-react';
-
 import { requireAdminOrNotFound } from '@/lib/auth/require-admin';
+import { fetchDashboardStats } from '@/lib/admin/dashboard';
+import StatCard from '@/components/admin/StatCard';
+import SubscribersChart from '@/components/admin/SubscribersChart';
 
-// /admin dashboard. The shell (sidebar, topbar, logout) lives in the
-// (protected) layout now; this page renders only its own content.
+// /admin dashboard — stats + subscribers trend (Task 2.7). The shell (sidebar,
+// topbar, logout) lives in the (protected) layout.
 //
-// SECURITY: the gate runs HERE at the page top too (not only in the layout). A
-// layout-only guard lets this page's RSC payload stream into the 404 HTML
-// (Task 2.3 leak). requireAdminOrNotFound() short-circuits before any JSX.
+// SECURITY: gate at the page top (Task 2.3 RSC-leak lesson).
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboardPage() {
   await requireAdminOrNotFound();
+  const stats = await fetchDashboardStats();
+
+  const subDezabonati = stats.subscribers.total - stats.subscribers.active;
 
   return (
-    <div style={{ maxWidth: 900 }}>
+    <div style={{ maxWidth: 1100 }}>
       <p className="label-caps" style={{ color: 'var(--copper)' }}>
         Panou
       </p>
       <h1
         className="font-caudex"
-        style={{ marginTop: 12, fontSize: 'clamp(1.8rem, 4vw, 2.6rem)', color: 'var(--oak-deep)', fontWeight: 700, lineHeight: 1.1 }}
+        style={{ marginTop: 8, fontSize: 'clamp(1.8rem, 4vw, 2.6rem)', color: 'var(--oak-deep)', fontWeight: 700, lineHeight: 1.1 }}
       >
         Administrare Oak Fantasy
       </h1>
-      <p
-        className="font-lora"
-        style={{ marginTop: 16, fontSize: '1.02rem', color: 'var(--ink-soft)', lineHeight: 1.7, maxWidth: 560 }}
-      >
-        De aici gestionezi catalogul. Comenzile, abonații și profilul prind contur
-        în etapele următoare.
-      </p>
 
-      <div className="mt-10 flex flex-wrap gap-4">
-        <Link
-          href="/admin/produse"
-          className="flex items-center gap-3 transition-all duration-200 hover:opacity-90 active:scale-[0.99]"
-          style={{
-            backgroundColor: 'var(--paper-aged)',
-            border: '1px solid rgba(92,58,32,0.18)',
-            borderRadius: 10,
-            padding: '20px 24px',
-            minWidth: 240,
-          }}
-        >
-          <Package size={22} strokeWidth={1.75} color="var(--oak-warm)" aria-hidden />
-          <span>
-            <span className="font-caudex block" style={{ color: 'var(--oak-deep)', fontWeight: 700, fontSize: '1.05rem' }}>
-              Produse
-            </span>
-            <span className="font-lora block" style={{ color: 'var(--ink-soft)', fontSize: '0.85rem' }}>
-              Adaugă, editează, activează
-            </span>
-          </span>
-        </Link>
+      {/* Stats (D3, D4: 4-col responsive grid) */}
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          label="Produse"
+          value={stats.products.total}
+          sub={`${stats.products.active} active · ${stats.products.draft} draft · ${stats.products.archived} arhivate`}
+        />
+        <StatCard
+          label="Abonați"
+          value={stats.subscribers.total}
+          sub={subDezabonati > 0 ? `${stats.subscribers.active} activi · ${subDezabonati} dezabonați` : `${stats.subscribers.active} activi`}
+        />
+        <StatCard label="Comenzi" value={stats.orders.total} sub="După lansare" />
+        <StatCard
+          label="Produse fără poză"
+          value={stats.products.withoutImage}
+          sub={`din ${stats.products.total} ${stats.products.total === 1 ? 'produs' : 'produse'}`}
+        />
+      </div>
+
+      {/* Subscribers trend */}
+      <div
+        className="mt-8"
+        style={{
+          backgroundColor: 'var(--paper-aged)',
+          border: '1px solid rgba(92,58,32,0.18)',
+          borderRadius: 10,
+          padding: '22px 22px 18px',
+        }}
+      >
+        <h2 className="font-caudex" style={{ fontSize: '1.1rem', color: 'var(--oak-deep)', fontWeight: 700 }}>
+          Abonați noi
+        </h2>
+        <p className="font-lora" style={{ color: 'var(--ink-soft)', fontSize: '0.82rem', marginBottom: 14 }}>
+          Ultimele 6 luni
+        </p>
+        <SubscribersChart data={stats.subscribersByMonth} />
       </div>
     </div>
   );

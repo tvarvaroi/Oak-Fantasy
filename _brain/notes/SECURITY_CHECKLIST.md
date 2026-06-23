@@ -3,7 +3,7 @@
 > **Document scop:** Audit complet de securitate înainte de lansare publică  
 > **Status:** Living document, actualizat la fiecare sprint  
 > **Owner:** Theodor + Claude Code (auto-update după task-uri sensibile)  
-> **Ultima actualizare:** 2026-06-23 (Task 2.6 — /admin/profile password change; 2FA Layer 3 deferred pre-launch, §8.1.d)
+> **Ultima actualizare:** 2026-06-23 (Sprint 2 CLOSED — admin complet; 3/4 layers, 2FA pre-launch; 2 migrații DB de aplicat pe live)
 
 ---
 
