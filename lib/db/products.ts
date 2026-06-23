@@ -26,3 +26,25 @@ export async function fetchActiveProducts(): Promise<CatalogProduct[]> {
     return [];
   }
 }
+
+// Single active product by slug, for the detail page. Returns null if the slug
+// doesn't exist OR the product isn't active (draft/archived → 404, never public
+// — RLS also enforces status='active' for anon, this is belt-and-suspenders).
+export async function fetchProductBySlug(slug: string): Promise<CatalogProduct | null> {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) return null;
+  try {
+    const sb = createClient<Database>(url, key);
+    const { data, error } = await sb
+      .from('products')
+      .select('*')
+      .eq('slug', slug)
+      .eq('status', 'active')
+      .maybeSingle();
+    if (error) return null;
+    return data ?? null;
+  } catch {
+    return null;
+  }
+}

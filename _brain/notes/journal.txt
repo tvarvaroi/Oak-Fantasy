@@ -778,3 +778,34 @@ recomandare poze produs PĂTRATE 1:1 ≥1500×1500.
 
 NEXT: Sprint 3 — Stripe + email tranzacționale (prima vânzare reală). OrderStatusBadge + tabel
 comenzi gata pentru date reale.
+
+═══════════════════════════════════════════════════════════════════════
+2026-06-23 — SPRINT 3 START · Task 3.1: Product detail page /tocatoare/[slug]
+═══════════════════════════════════════════════════════════════════════
+LIVRAT:
+- app/[locale]/tocatoare/[slug]/page.tsx — ISR (generateStaticParams produse active +
+  revalidate=60 + dynamicParams), 404 pe slug inexistent/draft/archived, metadata din produs
+  (meta_title/description fallback name+short), JSON-LD Product (price RON, PreOrder, url) +
+  BreadcrumbList, canonical + hreflang RO/EN.
+- components/product/: ProductDetailContent (client wrapper Navbar+Footer+lang toggle ce
+  păstrează slug-ul), ProductGallery (client, imagine mare + thumbnails switch, placeholder SVG
+  fără poză), ProductInfo (server: preț ÷100 + compare/reducere, dimensiuni formatDimensions,
+  greutate, gravare afișată dacă has_engraving; FĂRĂ production_time per D4), AddToCartButton
+  (placeholder onest → „Coșul vine în curând"), content.ts (labels RO/EN).
+- lib/db/products.ts: + fetchProductBySlug (status='active', null→404).
+- ProductCard: CTA → pagina de detaliu (localizedPath, nu mai waitlist).
+
+PATTERN cheie: server component (ProductInfo) pasat ca PROP la client wrapper (ProductDetailContent)
+— permis în Next App Router (client nu poate IMPORTA server component, dar îl poate primi ca prop/children).
+ROUTING: middleware existent gestionează deja nested (rest = segments.slice(3)) → /en/cutting-boards/{slug}
+rewrite la /en/tocatoare/{slug}, /en/tocatoare/{slug} → 308 cutting-boards. ZERO schimbare middleware.
+
+VERIFICAT (prod build + Playwright): RO detail 200, test(poză) 200 → galerie next/image, slug inexistent
+404, EN /en/cutting-boards/{slug} 200 (h1=name_en „Small Cutting Board"), /en/tocatoare/{slug} 308.
+Navbar+Footer (check #0), JSON-LD Product, breadcrumb, add-to-cart → mesaj onest. HYDRATION 0 pe toate.
+typecheck/lint/build green, i18n exit 0 (11 content maps).
+
+HAND-OFF founder (opțional): adaugă o pagină produs reprezentativă în tests/e2e/visual-regression.spec.ts
+PAGES + regenerează baselines (cp .env.staging.local .env.local + npm run test:e2e:update).
+
+NEXT: Task 3.2 — Cart (Zustand store + add-to-cart real + cart drawer/page). AddToCartButton de wired.

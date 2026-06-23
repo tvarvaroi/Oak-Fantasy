@@ -5,7 +5,7 @@ import Link from 'next/link';
 import styles from './tocatoare.module.css';
 import { formatPriceRon, formatDimensions } from './content';
 import type { TocatoareContent, Tier } from './content';
-import type { Locale } from '@/lib/i18n-routes';
+import { localizedPath, type Locale } from '@/lib/i18n-routes';
 import type { Database } from '@/types/supabase';
 
 type Product = Database['public']['Tables']['products']['Row'];
@@ -22,10 +22,9 @@ export default function ProductCard({ product, content, locale }: ProductCardPro
     locale === 'ro' ? product.short_description_ro : product.short_description_en;
   const dims = formatDimensions(product.dimensions, locale);
   const tier = product.tier as Tier;
-  // Until product detail pages + cart ship (Etapa 3+), both CTAs route to the
-  // homepage waitlist with ?interested_product=slug so the Etapa 2.6 subscriber
-  // capture can later pre-fill the email-subscribers.interested_product_ids[].
-  const ctaHref = `/${locale}?interested_product=${product.slug}#waitlist`;
+  // Task 3.1: both CTAs route to the product detail page (locale-aware URL;
+  // RO /tocatoare/{slug}, EN /cutting-boards/{slug} — middleware rewrites).
+  const ctaHref = `${localizedPath('tocatoare', locale)}/${product.slug}`;
 
   return (
     <article
