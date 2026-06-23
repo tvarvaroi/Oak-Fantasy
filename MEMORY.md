@@ -203,3 +203,26 @@ migrația 20260623110000 (coloană locale + create_order p_locale).
 GREȘITĂ — orders n-avea coloană). Gotcha durabil: param nou la funcție Postgres =
 OVERLOAD, trebuie DROP cu semnătura veche exactă întâi (vezi gotchas). Hand-off founder:
 aplică migrația locale + regen types înainte de smoke pe Vercel.
+
+## 2026-06-23 — Task 3.6: Admin orders management (SPRINT 3 CLOSED)
+
+**Pattern descoperit:** Sursă unică pentru enum-uri partajate (`lib/orders/status.ts`:
+ORDER_STATUSES + labels + isOrderStatus guard) importată de badge + dropdown + action +
+listă → zero drift față de CHECK-ul DB. Server actions order (updateOrderStatus +
+markOrderPaid) urmează pattern-ul product-actions: requireAdminOrNotFound (întoarce
+AuthUser → .id pentru changed_by) + getServerSupabase (RLS admin, NU service role) +
+revalidatePath. Status change = update orders (+ timestamp auto pe shipped/delivered/
+cancelled/refunded) + insert order_status_history (audit). D7: cancel din stare
+pre-shipment (RESERVED_STATUSES) cheamă release_stock per item; shipped/delivered NU
+(fulfill = Sprint 4). markOrderPaid → payment_status='paid' (ramburs, audit la status
+curent). Detaliu = server component + 1 insulă client (OrderStatusControl, useTransition
++ router.refresh). Filtru listă pills server-side via ?status= (validat cu isOrderStatus).
+**Typecheck gotcha:** payload de update Supabase NU acceptă Record<string,unknown> (index
+`never`) → tipează cu Database[...]['orders']['Update'] + cast punctual pe cheia timestamp.
+**Aplicat la:** lib/orders/status.ts, lib/admin/orders.ts (fetchOrderDetail), lib/admin/
+order-actions.ts, components/admin/{OrderStatusBadge,OrderStatusControl}, app/admin/
+(protected)/comenzi/{page,[id]/page}.tsx.
+**De ce contează:** SPRINT 3 COMPLET — magazin end-to-end (catalog→detaliu→coș→checkout→
+Stripe/ramburs→comandă→emailuri→admin management). Efecte stoc PARȚIALE: reserve la
+creare ✅, release la cancel/expired ✅, fulfill la shipped → Sprint 4 (curier). Pre-launch
+blockers: Stripe live keys, domeniu Resend, poze produs 1:1, date firmă (LEGAL_INFO env).

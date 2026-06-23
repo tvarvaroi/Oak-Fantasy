@@ -711,6 +711,21 @@ Apelul Supabase `.rpc('fn', {named: ...})` folosește argumente numite → ordin
 veche exactă.
 **Fișiere:** `supabase/migrations/20260623110000_add_order_locale.sql`.
 
+## 2026-06-23 — Supabase `.update()` nu acceptă `Record<string, unknown>` (index `never`)
+
+**Simptom (Task 3.6):** `const update: Record<string, unknown> = {...}; sb.from('orders').update(update)`
+→ TS2345: `Type 'unknown' is not assignable to type 'never'`. Tipul Update generat de
+Supabase e un obiect cu chei cunoscute; un `Record<string, unknown>` generic nu se
+potrivește cu signature-ul `RejectExcessProperties<...>` (index-ul devine `never`).
+**Cauză:** payload-ul de update e tipat strict pe coloanele tabelei; un record generic
+e „prea larg" și TS îl respinge.
+**Fix folosit:** tipează payload-ul cu `Database['public']['Tables']['<tabel>']['Update']`.
+Pentru o cheie calculată dinamic (ex. coloana timestamp aleasă în funcție de status),
+cast punctual: `(update as Record<string, unknown>)[tsCol] = ...`.
+**Lecție generală:** pentru orice `.insert()/.update()` cu payload construit dinamic,
+pleacă de la tipul Insert/Update generat, nu de la `Record`. Cast doar cheia dinamică.
+**Fișiere:** `lib/admin/order-actions.ts`.
+
 ## SECURITY_CHECKLIST.md maintenance protocol
 
 Document: `_brain/notes/SECURITY_CHECKLIST.md` (living document)

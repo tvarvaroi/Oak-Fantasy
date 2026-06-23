@@ -955,3 +955,69 @@ HAND-OFF FOUNDER (înainte de smoke):
    confirmare branded cu banner [TEST] + admin notificare).
 
 NEXT: Task 3.6 — admin orders management (vizualizare + schimbare status comandă).
+
+═══════════════════════════════════════════════════════════════════
+2026-06-23 — TASK 3.6 — Admin orders management [LIVRAT] · SPRINT 3 CLOSED
+═══════════════════════════════════════════════════════════════════
+Decizii aprobate: D1 9 stări din schema · D2 tranziții orice→orice + timestamp auto
++ history · D3 filtru pills ?status= · D4 istoric afișat · D5 markOrderPaid dedicat ·
+D6 email status DEFER post-launch · D7 release_stock la cancel ACUM.
+
+Livrat:
+- lib/orders/status.ts — ORDER_STATUSES[9] + ORDER_STATUS_LABELS + PAYMENT_STATUS_LABELS
+  + isOrderStatus (sursă unică, oglindește CHECK-ul DB).
+- components/admin/OrderStatusBadge.tsx — refactor: labels din status.ts, doar culorile local.
+- lib/admin/orders.ts — fetchOrderDetail(id) → {order, items, history} (UUID guard,
+  snapshot, RLS admin) + fetchOrders(statusFilter) + formatOrderDateTime.
+- lib/admin/order-actions.ts — updateOrderStatus (validare, no-op same-state, timestamp
+  auto, refunded→payment_status='refunded', D7 release_stock la cancel din RESERVED_STATUSES,
+  history audit cu changed_by) + markOrderPaid (D5).
+- app/admin/(protected)/comenzi/page.tsx — listă reală + filtru pills + rânduri → detaliu.
+- app/admin/(protected)/comenzi/[id]/page.tsx — detaliu server complet (client/adresă/
+  produse din snapshot/totaluri/plată/observații/locale) + istoric timeline + insula
+  OrderStatusControl.
+- components/admin/OrderStatusControl.tsx — client: dropdown status + Actualizează +
+  Marchează plătit (când !paid), useTransition + router.refresh.
+
+Quality gates: typecheck ✅ · lint ✅ · check:i18n ✅ (14 maps, doar warnings admin
+pre-existente) · build ✅ exit 0 (warning about.module.css = pre-existent benign).
+Rute: /admin/comenzi (ƒ) + /admin/comenzi/[id] (ƒ).
+Smoke real = founder (orders reale necesită migrațiile aplicate + comenzi în DB).
+
+╔═══════════════════════════════════════════════════════════════════╗
+║ SPRINT 3 — MAGAZIN END-TO-END COMPLET (3.1 → 3.6)                  ║
+╠═══════════════════════════════════════════════════════════════════╣
+3.1 Product detail /tocatoare/[slug] (ISR, server→client prop pattern)
+3.2 Cart (Zustand persist + drawer + /cos, useHydrated anti-#418)
+3.3 Checkout multistep (1 RHF + validare per pas, shipping config)
+3.4 Stripe Checkout hosted + create_order RPC atomic + webhook + /multumim
+3.5 Email tranzacționale (Resend, client confirmare + admin notificare, best-effort)
+3.6 Admin orders (listă + filtru + detaliu + status management + audit + release la cancel)
+
+Flux complet: catalog → detaliu → add-to-cart → checkout → plată (card Stripe /
+ramburs) → create_order atomic (reserve_stock) → emailuri → /multumim → admin
+vede/gestionează comanda.
+
+EFECTE STOC (parțial — documentat onest):
+- reserve_stock la creare comandă ✅ (create_order RPC, strict)
+- release_stock la cancel (admin) ✅ (Task 3.6 D7, din stări pre-shipment)
+- release_stock la expirare sesiune Stripe ✅ (webhook, Task 3.4)
+- fulfill_stock la shipped → SPRINT 4 (cu flux curier Sameday/FAN)
+
+HAND-OFF FOUNDER cumulativ (înainte de smoke live Sprint 3):
+1. Aplică migrațiile pe Supabase live, în ordine:
+   - 20260623100000_create_order_rpc.sql (3.4)
+   - 20260623110000_add_order_locale.sql (3.5)
+   (+ Storage 2.4 + subscribers SELECT 2.5 dacă nu sunt aplicate)
+2. Populează inventory (quantity_total > 0) pt toate produsele + rând pt "test".
+3. Regen types: npx supabase gen types typescript --linked > types/supabase.ts
+4. Env Vercel: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, NEXT_PUBLIC_APP_URL,
+   (RESEND_* deja din Sprint 1).
+5. Stripe Dashboard webhook → /api/webhooks/stripe (completed + expired).
+6. Promovează un user la admin (SQL) ca să vezi /admin/comenzi.
+
+PRE-LAUNCH BLOCKERS (rămase): Stripe LIVE keys (acum TEST), domeniu oakfantasy.ro
+verificat în Resend (emailuri reale clienți), poze produs 1:1 ≥1500px, date firmă
+reale în LEGAL_INFO (env NEXT_PUBLIC_COMPANY_*), Supabase Pro (no auto-pause).
+
+NEXT: Sprint 4 — Ramburs avansat + curieri (Sameday/FAN API) + fulfill_stock la shipped.

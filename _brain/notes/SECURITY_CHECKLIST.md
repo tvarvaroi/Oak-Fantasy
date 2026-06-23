@@ -3,7 +3,7 @@
 > **Document scop:** Audit complet de securitate înainte de lansare publică  
 > **Status:** Living document, actualizat la fiecare sprint  
 > **Owner:** Theodor + Claude Code (auto-update după task-uri sensibile)  
-> **Ultima actualizare:** 2026-06-23 (Task 3.5 — email tranzacționale comandă via Resend; zero env nou — reuse RESEND_API_KEY/RESEND_FROM_EMAIL/RESEND_ADMIN_EMAIL din Sprint 1; emailuri best-effort, nu blochează comanda; test mode → ambele la founder; pre-launch §1.1 verificare domeniu oakfantasy.ro în Resend rămâne blocker pentru emailuri reale către clienți)
+> **Ultima actualizare:** 2026-06-23 (Task 3.6 — admin orders management, SPRINT 3 CLOSED. Zero env/secret nou. Server actions order via getServerSupabase (RLS „Admin full access orders", least privilege — NU service role); gate la nivel de pagină (requireAdminOrNotFound) pe ambele rute /admin/comenzi[/[id]]; fetchOrderDetail UUID-guard. Audit complet în order_status_history (changed_by). PRE-LAUNCH BLOCKERS rămase: §1.4 Stripe LIVE keys (acum TEST), §1.1 domeniu oakfantasy.ro în Resend, poze produs 1:1, date firmă LEGAL_INFO env, Supabase Pro no-auto-pause.)
 
 ---
 
