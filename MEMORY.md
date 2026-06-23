@@ -181,3 +181,25 @@ expired→release_stock. /multumim: UUID guard (D3) + clear cart pe mount (D6). 
 cast `'fn' as never`. Server action call în client → try/catch (throw necontrolat → buton blocat altfel).
 **Aplicat la:** lib/stripe/, lib/orders/, app/api/webhooks/stripe/, app/[locale]/multumim/, migrația RPC.
 **De ce contează:** Prima vânzare reală (Sprint 3). 4 hand-off-uri founder (migrație, inventory, env, webhook).
+
+## 2026-06-23 — Task 3.5: Email tranzacționale comandă (Resend)
+
+**Pattern descoperit:** Email-uri comandă centralizate în `sendOrderEmails(orderId)` —
+self-contained (citește tot din `orders`+`order_items` via fetchOrderConfirmation;
+`guest_email` ține emailul clientului ȘI pentru useri logați, setat de create_order).
+**Best-effort total (D5):** funcția NU aruncă niciodată, swallow + console.error,
+nu blochează/rollback comanda. În webhook se cheamă DUPĂ update-ul `paid` (status
+corect în email + un 500 ar declanșa retry Stripe care ar sări emailul din cauza
+guard-ului `paid`). Idempotency (D4) = fără coloană nouă: guard `payment_status='paid'`
+(card) + execuție unică (ramburs). Test mode (D2): `fromEmail===onboarding@resend.dev`
+→ ambele emailuri la founder, client cu banner `[TEST → {email}]`. React Email reuse
+pattern Sprint 1 (paletă inline, Caudex/Lora, LEGAL_INFO). locale read defensiv din
+order (cast — nu e în types până la regen). `email-template-builder` skill NU există
+în registry — folosit pattern-ul existent din proiect.
+**Aplicat la:** emails/OrderConfirmationClient.tsx + OrderNotificationAdmin.tsx,
+lib/orders/send-order-emails.ts, hook în place-order (ramburs) + webhook (card),
+migrația 20260623110000 (coloană locale + create_order p_locale).
+**De ce contează:** D1 = coloană `locale` pe orders (premisa „comanda are locale" era
+GREȘITĂ — orders n-avea coloană). Gotcha durabil: param nou la funcție Postgres =
+OVERLOAD, trebuie DROP cu semnătura veche exactă întâi (vezi gotchas). Hand-off founder:
+aplică migrația locale + regen types înainte de smoke pe Vercel.

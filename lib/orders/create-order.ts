@@ -31,6 +31,7 @@ export interface CreateOrderInput {
   contact: OrderContactInput;
   items: OrderLineInput[];
   profileId: string | null;
+  locale: 'ro' | 'en';
 }
 
 export interface OrderDisplayLine {
@@ -139,6 +140,7 @@ export async function createOrder(input: CreateOrderInput): Promise<CreateOrderR
     p_billing_address: shippingAddress,
     p_customer_notes: input.contact.notes?.trim() || null,
     p_items: rpcItems,
+    p_locale: input.locale,
   } as never);
 
   if (error) {

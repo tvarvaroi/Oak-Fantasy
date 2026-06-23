@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       addresses: {
@@ -250,6 +275,7 @@ export type Database = {
           guest_email: string | null
           guest_phone: string | null
           id: string
+          locale: string
           order_number: string
           payment_method: string | null
           payment_status: string
@@ -277,6 +303,7 @@ export type Database = {
           guest_email?: string | null
           guest_phone?: string | null
           id?: string
+          locale?: string
           order_number: string
           payment_method?: string | null
           payment_status?: string
@@ -304,6 +331,7 @@ export type Database = {
           guest_email?: string | null
           guest_phone?: string | null
           id?: string
+          locale?: string
           order_number?: string
           payment_method?: string | null
           payment_status?: string
@@ -515,6 +543,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_order: {
+        Args: {
+          p_billing_address: Json
+          p_customer_notes: string
+          p_guest_email: string
+          p_guest_phone: string
+          p_items: Json
+          p_locale?: string
+          p_payment_method: string
+          p_profile_id: string
+          p_shipping_address: Json
+          p_shipping_cost_ron: number
+          p_status: string
+          p_subtotal_ron: number
+          p_total_ron: number
+        }
+        Returns: Json
+      }
       fulfill_stock: {
         Args: { p_order_id?: string; p_product_id: string; p_qty: number }
         Returns: undefined
@@ -657,6 +703,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },

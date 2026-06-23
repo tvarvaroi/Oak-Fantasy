@@ -2,6 +2,7 @@ import type Stripe from 'stripe';
 
 import { getStripe } from '@/lib/stripe/server';
 import { getServiceSupabase } from '@/lib/supabase-server';
+import { sendOrderEmails } from '@/lib/orders/send-order-emails';
 
 // Stripe webhook (Task 3.4). Lives under /api (excluded from middleware). Must
 // read the RAW body for signature verification. Handles:
@@ -43,6 +44,13 @@ async function handleCompleted(session: Stripe.Checkout.Session) {
     to_status: 'confirmed',
     note: 'Payment received (Stripe)',
   });
+
+  // Transactional emails (Task 3.5) — best-effort, after the paid update so the
+  // confirmation renders the "payment confirmed" status. Must NOT throw: a 500
+  // here would make Stripe retry, but the payment_status guard above already
+  // flipped to 'paid', so the retry would skip the email entirely. sendOrderEmails
+  // swallows all its own errors.
+  await sendOrderEmails(orderId);
 }
 
 async function handleExpired(session: Stripe.Checkout.Session) {

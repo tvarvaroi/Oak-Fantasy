@@ -3,7 +3,7 @@
 > **Document scop:** Audit complet de securitate înainte de lansare publică  
 > **Status:** Living document, actualizat la fiecare sprint  
 > **Owner:** Theodor + Claude Code (auto-update după task-uri sensibile)  
-> **Ultima actualizare:** 2026-06-23 (Task 3.4 — Stripe Checkout integrat TEST MODE; §1.4/1.5 rotație live pre-launch rămân valabile; webhook signature verify activ)
+> **Ultima actualizare:** 2026-06-23 (Task 3.5 — email tranzacționale comandă via Resend; zero env nou — reuse RESEND_API_KEY/RESEND_FROM_EMAIL/RESEND_ADMIN_EMAIL din Sprint 1; emailuri best-effort, nu blochează comanda; test mode → ambele la founder; pre-launch §1.1 verificare domeniu oakfantasy.ro în Resend rămâne blocker pentru emailuri reale către clienți)
 
 ---
 

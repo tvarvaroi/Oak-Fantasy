@@ -691,6 +691,26 @@ admin/login|administrare → ZERO.
 **Fișiere:** `app/admin/not-found.tsx`, `app/admin/(protected)/page.tsx`,
 `app/admin/layout.tsx`, `lib/auth/require-admin.ts` (requireAdminOrNotFound).
 
+## 2026-06-23 — Adăugarea unui param la o funcție Postgres = OVERLOAD, nu replace
+
+**Simptom (anticipat, Task 3.5):** `CREATE OR REPLACE FUNCTION create_order(...)`
+cu un argument în plus (`p_locale`) NU înlocuiește funcția veche — Postgres
+identifică funcțiile după (nume + listă de argumente), deci o listă diferită
+creează o **a doua** funcție supraîncărcată. Rezultat: 2× `create_order`
+(12-arg din 3.4 + 13-arg din 3.5), iar apelurile pot deveni ambigue.
+**Cauză:** semnătura funcției în Postgres include tipurile argumentelor.
+`CREATE OR REPLACE` înlocuiește doar dacă semnătura e identică.
+**Fix folosit:** `DROP FUNCTION IF EXISTS public.create_order(uuid, text, text,
+text, text, integer, integer, integer, jsonb, jsonb, text, jsonb);` (semnătura
+EXACTĂ a celei vechi) ÎNAINTE de `CREATE`. `IF EXISTS` face migrația sigură
+indiferent dacă 3.4 a fost deja aplicată sau nu pe live.
+**Lecție generală:** orice modificare a listei de argumente a unei funcții
+PL/pgSQL = DROP (cu semnătura veche exactă) + CREATE, nu doar CREATE OR REPLACE.
+Apelul Supabase `.rpc('fn', {named: ...})` folosește argumente numite → ordinea
+în noua definiție nu contează pentru apel, dar DROP-ul trebuie să dea ordinea
+veche exactă.
+**Fișiere:** `supabase/migrations/20260623110000_add_order_locale.sql`.
+
 ## SECURITY_CHECKLIST.md maintenance protocol
 
 Document: `_brain/notes/SECURITY_CHECKLIST.md` (living document)

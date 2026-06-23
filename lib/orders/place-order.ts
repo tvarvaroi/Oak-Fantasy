@@ -6,6 +6,7 @@ import { checkoutSchema } from '@/lib/schemas/checkout';
 import { localizedPath, isLocale, type Locale } from '@/lib/i18n-routes';
 import { getStripe, isStripeConfigured } from '@/lib/stripe/server';
 import { createOrder } from './create-order';
+import { sendOrderEmails } from './send-order-emails';
 
 export interface PlaceOrderInput {
   checkout: unknown; // CheckoutData — re-validated here, never trusted from the client
@@ -50,6 +51,7 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResu
       engravingText: i.engravingText,
     })),
     profileId: user?.id ?? null,
+    locale,
   });
 
   if (!created.ok) {
@@ -58,8 +60,11 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResu
 
   const thankYouPath = `${localizedPath('multumim', locale)}/${created.orderId}`;
 
-  // Ramburs — no online payment, straight to confirmation.
+  // Ramburs — no online payment, the order is placed now (pending_cod). Send
+  // both emails here (best-effort, D5 — never blocks the confirmation). The
+  // card path emails fire later from the webhook, on payment confirmation.
   if (data.paymentMethod === 'cod') {
+    await sendOrderEmails(created.orderId);
     return { ok: true, mode: 'thankyou', path: thankYouPath };
   }
 

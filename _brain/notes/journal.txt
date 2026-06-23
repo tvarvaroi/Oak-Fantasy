@@ -909,3 +909,49 @@ resetat, ZERO page errors, hydration 0. Flow real (plată + creare comandă) = f
 6. Test card: 4242 4242 4242 4242, orice CVC + dată viitoare.
 
 NEXT: Task 3.5 — email tranzacționale (Resend) la order paid/placed (confirmare client + notificare admin).
+
+═══════════════════════════════════════════════════════════════════
+2026-06-23 — TASK 3.5 — Email tranzacționale comandă (Resend) [LIVRAT]
+═══════════════════════════════════════════════════════════════════
+Decizii aprobate: D1 coloană locale pe orders · D2 test mode → ambele la founder,
+client cu banner [TEST→email] · D3 admin email separat (RESEND_ADMIN_EMAIL, RO) ·
+D4 fără idempotency nou (guard paid + execuție unică) · D5 best-effort total ·
+D6 conținut client complet.
+
+Livrat:
+- supabase/migrations/20260623110000_add_order_locale.sql — coloană orders.locale
+  (text NOT NULL DEFAULT 'ro' CHECK ro/en) + create_order recreat cu p_locale
+  (DROP 12-arg semnătura veche → CREATE 13-arg, ca să nu fie overload).
+- lib/orders/create-order.ts — CreateOrderInput.locale → p_locale în RPC.
+- lib/orders/place-order.ts — pasează locale la createOrder; ramburs → sendOrderEmails.
+- emails/OrderConfirmationClient.tsx — React Email RO/EN după order.locale, branded
+  (paletă inline + Caudex/Lora + LEGAL_INFO), status paid/cod/pending, produse+gravare,
+  subtotal/transport/total, adresă, lead-time 5-10 zile, link /multumim + catalog,
+  banner [TEST] în test mode.
+- emails/OrderNotificationAdmin.tsx — RO intern: plată/status/limbă/email/telefon,
+  produse, totaluri, adresă, observații, link /admin/comenzi.
+- lib/orders/send-order-emails.ts — sendOrderEmails(orderId): fetchOrderConfirmation
+  (guest_email = email client și pt logați), admin email mereu, client email cu
+  test-mode redirect; best-effort (NU aruncă, console.error).
+- app/api/webhooks/stripe/route.ts — handleCompleted cheamă sendOrderEmails DUPĂ
+  update paid (best-effort, nu întoarce 500).
+
+Quality gates: typecheck ✅ · lint ✅ · check:i18n ✅ (14 maps) · build ✅
+(warning webpack cache about.module.css = pre-existent, benign).
+Smoke complet IMPOSIBIL local (RPC+locale+inventory absente pe DB local, ca la 3.4) —
+pe ramburs order creation eșuează înainte de email. Smoke real = founder pe Vercel.
+
+HAND-OFF FOUNDER (înainte de smoke):
+1. Aplică migrația 20260623110000_add_order_locale.sql pe Supabase live
+   (după ce 20260623100000_create_order_rpc.sql de la 3.4 e aplicată).
+2. Regen types: npx supabase gen types typescript --linked > types/supabase.ts
+   (locale + create_order p_locale intră în types; castul defensiv rămâne valid oricum).
+3. Env (deja existente din Sprint 1, confirmă pe Vercel): RESEND_API_KEY,
+   RESEND_FROM_EMAIL, RESEND_ADMIN_EMAIL. Acum test mode (from=onboarding@resend.dev)
+   → ambele emailuri la tvarvaroi@gmail.com.
+4. Pre-launch: verifică domeniul oakfantasy.ro în Resend → set RESEND_FROM_EMAIL la
+   un from @oakfantasy.ro → clienții primesc emailuri reale.
+5. Smoke: plasează comandă (ramburs + card) → founder primește 2 emailuri (client
+   confirmare branded cu banner [TEST] + admin notificare).
+
+NEXT: Task 3.6 — admin orders management (vizualizare + schimbare status comandă).
