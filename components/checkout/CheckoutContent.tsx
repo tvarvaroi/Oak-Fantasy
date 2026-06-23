@@ -11,6 +11,7 @@ import { localizedPath, type Locale } from '@/lib/i18n-routes';
 import { useCartStore, cartSubtotal } from '@/lib/store/cart';
 import { useHydrated } from '@/lib/hooks/useHydrated';
 import { checkoutSchema, STEP_FIELDS, type CheckoutData } from '@/lib/schemas/checkout';
+import { placeOrder } from '@/lib/orders/place-order';
 import { CHECKOUT_CONTENT } from './content';
 import StepIndicator from './StepIndicator';
 import ShippingStep from './ShippingStep';
@@ -31,7 +32,8 @@ export default function CheckoutContent({ locale, prefill }: { locale: Locale; p
   const c = CHECKOUT_CONTENT[locale];
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
-  const [placed, setPlaced] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const methods = useForm<CheckoutData>({
     resolver: zodResolver(checkoutSchema),
@@ -64,9 +66,37 @@ export default function CheckoutContent({ locale, prefill }: { locale: Locale; p
     if (valid) setStep((s) => Math.min(3, s + 1) as 1 | 2 | 3);
   };
 
-  const submitOrder = methods.handleSubmit(() => {
-    // D8 — placeholder. Order creation + payment land in Task 3.4 / 3.5.
-    setPlaced(true);
+  const submitOrder = methods.handleSubmit(async (data) => {
+    setError(null);
+    setSubmitting(true);
+    try {
+      const res = await placeOrder({
+        checkout: data,
+        items: items.map((i) => ({ productId: i.productId, quantity: i.quantity, engravingText: i.engraving?.text })),
+        locale,
+      });
+      if (!res.ok) {
+        const map: Record<string, string> = {
+          unavailable: c.errors.unavailable,
+          out_of_stock: c.errors.outOfStock,
+          stripe_unconfigured: c.errors.paymentUnavailable,
+          stripe_failed: c.errors.paymentUnavailable,
+          stripe_no_url: c.errors.paymentUnavailable,
+        };
+        setError(map[res.error] ?? c.errors.generic);
+        setSubmitting(false);
+        return;
+      }
+      // Success — redirect (keep submitting=true through the navigation).
+      if (res.mode === 'stripe') {
+        window.location.href = res.url;
+      } else {
+        router.push(res.path);
+      }
+    } catch {
+      setError(c.errors.generic);
+      setSubmitting(false);
+    }
   });
 
   const onFormSubmit = (e: React.FormEvent) => {
@@ -121,7 +151,8 @@ export default function CheckoutContent({ locale, prefill }: { locale: Locale; p
 
                   <button
                     type="submit"
-                    className="font-caudex transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
+                    disabled={submitting}
+                    className="font-caudex transition-all duration-200 hover:opacity-90 active:scale-[0.98] disabled:opacity-60"
                     style={{
                       backgroundColor: 'var(--oak-warm)',
                       color: 'var(--cream-warm)',
@@ -132,13 +163,13 @@ export default function CheckoutContent({ locale, prefill }: { locale: Locale; p
                       boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12), 0 2px 6px rgba(31,24,16,0.2)',
                     }}
                   >
-                    {step < 3 ? c.continue : c.placeOrder}
+                    {step < 3 ? c.continue : submitting ? c.placing : c.placeOrder}
                   </button>
                 </div>
 
-                {placed ? (
-                  <p className="font-lora text-right" style={{ marginTop: 12, fontSize: '0.85rem', color: 'var(--ink-soft)' }} role="status">
-                    {c.placeOrderComingSoon}
+                {error ? (
+                  <p className="font-lora text-right" style={{ marginTop: 12, fontSize: '0.85rem', color: '#9F2D20' }} role="alert">
+                    {error}
                   </p>
                 ) : null}
               </form>

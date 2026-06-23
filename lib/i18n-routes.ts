@@ -30,6 +30,8 @@ export const PATHNAMES = {
   cos: { ro: 'cos', en: 'cart' },
   // Checkout (Task 3.3). Same word RO/EN.
   checkout: { ro: 'checkout', en: 'checkout' },
+  // Order confirmation (Task 3.4). RO /multumim, EN /thank-you.
+  multumim: { ro: 'multumim', en: 'thank-you' },
   // Legal pages. RO/EN slugs differ to match natural reading
   // conventions in each market. Folder names follow RO slug per the
   // PATHNAMES contract above.

@@ -159,3 +159,25 @@ Snapshot preț bani la add; stoc real validat la checkout (3.4), nu în coș.
 **Aplicat la:** lib/store/cart.ts, lib/hooks/useHydrated.ts, components/cart/*, components/product/AddToCartPanel.tsx, Navbar.
 **De ce contează:** Primul Zustand store din proiect — template pentru orice state client persistat.
 Cart complet funcțional (add/drawer/badge/stepper/remove/persist/EN). NEXT: checkout 3.3.
+
+## 2026-06-23 — Task 3.3: Checkout multistep
+
+**Pattern descoperit:** Multistep checkout = UN singur RHF useForm + FormProvider + validare per pas
+via trigger(STEP_FIELDS[step]); state pași React local (NU persistat — date personale nu în localStorage).
+Cart guard useHydrated → coș gol post-hydration → router.replace(/cos). force-dynamic page sub
+generateStaticParams apare ● în build dar e dinamică real (verifică header runtime Cache-Control no-store,
+nu simbolul build). Shipping config în lib/config (25 RON / gratuit ≥500), bani.
+**Aplicat la:** app/[locale]/checkout/, components/checkout/*, lib/schemas/checkout.ts, lib/data/counties.ts, lib/config/shipping.ts.
+**De ce contează:** Template multistep form. „Plasează comanda" = placeholder; Stripe + order real = 3.4/3.5.
+
+## 2026-06-23 — Task 3.4: Stripe Checkout + order creation
+
+**Pattern descoperit:** Order placement ATOMIC = RPC PL/pgSQL (order+items+reserve_stock+history într-o
+tranzacție; reserve eșuat → rollback, fără comandă fantomă). JS revalidează preț CURRENT din DB (D1, nu
+client) + totaluri server, apoi cheamă RPC. Stripe Checkout hosted = doar `stripe` server SDK, redirect la
+session.url (fără @stripe/stripe-js). unit_amount = bani direct (RON smallest unit). getStripe() LAZY
+(nu arunca la build fără cheie). Webhook: constructEvent(raw body+sig), idempotent (skip dacă paid),
+expired→release_stock. /multumim: UUID guard (D3) + clear cart pe mount (D6). RPC nou nu e în types →
+cast `'fn' as never`. Server action call în client → try/catch (throw necontrolat → buton blocat altfel).
+**Aplicat la:** lib/stripe/, lib/orders/, app/api/webhooks/stripe/, app/[locale]/multumim/, migrația RPC.
+**De ce contează:** Prima vânzare reală (Sprint 3). 4 hand-off-uri founder (migrație, inventory, env, webhook).

@@ -47,7 +47,9 @@ export interface CheckoutContent {
   termsLink: string;
   placeOrder: string;
   placeOrderComingSoon: string;
+  placing: string;
   engraving: string;
+  errors: { generic: string; unavailable: string; outOfStock: string; paymentUnavailable: string };
 }
 
 export const CHECKOUT_CONTENT: Record<Locale, CheckoutContent> = {
@@ -95,7 +97,14 @@ export const CHECKOUT_CONTENT: Record<Locale, CheckoutContent> = {
     termsLink: 'termenii și condițiile',
     placeOrder: 'Plasează comanda',
     placeOrderComingSoon: 'Plata vine în curând — o activăm în pasul următor.',
+    placing: 'Se procesează…',
     engraving: 'Gravare',
+    errors: {
+      generic: 'Ceva nu a mers. Te rugăm încearcă din nou.',
+      unavailable: 'Un produs din coș nu mai este disponibil.',
+      outOfStock: 'Un produs nu mai este în stoc în cantitatea cerută.',
+      paymentUnavailable: 'Plata cu cardul nu este disponibilă momentan. Încearcă ramburs.',
+    },
   },
   en: {
     pageTitle: 'Checkout',
@@ -141,6 +150,13 @@ export const CHECKOUT_CONTENT: Record<Locale, CheckoutContent> = {
     termsLink: 'terms and conditions',
     placeOrder: 'Place order',
     placeOrderComingSoon: 'Payment is coming soon — we enable it in the next step.',
+    placing: 'Processing…',
     engraving: 'Engraving',
+    errors: {
+      generic: 'Something went wrong. Please try again.',
+      unavailable: 'A product in your cart is no longer available.',
+      outOfStock: 'A product is no longer in stock in the requested quantity.',
+      paymentUnavailable: 'Card payment is unavailable right now. Try cash on delivery.',
+    },
   },
 };

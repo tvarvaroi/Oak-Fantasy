@@ -867,3 +867,45 @@ termeni → placeholder. HYDRATION 0. typecheck/lint/build green, i18n exit 0 (1
 
 NEXT: Task 3.4 — Stripe Checkout (hosted) + order creation real (service-role) + reserve_stock +
 revalidare preț/stoc. „Plasează comanda" de wired la Stripe.
+
+═══════════════════════════════════════════════════════════════════════
+2026-06-23 — Task 3.4: Stripe Checkout + order creation + plată reală
+═══════════════════════════════════════════════════════════════════════
+LIVRAT:
+- Pachet: stripe@22.2.3 (server SDK; @stripe/stripe-js NU — Checkout hosted = redirect la session.url).
+- lib/stripe/server.ts — getStripe() LAZY (nu aruncă la build fără cheie; isStripeConfigured()).
+- supabase/migrations/20260623100000_create_order_rpc.sql — create_order(...) RPC ATOMIC:
+  order_number + order + order_items + reserve_stock STRICT + status_history într-o tranzacție;
+  reserve eșuat → rollback total (fără comandă fantomă). HAND-OFF: aplică pe Supabase live.
+- lib/orders/create-order.ts — revalidare preț CURRENT din DB (D1, nu snapshot client), totaluri
+  server (order-math), shipping config, apel RPC; întoarce lines (pt Stripe) + totaluri.
+- lib/orders/place-order.ts ('use server') — Zod re-validare; card → Stripe Session (line_items bani
+  direct D7, currency ron, locale, metadata orderId, success/cancel url) + salvează session id; ramburs
+  → /multumim direct. Erori mapate (out_of_stock/unavailable/stripe_*).
+- app/api/webhooks/stripe/route.ts — constructEvent (raw body + signature), checkout.session.completed
+  → confirmed+paid (idempotent: skip dacă deja paid), checkout.session.expired → release_stock + cancelled.
+- app/[locale]/multumim/[orderId]/ — confirmare (fetch service-role, UUID guard D3), clear cart pe mount
+  (D6), mesaj card-paid/pending/cod. lib/orders/get-order.ts + components/order/*.
+- CheckoutContent: „Plasează comanda" wired (card→window.location=stripe url; cod→router.push /multumim)
+  + try/catch defensiv (orice throw → eroare + reset, nu buton blocat) + buton disabled while submitting.
+
+VERIFICAT (local, fără chei Stripe + fără RPC pe DB): typecheck/lint/build green, i18n exit 0 (14 maps).
+Rute: checkout, multumim/[orderId] (ƒ), api/webhooks/stripe (ƒ). /multumim UUID inexistent/malformat → 404.
+Webhook fără secret → 500 (graceful). Place order (cod) cu RPC absent → eroare grațioasă vizibilă, buton
+resetat, ZERO page errors, hydration 0. Flow real (plată + creare comandă) = founder pe Vercel.
+
+⚠️ HAND-OFF FOUNDER (CRITIC — fără ele comenzile nu funcționează):
+1. Aplică migrația 20260623100000_create_order_rpc.sql pe Supabase LIVE.
+2. Populează inventory (quantity_total > 0) pt toate produsele + creează rând inventory pt produsul „test"
+   (acum: 10 rânduri/11 produse, toate 0 → D4 strict blochează). Ex SQL:
+     update inventory set quantity_total = 20;
+     insert into inventory (product_id, quantity_total) select id, 20 from products where id not in (select product_id from inventory);
+3. Env Vercel (+ .env.local pt test local): STRIPE_SECRET_KEY (sk_test_), STRIPE_WEBHOOK_SECRET,
+   NEXT_PUBLIC_APP_URL (ex http://localhost:3000 local / https://oak-fantasy.vercel.app prod).
+   (NU e nevoie de NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY — redirect hosted.)
+4. Stripe Dashboard → Webhooks → endpoint <domeniu>/api/webhooks/stripe, events
+   checkout.session.completed + checkout.session.expired, copiază signing secret → STRIPE_WEBHOOK_SECRET.
+5. Test local webhook: `stripe listen --forward-to localhost:3000/api/webhooks/stripe`.
+6. Test card: 4242 4242 4242 4242, orice CVC + dată viitoare.
+
+NEXT: Task 3.5 — email tranzacționale (Resend) la order paid/placed (confirmare client + notificare admin).
