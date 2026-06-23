@@ -809,3 +809,31 @@ HAND-OFF founder (opțional): adaugă o pagină produs reprezentativă în tests
 PAGES + regenerează baselines (cp .env.staging.local .env.local + npm run test:e2e:update).
 
 NEXT: Task 3.2 — Cart (Zustand store + add-to-cart real + cart drawer/page). AddToCartButton de wired.
+
+═══════════════════════════════════════════════════════════════════════
+2026-06-23 — Task 3.2: Cart (Zustand + drawer + /cos)
+═══════════════════════════════════════════════════════════════════════
+LIVRAT:
+- lib/store/cart.ts — Zustand store, persist localStorage (partialize: DOAR items, NU isOpen),
+  CartItem cu lineId (productId sau productId:{text} pentru gravare → linie separată D4),
+  snapshot priceRon bani (D2), MAX_QTY 99 (D7), addItem auto-open drawer (D6),
+  selectors cartTotalItems/cartSubtotal (incl. gravare).
+- lib/hooks/useHydrated.ts — guard SSR (anti-#418): false pe server+first render → true post-mount.
+- components/cart/: CartIcon (badge, în Navbar), CartDrawer (slide-in dreapta, Esc/click-outside/scroll-lock),
+  CartLineItem (reutilizabil drawer+/cos, stepper +/- + remove), CartPageContent (client, Navbar+Footer),
+  content.ts (RO/EN).
+- components/product/AddToCartPanel.tsx — qty selector + gravare toggle/text (Switch) + add (D3/D4),
+  înlocuiește AddToCartButton placeholder (șters). ProductInfo îl randează.
+- app/[locale]/cos/page.tsx — server wrapper, noindex, /ro/cos + /en/cart.
+- lib/i18n-routes.ts: + cos {ro:'cos',en:'cart'}. Navbar: + CartIcon + CartDrawer.
+
+PATTERN cheie: Zustand persist + SSR = #418 garantat fără guard → useHydrated (items=[] pe server+first
+render, real post-mount). isOpen NU se persistă (partialize) ca drawer-ul să nu se redeschidă la load.
+
+VERIFICAT (prod build + Playwright, flow complet): add din pagina produs → drawer auto-open
+(translateX 0) + badge 1; /cos 1 item subtotal 500 RON; stepper „+" → 500→1.000; remove → empty
+state „Coșul tău e gol" + badge dispare; reload → persistă (localStorage); EN /en/cart „Your cart".
+HYDRATION 0 pe tot flow-ul. typecheck/lint/build green, i18n exit 0 (12 content maps).
+
+NEXT: Task 3.3 — Checkout (formular guest: email/nume/telefon/adresă + shipping/lead-time).
+Butoanele „Finalizează" (drawer + /cos) arată acum „vine în curând" — de wired la /checkout.

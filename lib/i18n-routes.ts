@@ -25,6 +25,9 @@ export const PATHNAMES = {
   // in RO and EN. Codified explicitly so the route is registered with
   // the middleware audit and shows up in localizedPath().
   contact: { ro: 'contact', en: 'contact' },
+  // Cart (Task 3.2). RO /cos, EN /cart — middleware rewrites EN onto the
+  // canonical /cos route folder.
+  cos: { ro: 'cos', en: 'cart' },
   // Legal pages. RO/EN slugs differ to match natural reading
   // conventions in each market. Folder names follow RO slug per the
   // PATHNAMES contract above.

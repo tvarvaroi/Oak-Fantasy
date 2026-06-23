@@ -138,3 +138,24 @@ lib/admin/{dashboard,orders}.ts, app/admin/(protected)/{page,comenzi/page}.tsx.
 **De ce contează:** Sprint 2 (auth + admin) COMPLET — sidebar 5 items active. Sprint 3 = Stripe.
 2 migrații DB de aplicat pe live (Storage 2.4 + subscribers SELECT 2.5). 2FA = pre-launch.
 Gotcha durabil major al sprintului: SpeedInsights ca frate al <html> = #418 global (mutat în body).
+
+## 2026-06-23 — Task 3.1: Product detail page (Sprint 3 start)
+
+**Pattern descoperit:** Server component pasat ca PROP/children la un client wrapper (ProductInfo
+server → ProductDetailContent 'use client') — singura cale de a avea Navbar/toggle client + conținut
+server. Client NU poate importa server component, dar îl poate primi ca prop. ISR detail page:
+generateStaticParams (toate locale × slug) + revalidate + dynamicParams. Middleware existent
+gestionează deja rute nested (rest = segments.slice(3)) — zero schimbare pentru /[locale]/tocatoare/[slug].
+**Aplicat la:** app/[locale]/tocatoare/[slug]/page.tsx, components/product/*, lib/db/products.ts (fetchProductBySlug).
+**De ce contează:** Template pentru orice pagină detaliu viitoare. AddToCartButton = placeholder, wired Task 3.2.
+
+## 2026-06-23 — Task 3.2: Cart (Zustand persist + drawer)
+
+**Pattern descoperit:** Zustand persist + SSR = #418 garantat → useHydrated guard OBLIGATORIU
+(items=[] pe server+first client render, valoare reală post-mount) pe TOATE componentele care
+citesc coșul (badge, drawer, /cos). persist cu partialize: salvează DOAR items, NU isOpen (altfel
+drawer se redeschide la load). lineId = productId sau productId:{engravingText} (linii separate).
+Snapshot preț bani la add; stoc real validat la checkout (3.4), nu în coș.
+**Aplicat la:** lib/store/cart.ts, lib/hooks/useHydrated.ts, components/cart/*, components/product/AddToCartPanel.tsx, Navbar.
+**De ce contează:** Primul Zustand store din proiect — template pentru orice state client persistat.
+Cart complet funcțional (add/drawer/badge/stepper/remove/persist/EN). NEXT: checkout 3.3.

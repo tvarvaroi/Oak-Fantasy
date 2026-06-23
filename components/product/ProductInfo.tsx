@@ -2,7 +2,7 @@ import type { Locale } from '@/lib/i18n-routes';
 import type { CatalogProduct } from '@/lib/db/products';
 import { formatPriceRon, formatDimensions, TOCATOARE_CONTENT, type Tier } from '@/components/tocatoare/content';
 import { PRODUCT_DETAIL_CONTENT } from './content';
-import AddToCartButton from './AddToCartButton';
+import AddToCartPanel from './AddToCartPanel';
 
 // Right column of the detail page: name, tier, price (+ sale), short
 // description, dimensions, weight, engraving availability, add-to-cart.
@@ -118,7 +118,19 @@ export default function ProductInfo({ product, locale }: { product: CatalogProdu
         </div>
       ) : null}
 
-      <AddToCartButton label={c.addToCart} comingSoon={c.cartComingSoon} />
+      <AddToCartPanel
+        locale={locale}
+        product={{
+          productId: product.id,
+          slug: product.slug,
+          name_ro: product.name_ro,
+          name_en: product.name_en,
+          priceRon: product.price_ron,
+          heroImageUrl: product.hero_image_url,
+          hasEngraving: product.has_engraving_option,
+          engravingPriceRon: product.engraving_price_ron,
+        }}
+      />
     </div>
   );
 }

@@ -9,6 +9,8 @@ import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 import { localizedPath, type Locale } from '@/lib/i18n-routes';
 import { createClient } from '@/lib/supabase-client';
+import CartIcon from '@/components/cart/CartIcon';
+import CartDrawer from '@/components/cart/CartDrawer';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -142,6 +144,7 @@ export default function Navbar({
   };
 
   return (
+    <>
     <header
       ref={navRef}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
@@ -275,6 +278,9 @@ export default function Navbar({
             )}
           </button>
 
+          {/* Cart (Task 3.2) — visible on all breakpoints; opens the drawer. */}
+          <CartIcon locale={language} color={navInk} colorTransition={colorTransition} />
+
           {/* Sign out — only when authenticated (Task 2.2 minimal logout) */}
           {authed && (
             <form action="/auth/signout" method="post" className="hidden md:block">
@@ -394,5 +400,7 @@ export default function Navbar({
         </nav>
       </div>
     </header>
+    <CartDrawer locale={language} />
+    </>
   );
 }
