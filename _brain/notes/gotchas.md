@@ -753,3 +753,80 @@ să mapezi comma-below ș/ț → ASCII; orice alt non-ASCII (inclusiv cedilla ra
 cade oricum pe pasul `.replace(/[^a-z0-9]+/g, '-')` și devine cratimă. Soluție mai
 simplă și conformă. (Editorul/tooling convertește \uXXXX înapoi în caracter, deci
 escape-urile nu ajută — pur și simplu elimină cazul.)
+
+## 2026-06-22 — Imagini produs „404": cauza reală = next/image remotePatterns, NU formatul URL
+
+**Raport inițial:** founder a testat URL-uri brute și a concluzionat: URL cu
+`/storage/v1/object/public/product-images/X` → 404; fără `/public/` → 200. A cerut
+strip `/public/` + getPublicUrl().
+
+**Investigație empirică (systematic-debugging, script one-off pe proiectul live):**
+- Codul folosea DEJA `getPublicUrl()` (nu string concat). getPublicUrl produce
+  formatul standard CU `/public/` — corect pentru bucket public.
+- Fetch anonim pe URL-ul cu `/public/` (cel din DB) = **200 OK, stabil** (×3).
+- `next/image` (`/_next/image?url=…`) cu `/public/` = **200, image/jpeg** ✓
+- `next/image` FĂRĂ `/public/` = **400 „url parameter is not allowed"** ✗
+  (remotePatterns permite exact `pathname:'/storage/v1/object/public/**'`).
+
+**Root cause real:** DOUĂ lucruri, niciunul fiind formatul URL:
+1. **next/image remotePatterns lipsea** pe serverul founder-ului (modificarea
+   next.config era necommisă) → next/image întorcea 400 pentru TOATE URL-urile
+   supabase → thumbnail spart în app.
+2. **404-ul brut pe `/public/` a fost TRANZITORIU** — CDN-ul Supabase cache-uiește
+   un miss (404) pe path-ul public imediat după creare bucket/upload; path-ul
+   non-`/public/` ocolește CDN-ul (servește direct via RLS anon SELECT), deci
+   „părea" că merge. CDN-ul s-a auto-vindecat → `/public/` acum 200 stabil.
+
+**Concluzie / regulă:**
+- `getPublicUrl()` e CORECT — produce `/public/`, formatul canonic pentru bucket
+  public. NU strip `/public/`. NU rula UPDATE SQL să scoți `/public/` — ar sparge
+  next/image (remotePatterns permite DOAR `/public/**`).
+- Fix-ul real = `next.config.js` `images.remotePatterns` cu
+  `pathname:'/storage/v1/object/public/**'` + restart/redeploy server.
+- Lecție de proces: când un URL brut pare să dea 404 dar fișierul+bucket+policy
+  sunt OK → suspectează (a) CDN cache tranzitoriu pe path public, (b) layer-ul de
+  rendering (next/image remotePatterns) care întoarce 400, nu 404. Testează la
+  FIECARE layer (raw fetch vs /_next/image) înainte de a „repara" formatul URL.
+
+## 2026-06-23 — #418/#423 GLOBAL: SpeedInsights ca frate al <html> în root layout
+
+**Simptom:** React #418 (hydration mismatch) + #423 (entire root client-renders)
+pe TOATE paginile în producție. Founder a raportat /tocatoare + /admin/produse,
+dar reproducerea (Playwright pe prod build) a arătat eroarea pe homepage, atelier,
+despre, tocatoare, contact, /admin/login — TOT site-ul.
+
+**Diagnostic greșit inițial:** „componentă partajată de afișare produs". FALS —
+nu e legat de produse. Eroarea apărea identic pe pagini fără produse.
+
+**Root cause (confirmat: stack trace + sursă pachet):**
+`app/layout.tsx` randa `<>{children}<SpeedInsights/></>` — adică `<SpeedInsights/>`
+ca **frate al lui `<html>`** (children = layout-ul [locale] care emite `<html>`).
+`@vercel/speed-insights@2.0.0` randează intern `<Suspense fallback={null}>` (citește
+useSearchParams). Un **Suspense boundary ca frate al lui `<html>`, la nivel #document,
+nu poate fi hidratat** → stack: `tryToClaimNextHydratableSuspenseInstance` →
+`updateSuspenseComponent` → „server HTML replaced with client content in #document,
+outside Suspense boundary → entire root client-renders".
+
+Comentariul vechi din root layout („returnează null, e ok în afara <body>") era
+valid pentru o versiune veche a pachetului; v2.0.0 a adăugat wrapper-ul `<Suspense>`
+→ presupunerea a picat. **Regresie tăcută la bump de pachet.** Vizibilă abia când
+founder a deschis devtools pe /tocatoare (recovery-ul #423 re-randează pe client,
+deci pagina „merge" dar cu flash + erori console).
+
+**Fix:** mută `<SpeedInsights/>` ÎN interiorul `<body>` (în `app/[locale]/layout.tsx`).
+Root layout devine pur passthrough (`return children`). Guard-ul de dedup din
+SpeedInsights (`document.head.querySelector(script[src*=...])`) previne dubla
+încărcare la remount pe schimbarea locale — deci grija veche nu se aplică.
+
+**Verificat:** prod build, Playwright capture pageerror pe 6 pagini publice +
+/admin/login → toate „clean", zero #418/#423.
+
+**Reguli:**
+- NU randa NIMIC care produce DOM/Suspense ca frate al `<html>` în root layout.
+  Orice (SpeedInsights, Analytics, scripturi) trebuie în interiorul `<body>`.
+- La fiecare bump de pachet care randează ceva la nivel de layout, re-verifică
+  hidratarea (Playwright pageerror pe prod build) — regresiile de hidratare sunt
+  tăcute (site-ul pare să meargă datorită recovery-ului #423).
+- Tehnică de debug: capturează `page.on('pageerror')` din prod build (minified
+  #418 + link) SAU din dev (mesaj complet); stack-ul `tryToClaim...SuspenseInstance`
+  = mismatch la o graniță Suspense; „#document" = problema e la rădăcină, nu adânc.

@@ -640,3 +640,22 @@ HAND-OFF FOUNDER:
 3. Commit + push (eu nu fac commit-uri).
 
 NEXT: Task 2.5 (/admin/subscribers + CSV), apoi 2.6 (/admin/profile + 2FA).
+
+--- 2026-06-22 (later) — Debug „imagini 404" (systematic-debugging) ---
+Raport founder: URL cu /public/ → 404. Investigație empirică pe proiectul live
+a DEMONTAT premisa: getPublicUrl() (deja folosit) produce /public/ = corect;
+raw fetch /public/ = 200 stabil; next/image /public/ = 200; next/image FĂRĂ
+/public/ = 400 (remotePatterns permite doar /public/**). Root cause real:
+(1) next.config remotePatterns necommis pe serverul founder → next/image 400;
+(2) 404 brut pe /public/ a fost CDN cache tranzitoriu (auto-vindecat).
+DECIZIE: zero schimbare de cod URL; NU rula UPDATE SQL (ar sparge next/image).
+Fix = deploy next.config existent + restart. Vezi gotcha 2026-06-22.
+
+--- 2026-06-23 — Fix #418/#423 GLOBAL (systematic-debugging) ---
+Founder a raportat /tocatoare + /admin/produse crash #418/#423, ipoteză „componentă
+produs partajată". Reproducere Playwright pe PROD build a infirmat: eroarea pe TOATE
+paginile (homepage/atelier/despre/tocatoare/contact/admin-login) la nivel #document.
+Root cause: <SpeedInsights/> (v2.0.0 = <Suspense> intern) randat ca frate al <html>
+în app/layout.tsx → Suspense boundary nehidratabil la rădăcină. Fix: mutat în <body>
+în [locale]/layout.tsx; root layout = passthrough. Verificat clean pe 7 pagini.
+NELEGAT de Task 2.4/produse — regresie de la bump speed-insights. Vezi gotcha 2026-06-23.

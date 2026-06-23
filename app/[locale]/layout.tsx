@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Caudex, Caveat, Lora } from 'next/font/google';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import PageTransition from '@/components/PageTransition';
 import '../globals.css';
 
@@ -72,6 +73,13 @@ export default function LocaleLayout({
     >
       <body>
         <PageTransition>{children}</PageTransition>
+        {/* SpeedInsights MUST live inside <body>. v2.0.0 wraps its component in
+            a <Suspense> boundary (it calls useSearchParams); a Suspense boundary
+            rendered as a sibling of <html> (the old root-layout placement) can't
+            be hydrated → global #document hydration mismatch (React #418/#423) on
+            every page. Its useEffect injector dedupes by script src, so the
+            locale-switch remount never double-loads. */}
+        <SpeedInsights />
       </body>
     </html>
   );
