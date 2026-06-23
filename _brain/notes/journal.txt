@@ -681,3 +681,24 @@ optimizator servește 828×462 @ q90 corect (naturalWidth=400 era artefact Playw
 Limită reziduală: sursa 16:9 landscape cropată pătrat rămâne ușor soft pe retina —
 soluția reală = upload PĂTRAT 1:1 ≥1500×1500 (documentat în gotchas + recomandare founder).
 Finding: fișier JPEG stocat ca .png (file.type greșit în ImageUpload) — nu strică, date murdare.
+
+═══════════════════════════════════════════════════════════════════════
+2026-06-23 — Task 2.5: /admin/subscribers + CSV export
+═══════════════════════════════════════════════════════════════════════
+LIVRAT:
+- Migrație 20260623090000_email_subscribers_admin_read.sql — policy admin SELECT
+  (FOR SELECT TO authenticated USING is_admin()). email_subscribers avea DOAR INSERT
+  policy → admin via getServerSupabase primea 0 rânduri. HAND-OFF: aplică pe Supabase live.
+- AdminSidebar: „Abonați" → active.
+- app/admin/(protected)/subscribers/page.tsx — gate + fetch + count (+ activi dacă diferă) + Export CSV.
+- components/admin/SubscribersTable.tsx (server component, fără hidratare) — email + dată RO + source + badge „Dezabonat" pe unsubscribed_at.
+- lib/admin/subscribers.ts — fetchSubscribers() (RLS admin, [] pe eroare) + formatSubscriberDate (Intl ro-RO, Europe/Bucharest, null-safe).
+- app/admin/(protected)/subscribers/export/route.ts — CSV download (Content-Disposition attachment),
+  gate EXPLICIT în handler (layout NU gatează route handlers — lecția 2.3), BOM UTF-8 + CRLF (Excel),
+  RFC-4180 escaping, filename subscribers-oak-fantasy-{YYYY-MM-DD}.csv. CSV: email+dată+language+source.
+
+VERIFICAT: typecheck/lint/i18n/build green. Rute generate (ƒ). Non-admin → 404 pe page ȘI export
+(body „Not found", zero leak). CSV logic validată offline (BOM, dată RO Bucharest UTC+3, escaping).
+Calea autentificată (listă cu date) = founder smoke după aplicarea migrației + login admin.
+
+NEXT: Task 2.6 (/admin/profile + 2FA TOTP — completează layer 3/4 securitate).

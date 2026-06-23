@@ -103,3 +103,15 @@ app/admin/(protected)/produse/**, lib/schemas/product.ts, lib/admin/*, migrația
 **De ce contează:** Template pentru toate uneltele admin viitoare (subscribers, comenzi).
 Gate la nivel de PAGINĂ + layout (RSC-leak lesson). zodResolver + .transform() necesită
 cast `as Resolver<Input,unknown,Output>`. check:i18n respinge cedilla ş/ţ chiar în cod.
+
+## 2026-06-23 — Task 2.5: /admin/subscribers + CSV export
+
+**Pattern descoperit:** CSV download = route handler cu gate EXPLICIT (layout-urile
+NU gatează route handlers — lecția 2.3), Content-Disposition attachment, BOM UTF-8
+(String.fromCharCode(0xFEFF)) + CRLF + RFC-4180 escaping pentru Excel.
+**Aplicat la:** app/admin/(protected)/subscribers/{page.tsx,export/route.ts},
+components/admin/SubscribersTable.tsx, lib/admin/subscribers.ts, migrația admin SELECT.
+**De ce contează:** email_subscribers NU avea policy SELECT (doar INSERT) — admin
+primea 0 rânduri până la migrația 20260623090000. Verifică RLS SELECT existent înainte
+de a presupune că getServerSupabase poate citi un tabel. Tabel display = server component
+(fără hidratare). Date RO = Intl ro-RO + timeZone Europe/Bucharest (null-safe).

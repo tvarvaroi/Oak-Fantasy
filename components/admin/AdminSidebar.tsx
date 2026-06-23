@@ -19,7 +19,7 @@ type NavItem = {
 const NAV: NavItem[] = [
   { label: 'Panou', href: '/admin', icon: LayoutDashboard, enabled: true },
   { label: 'Produse', href: '/admin/produse', icon: Package, enabled: true },
-  { label: 'Abonați', href: '/admin/subscribers', icon: Users, enabled: false },
+  { label: 'Abonați', href: '/admin/subscribers', icon: Users, enabled: true },
   { label: 'Profil', href: '/admin/profile', icon: UserCog, enabled: false },
   { label: 'Comenzi', href: '/admin/comenzi', icon: ShoppingBag, enabled: false },
 ];

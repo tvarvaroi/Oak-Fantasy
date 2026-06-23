@@ -3,7 +3,7 @@
 > **Document scop:** Audit complet de securitate înainte de lansare publică  
 > **Status:** Living document, actualizat la fiecare sprint  
 > **Owner:** Theodor + Claude Code (auto-update după task-uri sensibile)  
-> **Ultima actualizare:** 2026-06-22 (Task 2.4 — Storage RLS bucket product-images, §8.1.e)
+> **Ultima actualizare:** 2026-06-23 (Task 2.5 — email_subscribers admin SELECT policy, §8.1.b)
 
 ---
 
@@ -484,7 +484,10 @@ remote. Smoke-tested la Task 2.1 (scripts/smoke-auth.mjs):
 - [x] **products** — public reads active (anon+auth) + admin full.
 - [x] **inventory / stock_movements** — admin only. Mutații via
       reserve/release/fulfill_stock (SECURITY DEFINER, audit în stock_movements).
-- [x] **email_subscribers** — anon INSERT (canonical, Task 1.1) + admin reads.
+- [x] **email_subscribers** — anon INSERT (canonical, Task 1.1). Admin SELECT
+      policy "Admin reads subscribers" (is_admin()) added Task 2.5 (migrația
+      20260623090000) — anterior NU exista policy SELECT (admin primea 0 rânduri;
+      doar service_role citea). HAND-OFF: aplică migrația pe prod. Public read = none.
 - [x] **is_admin()** SECURITY DEFINER — evită recursion pe profiles policy.
 - [x] **handle_new_user** trigger — profile auto-created la signup
       (role=customer default). VERIFIED.
