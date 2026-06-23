@@ -27,6 +27,41 @@ export async function fetchActiveProducts(): Promise<CatalogProduct[]> {
   }
 }
 
+// Stock availability for a set of products. inventory RLS is admin-only, so the
+// public catalog can't read it with the anon client — we use the service-role
+// key SERVER-SIDE and expose ONLY a boolean (inStock) to the client; the exact
+// count never leaves the server (Task 4.1). Fails OPEN: on any error / missing
+// key it returns an empty map and callers treat everything as in stock, so a
+// transient inventory hiccup never hides the whole catalog.
+export async function fetchStockMap(productIds: string[]): Promise<Map<string, number>> {
+  const empty = new Map<string, number>();
+  if (productIds.length === 0) return empty;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !serviceKey) return empty;
+  try {
+    const sb = createClient<Database>(url, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data, error } = await sb
+      .from('inventory')
+      .select('product_id, quantity_available')
+      .in('product_id', productIds);
+    if (error || !data) return empty;
+    return new Map(data.map((r) => [r.product_id, r.quantity_available ?? 0]));
+  } catch {
+    return empty;
+  }
+}
+
+// Derives the set of out-of-stock product ids (available <= 0). Fail-open: an
+// empty stock map (fetch failed) yields an empty set — nothing marked sold out.
+export async function fetchOutOfStockIds(productIds: string[]): Promise<string[]> {
+  const stock = await fetchStockMap(productIds);
+  if (stock.size === 0) return [];
+  return productIds.filter((id) => (stock.get(id) ?? 0) <= 0);
+}
+
 // Single active product by slug, for the detail page. Returns null if the slug
 // doesn't exist OR the product isn't active (draft/archived → 404, never public
 // — RLS also enforces status='active' for anon, this is belt-and-suspenders).

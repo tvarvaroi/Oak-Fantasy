@@ -14,9 +14,10 @@ interface ProductCardProps {
   product: Product;
   content: TocatoareContent;
   locale: Locale;
+  inStock?: boolean;
 }
 
-export default function ProductCard({ product, content, locale }: ProductCardProps) {
+export default function ProductCard({ product, content, locale, inStock = true }: ProductCardProps) {
   const name = locale === 'ro' ? product.name_ro : product.name_en;
   const desc =
     locale === 'ro' ? product.short_description_ro : product.short_description_en;
@@ -68,6 +69,35 @@ export default function ProductCard({ product, content, locale }: ProductCardPro
             />
           </>
         )}
+        {!inStock ? (
+          // Out-of-stock overlay (D5). Card still links to the detail page (D7).
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(31,24,16,0.55)',
+              zIndex: 2,
+            }}
+          >
+            <span
+              className="font-caudex"
+              style={{
+                color: 'var(--cream-warm)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.18em',
+                fontSize: '0.7rem',
+                fontWeight: 700,
+                textAlign: 'center',
+                padding: '0 12px',
+              }}
+            >
+              {content.card.outOfStock}
+            </span>
+          </div>
+        ) : null}
       </div>
       <div className={styles.cardBody}>
         <div className={styles.tierRow}>
@@ -94,24 +124,46 @@ export default function ProductCard({ product, content, locale }: ProductCardPro
                 />
               </svg>
             </Link>
-            <Link
-              href={ctaHref}
-              className={styles.quickAdd}
-              aria-label={content.card.quickAddAria}
-              data-quick-add
-            >
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden>
-                <path
-                  d="M3 5h2l2.5 11h10l2-8H7"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <circle cx="9" cy="19.5" r="1.4" fill="currentColor" />
-                <circle cx="17" cy="19.5" r="1.4" fill="currentColor" />
-              </svg>
-            </Link>
+            {inStock ? (
+              <Link
+                href={ctaHref}
+                className={styles.quickAdd}
+                aria-label={content.card.quickAddAria}
+                data-quick-add
+              >
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden>
+                  <path
+                    d="M3 5h2l2.5 11h10l2-8H7"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <circle cx="9" cy="19.5" r="1.4" fill="currentColor" />
+                  <circle cx="17" cy="19.5" r="1.4" fill="currentColor" />
+                </svg>
+              </Link>
+            ) : (
+              // Disabled quick-add when out of stock (D5): greyed, not clickable.
+              <span
+                className={styles.quickAdd}
+                aria-disabled="true"
+                aria-label={content.card.outOfStock}
+                style={{ opacity: 0.4, pointerEvents: 'none', cursor: 'default' }}
+              >
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden>
+                  <path
+                    d="M3 5h2l2.5 11h10l2-8H7"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <circle cx="9" cy="19.5" r="1.4" fill="currentColor" />
+                  <circle cx="17" cy="19.5" r="1.4" fill="currentColor" />
+                </svg>
+              </span>
+            )}
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { isLocale, localizedPath, type Locale } from '@/lib/i18n-routes';
-import { fetchActiveProducts } from '@/lib/db/products';
+import { fetchActiveProducts, fetchOutOfStockIds } from '@/lib/db/products';
 import { TOCATOARE_CONTENT, formatPriceRon } from '@/components/tocatoare/content';
 import TocatoareContent from '@/components/tocatoare/TocatoareContent';
 
@@ -68,6 +68,8 @@ export default async function TocatoarePage({ params }: PageProps) {
   const content = TOCATOARE_CONTENT[locale];
 
   const products = await fetchActiveProducts();
+  // Stock availability (boolean only — exact counts never reach the client).
+  const outOfStockIds = await fetchOutOfStockIds(products.map((p) => p.id));
 
   const origin = 'https://oakfantasy.ro';
   const canonicalUrl = `${origin}${localizedPath('tocatoare', locale)}`;
@@ -120,7 +122,7 @@ export default async function TocatoarePage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: ldSafe(itemList) }}
       />
-      <TocatoareContent locale={locale} products={products} />
+      <TocatoareContent locale={locale} products={products} outOfStockIds={outOfStockIds} />
     </>
   );
 }

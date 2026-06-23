@@ -3,7 +3,8 @@ import { Plus } from 'lucide-react';
 
 import { requireAdminOrNotFound } from '@/lib/auth/require-admin';
 import { fetchAllProducts } from '@/lib/admin/products';
-import ProductTable from '@/components/admin/ProductTable';
+import { fetchInventoryMap } from '@/lib/admin/inventory';
+import ProductTable, { type StockCell } from '@/components/admin/ProductTable';
 
 // /admin/produse — catalog list. Shows ALL statuses (the public /tocatoare only
 // shows 'active'). SECURITY: gate at the page top before any data fetch/JSX.
@@ -13,6 +14,15 @@ export const dynamic = 'force-dynamic';
 export default async function AdminProductsPage() {
   await requireAdminOrNotFound();
   const products = await fetchAllProducts();
+
+  const inv = await fetchInventoryMap(products.map((p) => p.id));
+  const stock: Record<string, StockCell> = {};
+  for (const p of products) {
+    const s = inv.get(p.id);
+    stock[p.id] = s
+      ? { available: s.available, low: s.available <= s.lowThreshold, hasRow: true }
+      : { available: 0, low: false, hasRow: false };
+  }
 
   const activeCount = products.filter((p) => p.status === 'active').length;
 
@@ -52,7 +62,7 @@ export default async function AdminProductsPage() {
         </Link>
       </div>
 
-      <ProductTable products={products} />
+      <ProductTable products={products} stock={stock} />
     </div>
   );
 }

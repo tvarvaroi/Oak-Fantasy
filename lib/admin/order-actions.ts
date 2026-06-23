@@ -28,6 +28,10 @@ const RESERVED_STATUSES = new Set<OrderStatus>([
   'packed',
 ]);
 
+// Entering one of these from a still-reserved state = the item physically leaves
+// stock → fulfill_stock (Task 4.1 D3, uniform for card + ramburs).
+const FULFILL_TARGETS = new Set<OrderStatus>(['shipped', 'delivered']);
+
 // Maps a target status to the timestamp column it should stamp (D2).
 const STATUS_TIMESTAMP: Partial<Record<OrderStatus, string>> = {
   shipped: 'shipped_at',
@@ -65,20 +69,29 @@ export async function updateOrderStatus(
   // A refund implies the money went back (D5).
   if (newStatus === 'refunded') update.payment_status = 'refunded';
 
-  // D7: release reserved stock on cancellation (only from a pre-shipment state).
-  if (newStatus === 'cancelled' && RESERVED_STATUSES.has(fromStatus)) {
+  // Stock side-effects on transition. Both run only from a pre-shipment reserved
+  // state, so they can't double-apply (cancel→release once; ship/deliver→fulfill
+  // once). Stock fns aren't in the generated rpc types — cast.
+  let stockChanged = false;
+  const applyToItems = async (rpc: 'release_stock' | 'fulfill_stock') => {
     const { data: items } = await sb
       .from('order_items')
       .select('product_id, quantity')
       .eq('order_id', orderId);
     for (const it of items ?? []) {
-      // release_stock isn't in the generated rpc types — cast.
-      await sb.rpc('release_stock' as never, {
+      await sb.rpc(rpc as never, {
         p_product_id: it.product_id,
         p_qty: it.quantity,
         p_order_id: orderId,
       } as never);
     }
+    stockChanged = true;
+  };
+
+  if (newStatus === 'cancelled' && RESERVED_STATUSES.has(fromStatus)) {
+    await applyToItems('release_stock'); // D7
+  } else if (FULFILL_TARGETS.has(newStatus) && RESERVED_STATUSES.has(fromStatus)) {
+    await applyToItems('fulfill_stock'); // D3 (Task 4.1)
   }
 
   const { error: updErr } = await sb.from('orders').update(update).eq('id', orderId);
@@ -94,6 +107,11 @@ export async function updateOrderStatus(
 
   revalidatePath('/admin/comenzi');
   revalidatePath(`/admin/comenzi/${orderId}`);
+  if (stockChanged) {
+    // Availability changed → refresh the public catalog/detail (best-effort).
+    revalidatePath('/tocatoare');
+    revalidatePath('/admin/produse');
+  }
   return { ok: true };
 }
 

@@ -226,3 +226,27 @@ order-actions.ts, components/admin/{OrderStatusBadge,OrderStatusControl}, app/ad
 Stripe/ramburs→comandă→emailuri→admin management). Efecte stoc PARȚIALE: reserve la
 creare ✅, release la cancel/expired ✅, fulfill la shipped → Sprint 4 (curier). Pre-launch
 blockers: Stripe live keys, domeniu Resend, poze produs 1:1, date firmă (LEGAL_INFO env).
+
+## 2026-06-23 — Task 4.1: Stock management + out-of-stock visibility (SPRINT 4 start)
+
+**Pattern descoperit:** Vizibilitate stoc client FĂRĂ a expune numărul: `inventory` RLS =
+admin-only, deci catalogul anon nu-l poate citi. Soluție: `fetchStockMap(ids)` cu
+**client service-role SERVER-SIDE** în lib/db/products.ts (cheia nu e NEXT_PUBLIC → nu
+ajunge în bundle client; fișierul e importat doar de Server Components), derivă DOAR
+`inStock: boolean` și pasează booleanul la componentele client. **Fail-open:** map gol
+(fetch eșuat / lipsă cheie la build) → totul „în stoc" (nu ascunde catalogul). `quantity_available`
+= GENERATED STORED (total−reserved) → scade INSTANT la reserve, deci out-of-stock client
+e condus de reserve (deja wired); `fulfill` nu schimbă available (e doar acuratețe fizică).
+**fulfill_stock wired** în updateOrderStatus la shipped/delivered din stare rezervată (D3,
+lângă release la cancel) — nu se dublează (ambele doar din RESERVED_STATUSES). Ajustare
+manuală admin = funcție PL/pgSQL `adjust_stock(set absolut → delta intern → movement)`
+(regula backend: stoc prin funcții atomice FOR UPDATE). Oversell prevenit de reserve_stock
+atomic (FOR UPDATE + RAISE) — al 2-lea cumpărător al ultimului produs primește rollback.
+**Aplicat la:** migrația adjust_stock, lib/db/products.ts (fetchStockMap/fetchOutOfStockIds),
+lib/admin/inventory.ts + inventory-actions.ts, lib/admin/order-actions.ts (fulfill),
+ProductCard (overlay D5) + ProductInfo (badge + mesaj) + TocatoareCatalog/Content (thread
+outOfStockIds), admin ProductTable (coloană) + StockPanel + edit page (istoric).
+**De ce contează:** Numărul exact NU părăsește serverul niciodată (doar boolean). UI stoc =
+best-effort (ISR 60s + revalidatePath la ajustări/tranziții); guard real anti-oversell =
+reserve atomic la checkout. Hand-off founder: aplică migrația adjust_stock + regen types.
+JSON-LD detaliu acum InStock/OutOfStock (era PreOrder).

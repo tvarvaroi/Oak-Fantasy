@@ -40,7 +40,13 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-function ProductRow({ product }: { product: AdminProduct }) {
+export interface StockCell {
+  available: number;
+  low: boolean;
+  hasRow: boolean;
+}
+
+function ProductRow({ product, stock }: { product: AdminProduct; stock?: StockCell }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   // Optimistic local view of the on/off state; ON means status === 'active'.
@@ -100,6 +106,22 @@ function ProductRow({ product }: { product: AdminProduct }) {
         </span>
       </td>
       <td style={cellStyle}>
+        {!stock || !stock.hasRow ? (
+          <span className="font-lora" style={{ color: 'var(--ink-soft)', fontSize: '0.85rem' }}>—</span>
+        ) : (
+          <span
+            className="font-lora"
+            style={{
+              fontSize: '0.9rem',
+              fontWeight: stock.available <= 0 ? 700 : 400,
+              color: stock.available <= 0 ? '#9F2D20' : stock.low ? 'var(--copper)' : 'var(--ink)',
+            }}
+          >
+            {stock.available <= 0 ? 'Epuizat' : stock.available}
+          </span>
+        )}
+      </td>
+      <td style={cellStyle}>
         <StatusBadge status={product.status} />
       </td>
       <td style={cellStyle}>
@@ -129,7 +151,13 @@ function ProductRow({ product }: { product: AdminProduct }) {
   );
 }
 
-export default function ProductTable({ products }: { products: AdminProduct[] }) {
+export default function ProductTable({
+  products,
+  stock,
+}: {
+  products: AdminProduct[];
+  stock?: Record<string, StockCell>;
+}) {
   if (products.length === 0) {
     return (
       <p className="font-lora" style={{ color: 'var(--ink-soft)', padding: '32px 0' }}>
@@ -162,6 +190,9 @@ export default function ProductTable({ products }: { products: AdminProduct[] })
               Preț
             </th>
             <th className="label-caps" style={{ ...thStyle, color: 'var(--ink-soft)', fontSize: '0.58rem' }}>
+              Stoc
+            </th>
+            <th className="label-caps" style={{ ...thStyle, color: 'var(--ink-soft)', fontSize: '0.58rem' }}>
               Status
             </th>
             <th className="label-caps" style={{ ...thStyle, color: 'var(--ink-soft)', fontSize: '0.58rem' }}>
@@ -172,7 +203,7 @@ export default function ProductTable({ products }: { products: AdminProduct[] })
         </thead>
         <tbody>
           {products.map((p) => (
-            <ProductRow key={p.id} product={p} />
+            <ProductRow key={p.id} product={p} stock={stock?.[p.id]} />
           ))}
         </tbody>
       </table>

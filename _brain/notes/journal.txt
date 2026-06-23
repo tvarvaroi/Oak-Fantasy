@@ -1021,3 +1021,50 @@ verificat în Resend (emailuri reale clienți), poze produs 1:1 ≥1500px, date 
 reale în LEGAL_INFO (env NEXT_PUBLIC_COMPANY_*), Supabase Pro (no auto-pause).
 
 NEXT: Sprint 4 — Ramburs avansat + curieri (Sameday/FAN API) + fulfill_stock la shipped.
+
+═══════════════════════════════════════════════════════════════════
+2026-06-23 — TASK 4.1 — Stock management + out-of-stock visibility [LIVRAT]
+SPRINT 4 START
+═══════════════════════════════════════════════════════════════════
+Decizii aprobate: D1 coloană listă + panou pe edit (fără /admin/stoc) · D2 stock_movements
+există (fără migrație) · D3 fulfill la shipped/delivered din stare rezervată · D4 istoric pe
+edit · D5 overlay rgba(31,24,16,0.55) + Caudex uppercase · D6 set absolut via adjust_stock,
+motiv opțional, guard ≥reserved & ≥0 · D7 out-of-stock vizibil cu overlay · D8 reserve doar
+la comandă (fără lucru nou).
+
+Audit cheie: inventory.quantity_available = GENERATED STORED; stock_movements complet
+(restock/adjustment/order_*/damaged/return); funcțiile reserve/release/fulfill există;
+fulfill_stock NU era wired nicăieri; RLS inventory/stock_movements = admin only.
+
+Livrat:
+- supabase/migrations/20260623120000_adjust_stock.sql — funcție PL/pgSQL atomică (set
+  absolut total → delta → movement restock/adjustment; FOR UPDATE; guards ≥0 & ≥reserved).
+- lib/db/products.ts — fetchStockMap (service-role server-side, Map<id,available>) +
+  fetchOutOfStockIds (fail-open). Numărul NU părăsește serverul (doar boolean la client).
+- lib/admin/inventory.ts (fetchInventory/fetchInventoryMap/fetchStockMovements + labels) +
+  inventory-actions.ts (adjustStock → rpc adjust_stock + revalidate catalog/detail/admin).
+- lib/admin/order-actions.ts — fulfill_stock la shipped/delivered (D3) lângă release la cancel;
+  revalidate /tocatoare când stocul se schimbă.
+- Client: ProductCard overlay out-of-stock + quick-add gri ne-clicabil (card rămâne clickabil);
+  ProductInfo badge În stoc/Stoc epuizat + ascunde add-to-cart + mesaj când epuizat;
+  TocatoareContent/Catalog thread outOfStockIds. Bilingv (content maps tocatoare + product).
+- Admin: coloană Stoc în /admin/produse (Epuizat roșu / low copper / normal) + StockPanel pe
+  pagina edit (total/reservat/disponibil + ajustare set absolut) + istoric mișcări (tabel server).
+- JSON-LD detaliu: availability InStock/OutOfStock (era PreOrder).
+
+Quality gates: typecheck ✅ · lint ✅ · check:i18n ✅ (14 maps, doar warnings admin
+pre-existente) · build ✅ exit 0 (warning about.module.css pre-existent benign).
+
+Model stoc complet acum: reserve la creare → release la cancel/expire → fulfill la
+shipped/delivered. Oversell prevenit de reserve_stock atomic (FOR UPDATE).
+
+HAND-OFF FOUNDER:
+1. Aplică migrația 20260623120000_adjust_stock.sql pe Supabase live.
+2. Regen types: npx supabase gen types typescript --linked > types/supabase.ts
+   (adjust_stock intră în types; castul rămâne valid).
+3. Asigură SUPABASE_SERVICE_ROLE_KEY setat pe Vercel (deja necesar din Sprint 2) — fără el,
+   catalogul face fail-open (totul „în stoc"); cu el, out-of-stock real.
+4. Smoke: setează stoc 0 la un produs → overlay în catalog + „Stoc epuizat" pe detaliu +
+   buton ascuns; comandă → available scade; shipped → fulfill (total scade); istoric mișcări.
+
+NEXT: Sprint 4 continuă — curieri (Sameday/FAN API) + AWB + tracking; ramburs avansat.

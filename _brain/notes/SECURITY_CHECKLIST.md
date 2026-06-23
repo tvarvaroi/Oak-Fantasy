@@ -3,7 +3,7 @@
 > **Document scop:** Audit complet de securitate înainte de lansare publică  
 > **Status:** Living document, actualizat la fiecare sprint  
 > **Owner:** Theodor + Claude Code (auto-update după task-uri sensibile)  
-> **Ultima actualizare:** 2026-06-23 (Task 3.6 — admin orders management, SPRINT 3 CLOSED. Zero env/secret nou. Server actions order via getServerSupabase (RLS „Admin full access orders", least privilege — NU service role); gate la nivel de pagină (requireAdminOrNotFound) pe ambele rute /admin/comenzi[/[id]]; fetchOrderDetail UUID-guard. Audit complet în order_status_history (changed_by). PRE-LAUNCH BLOCKERS rămase: §1.4 Stripe LIVE keys (acum TEST), §1.1 domeniu oakfantasy.ro în Resend, poze produs 1:1, date firmă LEGAL_INFO env, Supabase Pro no-auto-pause.)
+> **Ultima actualizare:** 2026-06-23 (Task 4.1 — stock management + out-of-stock visibility, SPRINT 4 start. Zero secret nou. ATENȚIE NOUĂ: `SUPABASE_SERVICE_ROLE_KEY` folosit acum și în `lib/db/products.ts` (fetchStockMap) pentru a citi `inventory` (RLS admin-only) — STRICT server-side (fișier importat doar de Server Components; cheia NU e NEXT_PUBLIC → nu intră în bundle client). Clientul primește DOAR boolean inStock, niciodată numărul exact. adjust_stock = funcție PL/pgSQL SECURITY DEFINER apelată din action care re-aserează admin. PRE-LAUNCH BLOCKERS rămase: Stripe LIVE keys, domeniu oakfantasy.ro în Resend, poze produs 1:1, date firmă LEGAL_INFO env, Supabase Pro no-auto-pause.)
 
 ---
 

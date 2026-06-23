@@ -13,7 +13,15 @@ function formatWeight(kg: number, locale: Locale): string {
   return `${n} kg`;
 }
 
-export default function ProductInfo({ product, locale }: { product: CatalogProduct; locale: Locale }) {
+export default function ProductInfo({
+  product,
+  locale,
+  inStock,
+}: {
+  product: CatalogProduct;
+  locale: Locale;
+  inStock: boolean;
+}) {
   const c = PRODUCT_DETAIL_CONTENT[locale];
   const name = locale === 'ro' ? product.name_ro : product.name_en;
   const shortDesc = locale === 'ro' ? product.short_description_ro : product.short_description_en;
@@ -118,19 +126,54 @@ export default function ProductInfo({ product, locale }: { product: CatalogProdu
         </div>
       ) : null}
 
-      <AddToCartPanel
-        locale={locale}
-        product={{
-          productId: product.id,
-          slug: product.slug,
-          name_ro: product.name_ro,
-          name_en: product.name_en,
-          priceRon: product.price_ron,
-          heroImageUrl: product.hero_image_url,
-          hasEngraving: product.has_engraving_option,
-          engravingPriceRon: product.engraving_price_ron,
-        }}
-      />
+      {/* Stock status (Task 4.1) — binary only, never the exact count. */}
+      <div className="flex items-center gap-2">
+        <span
+          aria-hidden
+          style={{
+            width: 8,
+            height: 8,
+            borderRadius: 999,
+            backgroundColor: inStock ? 'var(--forest-mid)' : '#9F2D20',
+            display: 'inline-block',
+          }}
+        />
+        <span
+          className="label-caps"
+          style={{ color: inStock ? 'var(--forest-deep)' : '#9F2D20', fontSize: '0.62rem' }}
+        >
+          {inStock ? c.inStock : c.outOfStock}
+        </span>
+      </div>
+
+      {inStock ? (
+        <AddToCartPanel
+          locale={locale}
+          product={{
+            productId: product.id,
+            slug: product.slug,
+            name_ro: product.name_ro,
+            name_en: product.name_en,
+            priceRon: product.price_ron,
+            heroImageUrl: product.hero_image_url,
+            hasEngraving: product.has_engraving_option,
+            engravingPriceRon: product.engraving_price_ron,
+          }}
+        />
+      ) : (
+        <div
+          style={{
+            backgroundColor: 'var(--paper-aged)',
+            border: '1px solid rgba(159,45,32,0.25)',
+            borderRadius: 10,
+            padding: '16px 18px',
+          }}
+        >
+          <p className="font-lora" style={{ color: 'var(--ink)', fontSize: '0.95rem', lineHeight: 1.6 }}>
+            {c.outOfStockNote}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

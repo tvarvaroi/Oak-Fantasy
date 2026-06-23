@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { isLocale, localizedPath, LOCALES, type Locale } from '@/lib/i18n-routes';
-import { fetchProductBySlug, fetchActiveProducts } from '@/lib/db/products';
+import { fetchProductBySlug, fetchActiveProducts, fetchStockMap } from '@/lib/db/products';
 import { PRODUCT_DETAIL_CONTENT } from '@/components/product/content';
 import ProductDetailContent from '@/components/product/ProductDetailContent';
 import ProductGallery from '@/components/product/ProductGallery';
@@ -76,6 +76,10 @@ export default async function ProductPage({ params }: PageProps) {
   const product = await fetchProductBySlug(params.slug);
   if (!product) notFound();
 
+  // Stock (boolean only). Fail-open: empty map (fetch failed) → treat as in stock.
+  const stock = await fetchStockMap([product.id]);
+  const inStock = stock.size === 0 ? true : (stock.get(product.id) ?? 0) > 0;
+
   const c = PRODUCT_DETAIL_CONTENT[locale];
   const name = locale === 'ro' ? product.name_ro : product.name_en;
   const shortDesc = locale === 'ro' ? product.short_description_ro : product.short_description_en;
@@ -102,7 +106,7 @@ export default async function ProductPage({ params }: PageProps) {
       '@type': 'Offer',
       priceCurrency: 'RON',
       price: (product.price_ron / 100).toString(),
-      availability: 'https://schema.org/PreOrder',
+      availability: inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
       url: canonicalUrl,
     },
   };
@@ -134,7 +138,7 @@ export default async function ProductPage({ params }: PageProps) {
             thumbAria={c.galleryThumbAria}
           />
         }
-        info={<ProductInfo product={product} locale={locale} />}
+        info={<ProductInfo product={product} locale={locale} inStock={inStock} />}
       />
     </>
   );
