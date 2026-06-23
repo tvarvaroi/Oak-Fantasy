@@ -830,3 +830,24 @@ SpeedInsights (`document.head.querySelector(script[src*=...])`) previne dubla
 - Tehnică de debug: capturează `page.on('pageerror')` din prod build (minified
   #418 + link) SAU din dev (mesaj complet); stack-ul `tryToClaim...SuspenseInstance`
   = mismatch la o graniță Suspense; „#document" = problema e la rădăcină, nu adânc.
+
+## 2026-06-23 — Poza produs pe /admin dar nu pe /tocatoare: ProductCard ignora hero_image_url
+
+**Simptom:** produs cu hero_image_url → poza apare în /admin/produse (ProductTable),
+dar /tocatoare public arată placeholder SVG.
+
+**Root cause (cod, nu fetch):** `fetchActiveProducts` face `select('*')` → datele
+includ hero_image_url. ProductTable (admin) îl randa cu next/image; dar
+ProductCard (public) avea HARDCODAT `<img src="/3D_Cutting_Board_Model_Design.svg">`
+(placeholder din 2026-05-29, când nu existau poze) și nu citea deloc hero_image_url.
+
+**Fix:** ProductCard randează condiționat — `product.hero_image_url` prezent →
+`<Image fill>` full-bleed în `.medallion` (clasă `.medallionPhoto { object-fit: cover }`)
++ ascunde badge-ul „Foto în pregătire"; null → placeholder SVG ca înainte.
+Verificat: /tocatoare prod build → produsul cu poză afișează /_next/image (loaded),
+restul placeholder; hydration 0.
+
+**Lecție:** când un component „placeholder-only" preia date noi (poze încărcate),
+verifică DACĂ le citește — placeholder-ul hardcodat maschează datele reale. Compară
+mereu componentul care merge (admin) cu cel care nu (public): aici diferența era
+că public nu folosea câmpul deloc, nu un fetch/mapare greșit.

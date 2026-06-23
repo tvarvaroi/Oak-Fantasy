@@ -257,6 +257,10 @@
   background: var(--cream-warm);
   object-fit: cover;
 }
+/* Real product photo: full-bleed in the square medallion (next/image fill). */
+.medallionPhoto {
+  object-fit: cover;
+}
 .photoBadge {
   position: absolute;
   top: 14px;

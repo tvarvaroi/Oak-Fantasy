@@ -659,3 +659,17 @@ Root cause: <SpeedInsights/> (v2.0.0 = <Suspense> intern) randat ca frate al <ht
 în app/layout.tsx → Suspense boundary nehidratabil la rădăcină. Fix: mutat în <body>
 în [locale]/layout.tsx; root layout = passthrough. Verificat clean pe 7 pagini.
 NELEGAT de Task 2.4/produse — regresie de la bump speed-insights. Vezi gotcha 2026-06-23.
+
+--- 2026-06-23 (later) — Verificare "#418 persistă pe prod" → NU persistă ---
+Founder a raportat #418 încă pe producție după fix SpeedInsights (47b1424).
+Re-investigație (systematic-debugging, metodologia validată):
+- Local prod build (npm run build && start): CLEAN pe 7 pagini, normal + reduced-motion.
+- Niciun service worker, niciun @vercel/analytics mis-plasat în cod.
+- Găsit URL prod live: oak-fantasy.vercel.app. Playwright pageerror DIRECT pe prod:
+  /ro, /en, /tocatoare(ro+en), /atelier, /despre, /contact, /termeni, /admin/login,
+  + reduced-motion → TOATE clean, zero #418/#423.
+- Dev mode (după fix): și el clean.
+Concluzie: fix-ul SpeedInsights era COMPLET. Raportul founder = cache/propagare
+la momentul testului (hard refresh golește browser cache, nu edge/SW cache).
+Tip: pentru a confirma prod real, testează direct cu Playwright pageerror pe
+oak-fantasy.vercel.app, nu doar în browserul personal (poate avea cache/extensii).

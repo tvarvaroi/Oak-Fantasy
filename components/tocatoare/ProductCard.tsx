@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import styles from './tocatoare.module.css';
 import { formatPriceRon, formatDimensions } from './content';
@@ -35,18 +36,33 @@ export default function ProductCard({ product, content, locale }: ProductCardPro
       data-slug={product.slug}
     >
       <div className={styles.medallion}>
-        <span className={styles.photoBadge}>{content.card.photoBadge}</span>
-        {/* Decorative placeholder until the product photo shoot ships;
-            see HANDOFF.md "Logo / product placeholders". 2026-05-29: swapped
-            from the WhatsApp JPEG (green ring + raster pixelation) to the
-            clean SVG stencil used in Navbar + Footer — brand consistency. */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/3D_Cutting_Board_Model_Design.svg"
-          alt=""
-          className={styles.medallionLogo}
-          aria-hidden
-        />
+        {product.hero_image_url ? (
+          // Real product photo (uploaded via /admin/produse to Supabase
+          // Storage). Fills the square medallion; the "Foto în pregătire" badge
+          // is hidden since the photo is here.
+          <Image
+            src={product.hero_image_url}
+            alt={name}
+            fill
+            sizes="(max-width: 600px) 100vw, (max-width: 1024px) 50vw, 360px"
+            className={styles.medallionPhoto}
+          />
+        ) : (
+          <>
+            <span className={styles.photoBadge}>{content.card.photoBadge}</span>
+            {/* Decorative placeholder until a product photo is uploaded;
+                see HANDOFF.md "Logo / product placeholders". 2026-05-29: swapped
+                from the WhatsApp JPEG (green ring + raster pixelation) to the
+                clean SVG stencil used in Navbar + Footer — brand consistency. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/3D_Cutting_Board_Model_Design.svg"
+              alt=""
+              className={styles.medallionLogo}
+              aria-hidden
+            />
+          </>
+        )}
       </div>
       <div className={styles.cardBody}>
         <div className={styles.tierRow}>

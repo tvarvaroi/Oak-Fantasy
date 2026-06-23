@@ -90,3 +90,16 @@
 **Aplicat la:** `components/atelier/atelier.module.css` (hero + 7 sections cu `clamp()` paddings, `.toolsFeature` media queries fix cu `:nth-child(n)` pentru full-width mobile, breakpoint `.procWrap/.condHead/.condGrid` 900→640px pentru tablet 2-col, aggregate `@media (max-width: 640px)` cu gutter universal 24px + place margin reset + day tight padding), `components/Navbar.tsx` (hamburger `p-3 min-w-[44px] min-h-[44px]`, mobile menu links `py-3 min-h-[44px] flex items-center` ambele ramuri route+anchor), `tests/e2e/visual-regression.spec.ts` (adăugat `/ro/tocatoare` + `/en/cutting-boards` la PAGES → 24 total baselines = 8 pagini × 3 viewports). 24/24 baselines regenerate clean.
 
 **De ce contează:** (1) **Specificity bug fix transferabil**: orice CSS module cu rule `.x > *` în desktop + media query `.x > *` mobile — verifică dacă există rule-uri `.x > :nth-child(N)` care le ucid pe ambele. Aplicabil la oricare grid asymmetric din viitor. (2) **Touch target 44px = WCAG 2.5.5 mandatory**: hamburger + mobile menu links erau fail; fix cu min-h/min-w + flex items-center păstrează visual fără to bloat. Pattern: orice button/link interactiv pe mobile = 44×44 min. (3) **Aggregate mobile block = readability**: în loc de @media imprăștiate în CSS module, un singur bloc final cu toate overrides mobile = mai uşor de citit + de modificat. (4) **Iron Law gotcha port 3000 stale**: dev server vechi pe 3000 (de la sesiuni Bolt/anterior) confuza Playwright (`reuseExistingServer: true`) → 60+ teste eșuau cu HTML broken. Pattern viitor: înainte de `npm run verify`, check `netstat -ano | grep ":3000"` — dacă există PID nefamiliar, kill înainte de verify. Auto-mode blochează `taskkill /F` pe PID-uri nedeţinute (rezonabil) — necesită input founder. (5) **QA false negative pattern repetat**: a doua rundă QA a confirmat fix-uri cu hard refresh + 1.5s wait. Pattern QA: orice schimbare client-side (React state, CSS class swap), pentru verificare specifică = inspectează SSR HTML cu curl/node ÎNAINTE de QA browser screenshot. SSR HTML e ground truth pentru initial paint.
+
+## 2026-06-22 — Task 2.4: Admin shell + /admin/produse CRUD
+
+**Pattern descoperit:** Primele server actions din proiect (lib/admin/product-actions.ts).
+Pattern: `'use server'` → requireAdminOrNotFound() → Zod safeParse(input) →
+getServerSupabase() (RLS is_admin, NU service role) → revalidatePath. Client
+ProductForm trimite valorile RHF; action-ul re-validează (nu se încrede în client).
+Money: RON în UI → ×100 bani la salvare. Toggle binar ON=active/OFF=archived (soft-delete).
+**Aplicat la:** components/admin/{AdminShell,AdminSidebar,ProductForm,ProductTable,ImageUpload},
+app/admin/(protected)/produse/**, lib/schemas/product.ts, lib/admin/*, migrația Storage.
+**De ce contează:** Template pentru toate uneltele admin viitoare (subscribers, comenzi).
+Gate la nivel de PAGINĂ + layout (RSC-leak lesson). zodResolver + .transform() necesită
+cast `as Resolver<Input,unknown,Output>`. check:i18n respinge cedilla ş/ţ chiar în cod.
