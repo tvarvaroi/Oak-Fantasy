@@ -175,17 +175,17 @@ export default function WaitlistSection({ language }: { language: 'ro' | 'en' })
 
   const copy = {
     ro: {
-      eyebrow: 'Lista de așteptare',
-      headline: 'Înscrie-te pe listă.',
-      sub: 'Lansăm în octombrie. Primii pe listă primesc 15% reducere și ghidul nostru de îngrijire a lemnului — gratuit.',
+      eyebrow: 'Vești din atelier',
+      headline: 'Rămâi aproape.',
+      sub: 'Abonează-te și primești ghidul nostru de îngrijire a lemnului — gratuit. Plus vești din atelier, doar când avem ceva de spus.',
       formLabel: 'Adresa ta de email',
       social: 'Alături de 1.200+ oameni care iubesc lucrurile făcute cu mâna.',
       privacy: 'Nu trimitem spam. Niciodată.',
     },
     en: {
-      eyebrow: 'Waitlist',
-      headline: 'Join the list.',
-      sub: 'Launching in October. First on the list get 15% off and our wood care guide — free.',
+      eyebrow: 'Workshop news',
+      headline: 'Stay close.',
+      sub: 'Sign up and get our wood care guide — free. Plus workshop news, only when we have something to say.',
       formLabel: 'Your email address',
       social: 'Joined by 1,200+ people who love handmade things.',
       privacy: "We don't send spam. Ever.",

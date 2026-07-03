@@ -84,7 +84,6 @@ export default function Navbar({
   const links = language === 'ro' ? NAV_LINKS_RO : NAV_LINKS_EN;
   const homePath = `/${language}`;
   const onHomepage = pathname === homePath || pathname === '/';
-  const waitlistHref = `${homePath}#waitlist`;
 
   // FIX 1 (2026-05-28): Navbar text adapts to cream when transparent over a
   // dark hero (currently only /atelier). Once scrolled past 100px the Navbar
@@ -300,10 +299,10 @@ export default function Navbar({
             </form>
           )}
 
-          {/* CTA */}
+          {/* CTA — routes to the live catalog (store sells now; the old
+              Pre-comandă → #waitlist anchor predated checkout). */}
           <Link
-            href={waitlistHref}
-            onClick={(e) => handleAnchorClick(e, '#waitlist')}
+            href={localizedPath('tocatoare', language)}
             className="hidden md:inline-flex items-center px-5 py-2.5 text-sm font-caudex transition-all duration-200 hover:opacity-90 active:scale-95"
             style={{
               backgroundColor: 'var(--oak-warm)',
@@ -314,7 +313,7 @@ export default function Navbar({
               letterSpacing: '0.04em',
             }}
           >
-            {language === 'ro' ? 'Pre-comandă' : 'Pre-order'}
+            {language === 'ro' ? 'Cumpără' : 'Shop'}
           </Link>
 
           {/* Mobile hamburger — FIX 2 (D4): 44px+ touch target (WCAG 2.5.5). */}
@@ -368,8 +367,8 @@ export default function Navbar({
             );
           })}
           <Link
-            href={waitlistHref}
-            onClick={(e) => handleAnchorClick(e, '#waitlist')}
+            href={localizedPath('tocatoare', language)}
+            onClick={() => setMenuOpen(false)}
             className="mt-2 text-center py-3 font-caudex text-sm"
             style={{
               backgroundColor: 'var(--oak-warm)',
@@ -379,7 +378,7 @@ export default function Navbar({
               letterSpacing: '0.04em',
             }}
           >
-            {language === 'ro' ? 'Pre-comandă' : 'Pre-order'}
+            {language === 'ro' ? 'Cumpără' : 'Shop'}
           </Link>
           {authed && (
             <form action="/auth/signout" method="post" className="mt-1">

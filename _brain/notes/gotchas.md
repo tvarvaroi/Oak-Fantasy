@@ -726,6 +726,39 @@ cast punctual: `(update as Record<string, unknown>)[tsCol] = ...`.
 pleacă de la tipul Insert/Update generat, nu de la `Record`. Cast doar cheia dinamică.
 **Fișiere:** `lib/admin/order-actions.ts`.
 
+## 2026-06-23 — Vercel build eșuat: commit PARȚIAL (nu bug de cod) + warning line-clamp
+
+**Două „erori" raportate de la build-ul Vercel după Task 4.1. Cauze DIFERITE.**
+
+**Eroarea 2 — `Property 'outOfStockIds' does not exist on type Props` (page.tsx:125):**
+**Cauză reală:** NU bug de cod — **commit parțial**. `git status` arăta 4 fișiere Task 4.1
+necomise (product/content.ts, TocatoareCatalog.tsx, TocatoareContent.tsx, tocatoare/content.ts)
+în timp ce consumatorii lor (page.tsx, ProductCard, ProductInfo) erau DEJA comiși. Vercel a
+compilat tree-ul comis (consumatori noi + content/Props vechi) → type errors. `git show
+HEAD:...TocatoareContent.tsx | grep outOfStockIds` → absent = dovada.
+**De ce build-ul local „a trecut":** working tree-ul era COMPLET (toate fișierele salvate),
+deci `npm run build` local (chiar și clean cu .next șters) trece — clean build NU prinde un
+commit parțial, pentru că lucrează pe working tree, nu pe HEAD.
+**Fix:** comite TOATE fișierele modificate. Verificare reală pre-push = `git status` curat +
+(ideal) build dintr-un checkout curat al commit-ului, nu doar din working tree.
+**Lecție:** după orice task multi-fișier, `git status` ÎNAINTE de a te baza pe Vercel.
+Un type error pe Vercel care „nu se reproduce local" = suspectează commit parțial întâi.
+
+**Eroarea 1 — `Module not found: Can't resolve '@tailwindcss/line-clamp' in
+node_modules/tailwindcss/lib/util`:**
+**Cauză reală:** PRE-EXISTENTĂ, internă tailwindcss 3.3.3. `lib/util/validateConfig.js:27`
+face `require("@tailwindcss/line-clamp")` (în try/catch) ca să avertizeze dacă plugin-ul
+acum-built-in mai e în config. La runtime catch-ul îl înghite, dar **webpack analizează
+static require-ul** și nu-l poate rezolva (plugin neinstalat — line-clamp e core din TW 3.3)
+→ warning „Module not found". Exit 0 local (warning), dar CI strict îl poate trata fatal.
+NU vine din cod app (zero import runtime de tailwindcss; doar `import type` în config).
+**Fix:** alias webpack în next.config.js → `config.resolve.alias['@tailwindcss/line-clamp']
+= false` (webpack rezolvă la modul gol; try/catch-ul rămâne corect). Verificat: warning-ul
+dispare la clean build.
+**Lecție:** pentru un require opțional (try/catch) dintr-o dependență pe care webpack nu-l
+poate tree-shake-ui → `resolve.alias[mod] = false`, nu instala pachetul deprecat.
+**Fișiere:** `next.config.js` (alias), cauza în `node_modules/tailwindcss/lib/util/validateConfig.js`.
+
 ## SECURITY_CHECKLIST.md maintenance protocol
 
 Document: `_brain/notes/SECURITY_CHECKLIST.md` (living document)

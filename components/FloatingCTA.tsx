@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { localizedPath } from '@/lib/i18n-routes';
 
 export default function FloatingCTA({ language }: { language: 'ro' | 'en' }) {
   const [visible, setVisible] = useState(false);
@@ -17,10 +19,8 @@ export default function FloatingCTA({ language }: { language: 'ro' | 'en' }) {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  // Routes to the live catalog (store sells now; the old scroll-to-waitlist
+  // behaviour predated checkout — SEO audit fix #3).
 
   return (
     <AnimatePresence>
@@ -38,9 +38,8 @@ export default function FloatingCTA({ language }: { language: 'ro' | 'en' }) {
             mass: 0.9,
           }}
         >
-          <a
-            href="#waitlist"
-            onClick={handleClick}
+          <Link
+            href={localizedPath('tocatoare', language)}
             className="flex items-center gap-2 font-caudex text-sm"
             style={{
               backgroundColor: 'var(--oak-warm)',
@@ -71,8 +70,8 @@ export default function FloatingCTA({ language }: { language: 'ro' | 'en' }) {
               }}
               aria-hidden
             />
-            {language === 'ro' ? 'Pre-comandă' : 'Pre-order'}
-          </a>
+            {language === 'ro' ? 'Vezi tocătoarele' : 'See the boards'}
+          </Link>
         </motion.div>
       )}
     </AnimatePresence>

@@ -2,9 +2,10 @@
 
 import { useEffect, useRef } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { motion, useReducedMotion } from 'framer-motion';
-import EmailForm from './EmailForm';
+import { localizedPath } from '@/lib/i18n-routes';
 
 const CuttingBoard3D = dynamic(() => import('./CuttingBoard3D'), {
   ssr: false,
@@ -227,12 +228,13 @@ export default function Hero({ language }: HeroProps) {
     subhead: language === 'ro'
       ? 'Din lemn de stejar românesc, tăiat și finisat unul câte unul în atelierul nostru. Genul de obiect din bucătărie care nu se aruncă — se moștenește.'
       : 'From Romanian oak, cut and finished one by one in our workshop. The kind of kitchen object that isn\'t thrown away — it\'s inherited.',
-    label: language === 'ro'
-      ? 'Lansăm în octombrie. Înscrie-te și primești 15% reducere + ghidul de îngrijire.'
-      : 'Launching in October. Sign up and get 15% off + the care guide.',
-    social: language === 'ro'
-      ? 'Deja 1,200+ pe listă · Nu trimitem spam, doar lucruri faine.'
-      : 'Already 1,200+ on the list · No spam, just good things.',
+    // Live-shop CTA (SEO audit fix #3 — the store sells now; the waitlist copy
+    // predated checkout). Newsletter capture stays in WaitlistSection below.
+    cta: language === 'ro' ? 'Descoperă colecția' : 'Browse the collection',
+    ctaNote:
+      language === 'ro'
+        ? 'Lucrate manual, în stoc limitat — fiecare piesă e unică.'
+        : 'Handmade in small batches — every piece is one of a kind.',
     tagline: 'Făcut cu drag în România.',
     tagline_en: 'Made with love in Romania.',
   };
@@ -334,20 +336,37 @@ export default function Hero({ language }: HeroProps) {
               {copy.subhead}
             </motion.p>
 
-            {/* Email form */}
-            <motion.div {...fadeUp(1.2)} className="flex flex-col gap-2 max-w-lg">
+            {/* Primary CTA → catalog (store is live) */}
+            <motion.div {...fadeUp(1.2)} className="flex flex-col gap-3 max-w-lg">
+              <Link
+                href={localizedPath('tocatoare', language)}
+                className="font-caudex inline-flex items-center gap-2.5 w-fit transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
+                style={{
+                  backgroundColor: 'var(--oak-warm)',
+                  color: 'var(--cream-warm)',
+                  borderRadius: 8,
+                  letterSpacing: '0.04em',
+                  padding: '16px 36px',
+                  fontSize: '1.02rem',
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12), 0 2px 8px rgba(31,24,16,0.22)',
+                }}
+              >
+                {copy.cta}
+                <svg width="16" height="11" viewBox="0 0 16 11" fill="none" aria-hidden>
+                  <path
+                    d="M1 5.5h14M10.5 1l4.5 4.5-4.5 4.5"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </Link>
               <p
                 className="font-lora text-sm"
-                style={{ color: 'var(--ink-soft)', fontFamily: 'var(--font-lora)' }}
+                style={{ color: 'var(--ink-soft)', fontFamily: 'var(--font-lora)', opacity: 0.85 }}
               >
-                {copy.label}
-              </p>
-              <EmailForm source="hero" language={language} />
-              <p
-                className="font-lora text-xs mt-1"
-                style={{ color: 'var(--ink-soft)', fontFamily: 'var(--font-lora)', opacity: 0.75 }}
-              >
-                {copy.social}
+                {copy.ctaNote}
               </p>
             </motion.div>
           </div>

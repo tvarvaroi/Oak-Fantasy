@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { Caudex, Caveat, Lora } from 'next/font/google';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import PageTransition from '@/components/PageTransition';
+import { isLocale, type Locale } from '@/lib/i18n-routes';
+import { LEGAL_INFO } from '@/lib/legal-info';
 import '../globals.css';
 
 const caudex = Caudex({
@@ -25,16 +28,79 @@ const lora = Lora({
   display: 'swap',
 });
 
-type Locale = 'ro' | 'en';
+const SITE_URL = 'https://oakfantasy.ro';
+
+// Sitewide entity graph (SEO audit fix #4). Organization + WebSite with stable
+// @id anchors — subpages (despre/atelier/contact/termeni) reference these ids
+// instead of re-declaring disconnected copies. sameAs is intentionally OMITTED
+// until real social profiles exist (a generic instagram.com link would be a
+// placeholder entity signal — worse than none).
+function entityGraph(locale: Locale) {
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': `${SITE_URL}/#organization`,
+        name: 'Oak Fantasy',
+        url: SITE_URL,
+        logo: `${SITE_URL}/3D_Cutting_Board_Model_Design.svg`,
+        description:
+          locale === 'en'
+            ? 'A small Romanian workshop hand-crafting oak cutting boards from Carpathian oak.'
+            : 'Atelier românesc mic care lucrează manual tocătoare din stejar din Carpați.',
+        foundingDate: '2026',
+        email: LEGAL_INFO.contactEmail,
+        // Placeholder-aware (audit fix #11): the street address joins the
+        // schema automatically once NEXT_PUBLIC_WORKSHOP_ADDRESS is real —
+        // never emit a "[ADRESA_ATELIER]" token to crawlers.
+        address: {
+          '@type': 'PostalAddress',
+          ...(LEGAL_INFO.workshopAddress.startsWith('[')
+            ? {}
+            : { streetAddress: LEGAL_INFO.workshopAddress }),
+          addressCountry: 'RO',
+          addressRegion: 'Transilvania',
+        },
+      },
+      {
+        '@type': 'WebSite',
+        '@id': `${SITE_URL}/#website`,
+        url: SITE_URL,
+        name: 'Oak Fantasy',
+        inLanguage: ['ro', 'en'],
+        publisher: { '@id': `${SITE_URL}/#organization` },
+      },
+    ],
+  };
+}
+
+// Escape `<` so embedded JSON-LD can't break out of <script>.
+function ldSafe(json: unknown): string {
+  return JSON.stringify(json).replace(/</g, '\\u003c');
+}
 
 export async function generateMetadata({
   params,
 }: {
-  params: { locale: Locale };
+  params: { locale: string };
 }): Promise<Metadata> {
-  const { locale } = params;
+  if (!isLocale(params.locale)) return {};
+  const locale: Locale = params.locale;
+
+  // Homepage canonical + hreflang (SEO audit fix #4) — every inner page already
+  // declares these; the homepage was the only URL without them.
+  const shared = {
+    metadataBase: new URL(SITE_URL),
+    alternates: {
+      canonical: `/${locale}`,
+      languages: { ro: '/ro', en: '/en', 'x-default': '/ro' },
+    },
+  };
+
   if (locale === 'en') {
     return {
+      ...shared,
       title: 'Oak Fantasy — Romanian Oak Cutting Boards',
       description: 'Handcrafted cutting boards from Carpathian oak. Made with love in Romania.',
       openGraph: {
@@ -45,6 +111,7 @@ export async function generateMetadata({
     };
   }
   return {
+    ...shared,
     title: 'Oak Fantasy — Tocătoare din stejar românesc',
     description: 'Tocătoare lucrate manual din stejar din Carpați. Făcut cu drag în România.',
     openGraph: {
@@ -64,14 +131,25 @@ export default function LocaleLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: { locale: Locale };
+  params: { locale: string };
 }) {
+  // SEO audit fix #1: without this guard, ANY dotted path skipped by the
+  // middleware matcher (/robots.txt, /.env, /x.jpg, /wp-login.php) fell through
+  // to this dynamic segment with locale="robots.txt" and soft-rendered the
+  // homepage as HTTP 200 — infinite duplicate-content surface. Real 404 now.
+  if (!isLocale(params.locale)) notFound();
+  const locale: Locale = params.locale;
+
   return (
     <html
-      lang={params.locale}
+      lang={locale}
       className={`${caudex.variable} ${caveat.variable} ${lora.variable}`}
     >
       <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: ldSafe(entityGraph(locale)) }}
+        />
         <PageTransition>{children}</PageTransition>
         {/* SpeedInsights MUST live inside <body>. v2.0.0 wraps its component in
             a <Suspense> boundary (it calls useSearchParams); a Suspense boundary

@@ -1068,3 +1068,53 @@ HAND-OFF FOUNDER:
    buton ascuns; comandă → available scade; shipped → fulfill (total scade); istoric mișcări.
 
 NEXT: Sprint 4 continuă — curieri (Sameday/FAN API) + AWB + tracking; ramburs avansat.
+
+═══════════════════════════════════════════════════════════════════
+2026-07-02 — AUDIT SEO/GEO COMPLET (claude-seo, 8 subagenți) — REZUMAT
+═══════════════════════════════════════════════════════════════════
+Health Score ~55/100. Rapoarte complete în conversație. CRITICE descoperite:
+1. Soft-200 routing: ORICE path cu punct (robots.txt/sitemap.xml/llms.txt/favicon/
+   .env/wp-login.php) → homepage 200 cu lang="<path>" — [locale]/page.tsx nu are
+   isLocale guard + middleware exclude dotted paths. Fix: guard + app/robots.ts +
+   app/sitemap.ts (cod recomandat primit de la agent).
+2. robots.txt/sitemap.xml inexistente. Recomandare: Variant A (Disallow all) pe
+   vercel.app PRE-LAUNCH → flip la Variant B la conectarea oakfantasy.ro (MUST-FLIP).
+3. Produs „test" (OF-00, 500 RON) LIVE în catalog+ItemList+PDP → status draft în admin.
+4. Contradicție schema: catalog ItemList = PreOrder+waitlist+copy „Lansăm în octombrie"
+   (stale din 2.1.5) vs PDP = InStock+checkout real. Fix: wire outOfStockIds în ItemList
+   (pattern PDP există) + decizie founder pe copy.
+5. Homepage /ro+/en: ZERO JSON-LD + fără canonical/hreflang (singura pagină fără).
+   Fix: Organization+WebSite cu @id graph în [locale]/layout + alternates.
+IMPORTANTE: canonicals→oakfantasy.ro NXDOMAIN (rezolvă la cutover); security headers
+lipsă (nosniff/CSP/Referrer-Policy); PDP thin 28-147 cuvinte + fără trust block/related;
+Three.js bundle ~183KB br pe TOATE rutele (izolare la homepage); Organization.address
+hardcodat region-only (nu citește LEGAL_INFO); headings fragmentate de animații (h2
+split pe cuvinte); titluri fără keywords; llms.txt de creat DUPĂ fix routing.
+PUNCTE FORTE: SSR 100% (AI crawlers citesc tot), hreflang interior corect, PDP schema
++ prețuri bani→RON corecte peste tot, TTFB 140-229ms, noindex corect pe cart/checkout/
+multumim/admin, NAP centralizat în LEGAL_INFO.
+
+═══════════════════════════════════════════════════════════════════
+2026-07-02 — SEO CRITICAL FIXES (post-audit) [LIVRAT]
+═══════════════════════════════════════════════════════════════════
+FIX 1 — Guard isLocale în [locale]/layout.tsx (server; page e client) → dotted paths
+  (/x.jpg, /.env, /wp-login.php, /llms.txt) = 404 real. + app/not-found.tsx NOU cu
+  propriul <html><body> (notFound() din [locale] layout se randează sub root passthrough).
+FIX 2 — app/robots.ts Variant A (Disallow: /) — 🚨 MUST-FLIP-BEFORE-LAUNCH (SECURITY_
+  CHECKLIST TL;DR #11) + app/sitemap.ts complet (localizedPath + fetchActiveProducts +
+  filtru defensiv 'test' + hreflang alternates). Verificat: text/plain + XML valid.
+FIX 3 — ItemList catalog: InStock/OutOfStock din outOfStockIds + URL-uri PDP reale
+  (zero PreOrder/waitlist — verificat 0 matches). Copy magazin real aplicat: catalog
+  note, Hero CTA „Descoperă colecția"→/tocatoare (EmailForm scos din hero; newsletter
+  rămâne în WaitlistSection cu copy nou „Rămâi aproape" fără promisiune octombrie),
+  Navbar „Cumpără"→/tocatoare, FloatingCTA „Vezi tocătoarele"→/tocatoare.
+FIX 4 — Entity graph @graph cu Organization(@id #organization, email, address
+  placeholder-aware din LEGAL_INFO) + WebSite(@id #website) în [locale]/layout +
+  canonical/hreflang homepage. /despre+/atelier: mainEntity={'@id'} (dedup).
+BONUS — Titlu catalog „Tocătoare din Stejar Românesc" / EN echivalent. Auth pages:
+  noindex DEJA prezent pe toate 4 (doar verificat).
+Gates: typecheck/lint/i18n/build ✅ exit 0. Verificări prod build local: robots
+  text/plain Disallow ✅, sitemap XML+hreflang ✅, 404 pe junk paths ✅, JSON-LD
+  Organization+WebSite+canonical pe /ro ✅, ItemList 11×InStock+URL PDP ✅, copy nou
+  RO+EN ✅, zero „octombrie" ✅. Baselines regen (Navbar global → 24).
+NEXT (din audit, 🟡): security headers, PDP content 300+, bundle 3D izolat, llms.txt.

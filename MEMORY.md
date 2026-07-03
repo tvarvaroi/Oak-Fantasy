@@ -250,3 +250,23 @@ outOfStockIds), admin ProductTable (coloană) + StockPanel + edit page (istoric)
 best-effort (ISR 60s + revalidatePath la ajustări/tranziții); guard real anti-oversell =
 reserve atomic la checkout. Hand-off founder: aplică migrația adjust_stock + regen types.
 JSON-LD detaliu acum InStock/OutOfStock (era PreOrder).
+
+## 2026-07-02 — SEO Critical Fixes (post-audit, 4 fix-uri + bonus)
+
+**Pattern descoperit:** `notFound()` aruncat în layout-ul `[locale]` se randează SUB root
+layout (passthrough, fără html/body) → trebuie `app/not-found.tsx` cu PROPRIUL
+`<html><body>` (404 generic, fără hints admin — lecția 2.3). Guard `isLocale` în
+`[locale]/layout.tsx` (server) închide soft-200 pe dotted paths — page-ul e 'use client',
+nu poate chema notFound(). `app/robots.ts`/`app/sitemap.ts` (convenții metadata) se
+rezolvă ÎNAINTE de `[locale]` → bypass automat. Entity graph JSON-LD cu `@graph` +
+`@id` (#organization/#website) în layout; subpaginile referă `{'@id': ...}` în loc să
+dubleze. Address placeholder-aware (spread condiționat — nu emite `[ADRESA_ATELIER]`).
+**Aplicat la:** [locale]/layout.tsx (guard+alternates+graph), app/not-found.tsx,
+app/robots.ts (Variant A Disallow all — 🚨 MUST-FLIP la cutover, în SECURITY_CHECKLIST
+TL;DR #11), app/sitemap.ts (localizedPath+fetchActiveProducts+filtru 'test'),
+tocatoare/page.tsx (ItemList InStock/OutOfStock + URL-uri PDP), Hero/Navbar/FloatingCTA/
+WaitlistSection/tocatoare content (copy magazin real — zero „Lansăm în octombrie"),
+despre/atelier (@id refs), titlu catalog cu keywords.
+**De ce contează:** Toate cele 5 CRITICE din audit închise în cod (test product =
+founder în admin). Baselines regen (Navbar global). Auth pages aveau DEJA noindex —
+auditul cerea doar verificare, nu s-a fabricat fix.

@@ -39,10 +39,10 @@ export interface TocatoareContent {
 export const TOCATOARE_CONTENT: Record<Locale, TocatoareContent> = {
   ro: {
     meta: {
-      title: 'Tocătoarele noastre — Oak Fantasy',
+      title: 'Tocătoare din Stejar Românesc — Oak Fantasy',
       description:
         'Zece modele de tocătoare din stejar de Carpați, lucrate manual. De la tocătorul de zi cu zi până la blocul de moștenire.',
-      ogTitle: 'Tocătoarele noastre — Oak Fantasy',
+      ogTitle: 'Tocătoare din Stejar Românesc — Oak Fantasy',
       ogDescription:
         'Catalog complet: zece modele lucrate manual din stejar românesc, de la 180 la 1.800 RON.',
     },
@@ -52,8 +52,8 @@ export const TOCATOARE_CONTENT: Record<Locale, TocatoareContent> = {
       titleEm: 'noastre.',
       sub: 'Zece modele, de la tocătorul de zi cu zi până la blocul de moștenire. Fiecare lucrat manual din stejar de Carpați.',
       note: {
-        strong: 'Lansăm în octombrie.',
-        rest: 'Înscrie-te pe listă și ești primul care află când deschidem comenzile.',
+        strong: 'Fiecare tocător pleacă din atelier gata de folosit.',
+        rest: 'Comanzi azi, îl lucrăm și îl trimitem în 5–10 zile lucrătoare.',
       },
     },
     filters: {
@@ -97,10 +97,10 @@ export const TOCATOARE_CONTENT: Record<Locale, TocatoareContent> = {
   },
   en: {
     meta: {
-      title: 'Our cutting boards — Oak Fantasy',
+      title: 'Romanian Oak Cutting Boards — Oak Fantasy',
       description:
         'Ten models of Carpathian oak cutting boards, handcrafted. From the everyday board to the heirloom block.',
-      ogTitle: 'Our cutting boards — Oak Fantasy',
+      ogTitle: 'Romanian Oak Cutting Boards — Oak Fantasy',
       ogDescription:
         'Full catalogue: ten handcrafted Romanian oak boards, from 180 to 1,800 RON.',
     },
@@ -110,8 +110,8 @@ export const TOCATOARE_CONTENT: Record<Locale, TocatoareContent> = {
       titleEm: 'boards.',
       sub: 'Ten models, from the everyday board to the heirloom block. Each handcrafted from Carpathian oak.',
       note: {
-        strong: 'Launching in October.',
-        rest: 'Join the list and be the first to know when orders open.',
+        strong: 'Every board leaves the workshop ready to use.',
+        rest: 'Order today — we craft and ship it in 5–10 business days.',
       },
     },
     filters: {

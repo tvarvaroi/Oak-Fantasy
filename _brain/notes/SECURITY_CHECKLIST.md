@@ -21,6 +21,12 @@
 8. ✅ HTTPS-only enforced (no HTTP fallback)
 9. ✅ Backup Supabase production database
 10. ✅ Monitoring + alerts setup (Sentry, Speed Insights, Vercel logs)
+11. 🚨 **MUST-FLIP: `app/robots.ts` Variant A → Variant B** — acum e `Disallow: /`
+    (lockdown pre-launch pe vercel.app, SEO audit fix #2). În ACELAȘI PR cu
+    conectarea oakfantasy.ro: allow all + disallow /admin,/api,/auth + pagini
+    tranzacționale (cos/cart, checkout, multumim/thank-you, auth) + adaugă
+    `sitemap: 'https://oakfantasy.ro/sitemap.xml'`. Fără flip, site-ul lansat
+    rămâne INVIZIBIL pentru Google. Sitemap-ul (app/sitemap.ts) e deja construit.
 
 ---
 

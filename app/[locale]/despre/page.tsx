@@ -80,22 +80,9 @@ function buildJsonLd(locale: Locale) {
     description: c.meta.description,
     url: `${SITE_URL}${path}`,
     inLanguage: locale === 'en' ? 'en' : 'ro',
-    mainEntity: {
-      '@type': 'Organization',
-      name: 'Oak Fantasy',
-      url: SITE_URL,
-      logo: `${SITE_URL}/3D_Cutting_Board_Model_Design.svg`,
-      description:
-        locale === 'en'
-          ? 'A small Romanian workshop hand-crafting oak cutting boards from Carpathian oak.'
-          : 'Atelier românesc mic care lucrează manual tocătoare din stejar din Carpați.',
-      foundingDate: '2026',
-      address: {
-        '@type': 'PostalAddress',
-        addressCountry: 'RO',
-        addressRegion: 'Transilvania',
-      },
-    },
+    // Reference the sitewide Organization node ([locale]/layout.tsx entity
+    // graph) instead of re-declaring a disconnected copy (SEO audit fix #4).
+    mainEntity: { '@id': `${SITE_URL}/#organization` },
   };
 
   const breadcrumb = {

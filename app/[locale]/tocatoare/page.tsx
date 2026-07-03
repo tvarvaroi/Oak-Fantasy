@@ -87,6 +87,12 @@ export default async function TocatoarePage({ params }: PageProps) {
     ],
   };
 
+  // Real availability + real PDP URLs (SEO audit fix #3). Availability comes
+  // from live inventory (outOfStockIds, already fetched above) and mirrors the
+  // product detail page's Offer exactly — the stale PreOrder/waitlist shape
+  // predated the Stripe checkout and contradicted the PDP schema for the same
+  // SKUs (rich-result suppression risk).
+  const outOfStock = new Set(outOfStockIds);
   const itemList = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -100,13 +106,15 @@ export default async function TocatoarePage({ params }: PageProps) {
         description:
           (locale === 'ro' ? p.short_description_ro : p.short_description_en) ?? '',
         sku: p.sku,
-        url: `${canonicalUrl}#${p.slug}`,
+        url: `${canonicalUrl}/${p.slug}`,
         offers: {
           '@type': 'Offer',
           priceCurrency: 'RON',
           price: formatPriceRon(p.price_ron, 'en').replace(/[.,]/g, ''),
-          availability: 'https://schema.org/PreOrder',
-          url: `${homeUrl}?interested_product=${p.slug}#waitlist`,
+          availability: outOfStock.has(p.id)
+            ? 'https://schema.org/OutOfStock'
+            : 'https://schema.org/InStock',
+          url: `${canonicalUrl}/${p.slug}`,
         },
       },
     })),
