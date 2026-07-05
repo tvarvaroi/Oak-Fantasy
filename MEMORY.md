@@ -325,3 +325,24 @@ race + RM priming).
 **De ce contează:** Auditul rămâne credibil doar dacă protocolul de captură nu
 fabrică findings — cele 2 reguli noi (decode race, RM priming) sunt permanente în
 skill. Toate cele 7 fix-uri verificate cu 52 capturi + 4 assert-uri runtime.
+
+## 2026-07-06 — llms.txt + security headers (CSP Report-Only) + H2 semantic
+
+**Pattern descoperit:** (1) **CSP se introduce în două trepte pe un site live**:
+inventar de surse din COD (nu din presupuneri — ex. verificat că Stripe hosted
+Checkout = redirect, zero JS Stripe pe site → fără stripe.com în policy), apoi
+`Content-Security-Policy-Report-Only` cu verificare pe fluxurile fragile
+(checkout/imagini/3D/fonturi), promovare la enforce abia după fereastra de
+observație. Nonce-uri pe SSG = forțează dynamic rendering — unsafe-inline e
+trade-off-ul corect deocamdată. (2) **Dovada „vizual neschimbat" = visual
+regression contra baseline-urilor EXISTENTE fără update** — dacă trec, refactorul
+e pixel-identic; nu regenera baselines când nu s-a schimbat nimic. (3) **heading
+fragmentat de animație** = un `<h2>` + `<motion.span className="block">` per
+linie cu aceiași parametri — pattern-ul Hero (h1) aplicat la h2-uri. (4) llms.txt
+= fapte citabile VERIFICATE din conținutul site-ului (grep înainte de scris),
+placeholder-aware (fără telefon/firmă cât sunt token-uri).
+**Aplicat la:** public/llms.txt, next.config.js (headers() + CSP_REPORT_ONLY cu
+inventar comentat), WorkshopSection.tsx + ProductTease.tsx (h2 unic).
+**De ce contează:** SEO #8/#12/#14 închise. 🚨 De reținut: promovarea CSP la
+enforce = schimbi numele header-ului în next.config.js DUPĂ verificarea pe
+Vercel prod (violările apar în consola browserului).

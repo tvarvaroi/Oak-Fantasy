@@ -345,27 +345,32 @@ export default function ProductTease({ language }: { language: 'ro' | 'en' }) {
               {copy.eyebrow}
             </motion.p>
 
-            <div>
+            {/* ONE semantic h2, lines animated as spans inside it (SEO audit
+                #12 — the old per-line <motion.h2> split the heading into 2
+                separate headings). Same animation — visually identical. */}
+            <h2
+              className="font-caudex"
+              style={{
+                fontSize: 'clamp(2.4rem, 5vw, 4rem)',
+                fontWeight: 700,
+                color: 'var(--cream-warm)',
+                lineHeight: 1.1,
+                letterSpacing: '-0.01em',
+              }}
+            >
               {copy.title.map((line, i) => (
-                <motion.h2
+                <motion.span
                   key={i}
-                  className="font-caudex block"
-                  style={{
-                    fontSize: 'clamp(2.4rem, 5vw, 4rem)',
-                    fontWeight: 700,
-                    color: 'var(--cream-warm)',
-                    lineHeight: 1.1,
-                    letterSpacing: '-0.01em',
-                  }}
+                  className="block"
                   initial={prefersReduced ? false : { opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.7, delay: 0.1 + i * 0.1, ease: [0.16, 1, 0.3, 1] }}
                 >
                   {line}
-                </motion.h2>
+                </motion.span>
               ))}
-            </div>
+            </h2>
           </div>
 
           <motion.p

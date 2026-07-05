@@ -1164,3 +1164,29 @@ NEXT (din audit, 🟡): security headers, PDP content 300+, bundle 3D izolat, ll
   Verificat runtime: ZERO token-uri [] pe home/contact/termeni RO+EN.
 - Verificare: 52 capturi design-qa + 4 assert-uri runtime (toate PASS) + review
   vizual pe toate zonele reparate. Gates: typecheck/lint/i18n/build ✓.
+
+2026-07-06 — llms.txt + SECURITY HEADERS + H2 FRAGMENTATION (SEO #14/#8/#12)
+- public/llms.txt: fapte citabile VERIFICATE din conținutul site-ului (uscare
+  6–12 luni → 8–10%, climat 18–22°C/45–55%, Titebond III + presare 24h, șlefuire
+  80→320, ulei+ceară, made-to-order 5–10 zile, catalog 10 modele 180–2.200 RON),
+  copy magazin real (NU waitlist), link-uri RO+EN, contact DOAR email real
+  (fără telefon/firmă — placeholders). Servit 200 text/plain (routing-ul fixat
+  în task-ul SEO permite acum dotted paths).
+- Security headers în next.config.js headers(): nosniff, Referrer-Policy
+  strict-origin-when-cross-origin, X-Frame-Options DENY, Permissions-Policy,
+  + CSP REPORT-ONLY (D1: decizie founder+eu — enforce doar după fereastră de
+  verificare). Inventar surse documentat în config: unsafe-inline pt hydration
+  Next (nonce = dynamic rendering pe site SSG, nu merită încă) + stiluri inline,
+  img *.supabase.co, connect supabase+vitals, worker blob (drei), FĂRĂ stripe.com
+  (Checkout hosted = redirect, zero JS Stripe pe site — verificat).
+- H2 fragmentation: EXACT 2 locuri (WorkshopSection 3×h2, ProductTease 2×h2)
+  → un <h2> semantic + <motion.span> cu aceiași parametri de animație.
+  CraftVideoTease era deja corect (glifurile din audit = TwigDivider mid-draw,
+  artefact captură). /ro: 7 h2 → 4 h2 coerente.
+- Verify: llms.txt 200 text/plain ✓, toate 5 headerele pe /ro ✓, CSP smoke pe
+  home/catalog/atelier/PDP/checkout-până-la-terms = ZERO violări reale (doar
+  SpeedInsights 404 pe localhost, refuzat corect de nosniff — pe Vercel OK),
+  H2 count verificat în HTML, visual regression contra baselines EXISTENTE
+  (fără update) = dovada că animația e pixel-identică.
+- NEXT: după deploy, verifică consola pe Vercel prod o perioadă → promovează
+  CSP din Report-Only în enforce (schimbi numele header-ului în next.config.js).

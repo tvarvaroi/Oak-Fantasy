@@ -287,19 +287,24 @@ export default function WorkshopSection({ language }: { language: 'ro' | 'en' })
               {c.eyebrow}
             </motion.p>
 
-            {/* title */}
-            <div className="mb-8">
+            {/* title — ONE semantic h2, lines animated as spans inside it
+                (SEO audit #12: the old per-line <motion.h2> split one visual
+                heading into 3 separate headings for crawlers/screen readers).
+                Same animation params — visually identical. */}
+            <h2
+              className="font-caudex mb-8"
+              style={{
+                fontSize: 'clamp(2rem, 3.8vw, 3.2rem)',
+                fontWeight: 700,
+                color: 'var(--ink)',
+                lineHeight: 1.15,
+                letterSpacing: '-0.01em',
+              }}
+            >
               {c.title.map((line, i) => (
-                <motion.h2
+                <motion.span
                   key={i}
-                  className="font-caudex block"
-                  style={{
-                    fontSize: 'clamp(2rem, 3.8vw, 3.2rem)',
-                    fontWeight: 700,
-                    color: 'var(--ink)',
-                    lineHeight: 1.15,
-                    letterSpacing: '-0.01em',
-                  }}
+                  className="block"
                   initial={prefersReduced ? false : { opacity: 0, x: -16 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
@@ -310,9 +315,9 @@ export default function WorkshopSection({ language }: { language: 'ro' | 'en' })
                   }}
                 >
                   {line}
-                </motion.h2>
+                </motion.span>
               ))}
-            </div>
+            </h2>
 
             {/* divider */}
             <div
