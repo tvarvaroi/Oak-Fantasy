@@ -1118,3 +1118,22 @@ Gates: typecheck/lint/i18n/build ✅ exit 0. Verificări prod build local: robot
   Organization+WebSite+canonical pe /ro ✅, ItemList 11×InStock+URL PDP ✅, copy nou
   RO+EN ✅, zero „octombrie" ✅. Baselines regen (Navbar global → 24).
 NEXT (din audit, 🟡): security headers, PDP content 300+, bundle 3D izolat, llms.txt.
+
+2026-07-04 — DESIGN QA: skill nou + audit complet + Navbar drawer
+- ACT 1: skill permanent ~/.claude/skills/design-qa/ (4 viewports + checklist A-I +
+  review obligatoriu pe screenshots) + protocol în CLAUDE.md (workflow UI + Iron Law).
+- ACT 2: audit COMPLET pe prod build — 140 capturi (RO+EN × 4 viewports + stări:
+  drawer, checkout 3 pași + erori, contact erori, reduced-motion, 404, badge 99).
+  9 agenți paraleli review. Raport: docs/design-qa-audit-2026-07-04.md.
+  Rezumat: 5 🔴 (3 închise de fix-ul Navbar / false alarm după verificare runtime;
+  rămân: imagini ProductTease nepictate la 768 + heading /despre EN mobil invizibil),
+  ~15 🟡 (footer placeholders cross-site, scrim-uri lipsă /despre + /tocatoare hero,
+  hero 3D blob+umbră rece, WorkshopSection bandă goală, gradient ProductTease→Numbers,
+  atelier EN heading neterminat, 404 body EN), ~16 🟢. STOP — founder decide batch-urile.
+- ACT 3: Navbar redesign LIVRAT — hamburger drawer sub lg (1024), pattern CartDrawer,
+  bară mobilă = logo + cart + hamburger, limba/CTA/auth în drawer, GSAP mort scos.
+  design-qa PASS 4/4 viewports × toate stările (deschis/închis/scrolled/darkHero/badge99/
+  z-order coș-peste-meniu/Esc). Runtime: PDP overflow 375 REZOLVAT, checkout 1→2 OK,
+  /cos H1 clar. Gates: typecheck+lint+i18n+build ✓, e2e 199/199 ✓, hydration 0 ✓,
+  baselines 72 regen (founder review înainte de push).
+- NEXT (founder): prioritizare batch-uri A/B/C din raport; commit + push tot.

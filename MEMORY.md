@@ -270,3 +270,31 @@ despre/atelier (@id refs), titlu catalog cu keywords.
 **De ce contează:** Toate cele 5 CRITICE din audit închise în cod (test product =
 founder în admin). Baselines regen (Navbar global). Auth pages aveau DEJA noindex —
 auditul cerea doar verificare, nu s-a fabricat fix.
+
+## 2026-07-04 — Design QA: skill permanent + audit complet site + Navbar drawer redesign
+
+**Pattern descoperit:** (1) Skill nou permanent `~/.claude/skills/design-qa/` — protocol
+vizual obligatoriu la finalul oricărui task UI: captură Playwright pe matrice 4 viewports
+(375/768/1024/1440 — inclusiv valorile EXACTE de breakpoint md/lg, unde se aglomerează
+bug-urile) + REVIEW pe fiecare screenshot (captura fără review = gate fals) pe checklist
+A-I (overlap, touch targets 44px, spacing, ierarhie, tipografie, brand, animații +
+reduced-motion, stări interactive, onestitate). Înregistrat în CLAUDE.md (tabel skills +
+workflow UI pas 5 + Iron Law). (2) Audit la scară: 140 capturi → segmentare ffmpeg la
+2000px → 9 agenți paraleli de review cu brief comun + format strict de findings →
+sinteză dedupe-uită. Agenții căzuți pe erori API tranzitorii se reiau cu SendMessage
+(„resume + deliver FINAL report"); transcript pierdut = respawn de la zero. (3) Navbar
+redesign: hamburger drawer sub lg (1024) — pattern CartDrawer (Esc + backdrop + scroll-lock
++ focus close), z-order disciplinat (navbar 50 < menu 55/56 < cart 60/61), logo redus
+sub lg, limba/auth/CTA mutate în drawer (bară = logo + cart + hamburger).
+**Aplicat la:** ~/.claude/skills/design-qa/SKILL.md, CLAUDE.md, scripts/design-qa-capture.mjs,
+docs/design-qa-audit-2026-07-04.md (raportul complet), docs/plans/2026-07-03-navbar-drawer-design.md,
+components/Navbar.tsx (rewrite: drawer + breakpoint md→lg + GSAP mort eliminat + logo
+responsive + tagline hidden <md), tests/e2e/shared-components.spec.ts (selector
+aria-expanded + skip <1024).
+**De ce contează:** Vechiul Navbar era CAUZA a 3 findings „de pagină" (overflow PDP 375,
+click-uri interceptate în checkout, coliziune H1 /cos) — un fix de chrome a închis 5
+findings. GSAP scos din Navbar = GSAP dispare din First Load JS pe paginile interioare
+(rămâne doar unde e folosit: ProductTease). Auditul complet (docs/design-qa-audit-2026-07-04.md)
+e input-ul founder-ului pentru batch-urile de fix — NIMIC din raport nu s-a reparat în
+afara Navbar-ului (scope discipline). Verificare 199/199 e2e + 72 baselines regen +
+hydration 0 + runtime checks pe cele 3 findings ambigue (toate rezolvate/false alarm).

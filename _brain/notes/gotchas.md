@@ -949,3 +949,47 @@ dar stocat ca `.png` cu `Content-Type: image/png`. Cauza: `ImageUpload.tsx` deri
 extensia + contentType din `file.type` (raporta image/png pentru un JPEG). NU strică
 randarea (sharp sniff-uiește formatul real), dar e date murdare. TODO opțional: sniff
 magic bytes la upload în loc să te bazezi pe file.type. Vezi components/admin/ImageUpload.tsx.
+
+## 2026-07-04 — Vechiul Navbar era cauza „bug-urilor de pagină" pe mobil (overflow PDP, checkout blocat)
+
+**Simptom:** Auditul design-qa raporta 🔴 pe PDP mobil (pagina mai lată decât viewport-ul,
+navbar off-canvas) și pe checkout mobil (progresia pas 1→2 eșuată cu eroare stale
+„Alege județul."). Păreau bug-uri separate în PDP/checkout.
+**Cauză reală:** Navbar-ul vechi (logo 100px + wordmark 2.4rem + toggle + cart + hamburger
+pe o bară la 375px) era MAI LAT decât viewport-ul → `scrollWidth > innerWidth` pe orice
+pagină cu breadcrumb/conținut care nu forța shrink; iar navbar-ul înalt suprapunea
+butoanele → click-urile Playwright (și tap-urile reale) interceptate.
+**Fix:** Redesign-ul Navbar (drawer sub lg) a rezolvat AMBELE colateral. Verificare
+runtime pe build nou: `scrollWidth=375=innerWidth`, checkout pas 2 atins cu click real.
+**Lecție:** Overflow-ul unei componente fixed partajate se manifestă ca bug-uri
+„per-pagină". Înainte de a vâna bug-uri în pagini individuale pe mobil, verifică
+`document.documentElement.scrollWidth > window.innerWidth` și cine e vinovatul real
+(inspectează ce element depășește). Un singur fix de chrome > N fix-uri de pagini.
+**Fișiere:** components/Navbar.tsx (redesign 2026-07-04).
+
+## 2026-07-04 — TaskStop pe `npm run start` lasă copilul node orfan pe port (Windows)
+
+**Simptom:** După oprirea task-ului de background `PORT=3001 npm run start`, următorul
+`npm run start` pică cu `EADDRINUSE :::3001`.
+**Cauză reală:** Pe Windows, kill-ul wrapper-ului npm NU omoară procesul node copil
+(next start). Portul rămâne ocupat de un proces orfan.
+**Fix:** `netstat -ano | grep ":3001.*LISTENING"` → PID → `taskkill //PID <pid> //F`.
+E propriul nostru copil, deci taskkill merge fără probleme de permisiuni (spre deosebire
+de PID-uri străine, care rămân hand-off founder).
+**Lecție:** După orice stop de server de background pe Windows, verifică portul cu
+netstat înainte de restart. Slash-uri duble (`//PID`) în Git Bash ca să eviți MSYS mangling.
+
+## 2026-07-04 — Artefacte de captură design-qa (nu bug-uri reale) — checklist pentru review
+
+Trei pattern-uri care apar în screenshots fullPage Playwright și NU sunt bug-uri:
+1. **Counters IntersectionObserver la 0** (NumbersStrip „0+"): scroll programatic rapid
+   (120ms/pas) nu lasă animația `animate()` să se vadă în capturi. La scroll uman lent →
+   valori corecte (verificat runtime). Regula: valori animate = verifică runtime, nu în captură.
+2. **Navbar-ul fixed „pictat" în mijlocul paginii** în fullPage screenshots: stitching-ul
+   CDP poate lăsa elementele fixed la poziția lor din momentul capturii. Nu e overlap real —
+   verifică cu boundingRect runtime.
+3. **Imagini lazy sub fold nepictate** în capturi fără scroll priming: poate fi artefact
+   SAU bug real de reveal (ex. ProductTease tablet-p — reprodus pe RO+EN = real). Diferențiere:
+   reproduce pe ambele locale + verifică runtime cu scroll lent.
+**Unealtă:** imagini prea înalte pentru review → segmentare cu ffmpeg crop
+(`scratchpad/split-tall.sh` pattern; fără dependențe noi — sharp/pngjs nu-s instalate).

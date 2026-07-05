@@ -168,6 +168,7 @@ Aceste plugins trebuie folosite pe fiecare task relevant. Referențiază-le expl
 | `stripe-integration-expert` | Stripe (Etapa 3) |
 | `ux-researcher-designer` | Page design, user flow |
 | `playwright-pro` | E2E testing |
+| `design-qa` | **OBLIGATORIU la finalul oricărui task care atinge UI** — screenshots 4 viewports (375/768/1024/1440) + review vizual pe checklist (suprapuneri, touch targets, spacing, ierarhie, tipografie, brand, animații + reduced-motion, stări interactive). Schimbări pe chrome partajat (Navbar/Footer/drawers) = review TOATE paginile. |
 
 ### Engineering workflow pentru orice task UI
 
@@ -176,8 +177,9 @@ Aceste plugins trebuie folosite pe fiecare task relevant. Referențiază-le expl
 2. frontend-design               → aesthetic direction
 3. senior-frontend               → implementation
 4. systematic-debugging          → if bugs arise
-5. verification-before-completion → before "done" claim
-6. code-reviewer                 → final pass
+5. design-qa                     → screenshots 4 viewports + review vizual (MANDATORY)
+6. verification-before-completion → before "done" claim
+7. code-reviewer                 → final pass
 ```
 
 ### Raportează ce încarci
@@ -336,6 +338,7 @@ Suntem la **Etapa 1, Săptămâna 1**. Următorul task: construire pagini lipsă
 Înainte să-mi spui "gata":
 - Ai rulat `npm run build` local? A trecut fără erori?
 - Ai testat manual pe `localhost:3000`?
+- Ai rulat `design-qa` dacă task-ul a atins UI (screenshots 4 viewports + review vizual)?
 - Funcționează pe mobile (DevTools mobile view)?
 - Diacriticele se afișează corect?
 - Funcționează versiunea EN dacă e i18n?

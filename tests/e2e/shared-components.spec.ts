@@ -1,19 +1,21 @@
 import { test, expect } from './fixtures';
 import type { Page } from '@playwright/test';
 
-// On the mobile viewport the desktop nav has `hidden md:flex` and the mobile
-// menu starts collapsed (`max-h-0 opacity-0`). The Atelier route link exists
-// in both places; the visibility/click tests need the menu open on mobile.
+// Below lg (1024px — 2026-07-03 Navbar redesign) the desktop nav is hidden and
+// the nav links live in a side drawer opened by the hamburger. The Atelier
+// route link exists in both places; the visibility/click tests need the
+// drawer open on mobile AND tablet.
 async function openMobileMenuIfNeeded(page: Page) {
   await page.waitForLoadState('networkidle');
-  const toggle = page.locator('button[aria-label="Toggle menu"]');
+  // Hamburger is the only header button with aria-expanded.
+  const toggle = page.locator('header button[aria-expanded]');
   if (await toggle.isVisible()) {
     // On Playwright's mobile-emulation projects, click() reports the
     // fixed-position hamburger as "outside the viewport" even after scroll.
     // Dispatching the click event directly on the DOM node bypasses the
     // viewport-coordinate check entirely and triggers the React onClick.
     await toggle.dispatchEvent('click');
-    await page.waitForTimeout(450); // mobile menu has ~400ms expand transition
+    await page.waitForTimeout(450); // drawer has a 320ms slide transition
   }
 }
 
@@ -73,10 +75,11 @@ test.describe('Navbar Atelier link (2026-05-27 — /atelier route)', () => {
   });
 
   test('Atelier link is copper at scroll 0 on /ro/atelier (FIX 1 darkHero adaptive)', async ({ page, viewport }) => {
-    // Mobile viewport: mobile menu is its own cream-bg context — active link
-    // stays oak-warm there regardless of darkHero. This test targets the
-    // VISIBLE desktop/tablet navbar where darkHero adapts.
-    test.skip((viewport?.width ?? 0) < 768, 'darkHero adaptive only affects visible nav, not opened mobile menu');
+    // Mobile/tablet viewports: the menu drawer is its own cream-bg context —
+    // active link stays oak-warm there regardless of darkHero. This test
+    // targets the VISIBLE desktop navbar (lg+, 2026-07-03 redesign) where
+    // darkHero adapts.
+    test.skip((viewport?.width ?? 0) < 1024, 'darkHero adaptive only affects the visible desktop nav, not the menu drawer');
     await page.goto('/ro/atelier');
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.waitForTimeout(400);
