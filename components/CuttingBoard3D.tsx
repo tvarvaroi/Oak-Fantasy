@@ -300,17 +300,33 @@ function Board({ mouseRef }: { mouseRef: React.MutableRefObject<{ x: number; y: 
   }), []);
 
   /* The board is 3.6 wide × 2.0 tall × 0.17 thick in scene units.
-     The handle/C-shape is on the LEFT side in the photo but we orient
-     the board so the main face faces the camera. */
+     The handle slot sits near the LEFT edge, like the product photo. */
   const W = 3.6, H = 2.0, D = 0.17;
 
-  /* Left C-cutout: we subtract a cylinder from the left edge using a
-     dark cylinder positioned to peek through and a matching dark back-cap. */
-  const cR  = 0.58; /* radius of the rounded C cutout */
-  const cX  = -W / 2 + cR * 0.65; /* centre — slightly left of edge */
+  /* Slot handle: narrow rounded slot near the left edge, upper half */
+  const slotW = 0.2, slotH = 0.52;
+  const slotX = -W / 2 + 0.42;
 
-  /* Slot handle: narrow oval punched near the left edge top */
-  const slotW = 0.18, slotH = 0.48;
+  /* Flat rounded-rect shape for the slot decal (design-qa Batch A fix).
+     The old fake C-cutout (a Ø1.16 dark disc + open cylinder + 3D capsules
+     protruding through the board) read as an opaque brown BLOB with side
+     tabs at most rotation angles — audit finding on every viewport <1440.
+     A flat dark decal flush with each face reads as a routed slot without
+     any volume to stick out when the board rotates. */
+  const slotShape = useMemo(() => {
+    const s = new THREE.Shape();
+    const w = slotW, h = slotH, r = slotW / 2;
+    s.moveTo(-w / 2 + r, -h / 2);
+    s.lineTo(w / 2 - r, -h / 2);
+    s.absarc(w / 2 - r, -h / 2 + r, r, -Math.PI / 2, 0, false);
+    s.lineTo(w / 2, h / 2 - r);
+    s.absarc(w / 2 - r, h / 2 - r, r, 0, Math.PI / 2, false);
+    s.lineTo(-w / 2 + r, h / 2);
+    s.absarc(-w / 2 + r, h / 2 - r, r, Math.PI / 2, Math.PI, false);
+    s.lineTo(-w / 2, -h / 2 + r);
+    s.absarc(-w / 2 + r, -h / 2 + r, r, Math.PI, Math.PI * 1.5, false);
+    return s;
+  }, []);
 
   return (
     <group ref={groupRef}>
@@ -325,34 +341,14 @@ function Board({ mouseRef }: { mouseRef: React.MutableRefObject<{ x: number; y: 
         <primitive object={woodMat} attach="material" />
       </RoundedBox>
 
-      {/* ── Left C-cutout visual: dark interior cylinder ─── */}
-      {/* We can't boolean-subtract in R3F without CSG, so we fake it:
-          Place a dark rounded disc at the C position to simulate the
-          routed-away hollow, slightly proud of the board face */}
-      <mesh position={[cX, 0.18, D / 2 + 0.001]} castShadow>
-        <circleGeometry args={[cR, 40]} />
-        <meshStandardMaterial color="#4a2c0e" roughness={0.92} metalness={0} />
-      </mesh>
-      {/* back face of hole */}
-      <mesh position={[cX, 0.18, -D / 2 - 0.001]} rotation={[0, Math.PI, 0]}>
-        <circleGeometry args={[cR, 40]} />
+      {/* ── Slot handle: flat dark decals flush with each face ── */}
+      <mesh position={[slotX, 0.35, D / 2 + 0.002]}>
+        <shapeGeometry args={[slotShape, 24]} />
         <meshStandardMaterial color="#3a2008" roughness={0.95} metalness={0} />
       </mesh>
-      {/* cylinder interior wall */}
-      <mesh position={[cX, 0.18, 0]}>
-        <cylinderGeometry args={[cR, cR, D + 0.01, 40, 1, true]} />
-        <meshStandardMaterial color="#3a2008" roughness={0.95} metalness={0} side={THREE.BackSide} />
-      </mesh>
-
-      {/* ── Slot handle: dark oval pill ─────────────────── */}
-      <mesh position={[cX, 0.18, D / 2 + 0.002]} castShadow>
-        <capsuleGeometry args={[slotW / 2, slotH - slotW, 8, 16]} />
-        <meshStandardMaterial color="#2c1506" roughness={0.95} metalness={0} />
-      </mesh>
-      {/* slot back */}
-      <mesh position={[cX, 0.18, -D / 2 - 0.002]} rotation={[0, Math.PI, 0]}>
-        <capsuleGeometry args={[slotW / 2, slotH - slotW, 8, 16]} />
-        <meshStandardMaterial color="#2c1506" roughness={0.95} metalness={0} />
+      <mesh position={[slotX, 0.35, -D / 2 - 0.002]} rotation={[0, Math.PI, 0]}>
+        <shapeGeometry args={[slotShape, 24]} />
+        <meshStandardMaterial color="#3a2008" roughness={0.95} metalness={0} />
       </mesh>
 
       {/* ── Routed border groove ─────────────────────────
@@ -389,10 +385,15 @@ function Board({ mouseRef }: { mouseRef: React.MutableRefObject<{ x: number; y: 
 /* ──────────────────────────────────────────────────────────────── */
 
 function ShadowPlane() {
+  /* Warm, soft ground shading (design-qa Batch A fix): the default black
+     shadowMaterial at 0.22 read as a cold gray hard-edged polygon clipped by
+     the canvas edge — against the warm-palette rule. Oak-deep tint + lower
+     opacity + blurred shadow map (radius) makes it read as gentle warm
+     ambient occlusion instead. */
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -2.0, 0]} receiveShadow>
       <planeGeometry args={[14, 14]} />
-      <shadowMaterial transparent opacity={0.22} />
+      <shadowMaterial transparent opacity={0.13} color="#5C3A20" />
     </mesh>
   );
 }
@@ -440,7 +441,8 @@ export default function CuttingBoard3D() {
             intensity={2.2}
             position={[-4, 5, 3]}
             castShadow
-            shadow-mapSize={[1024, 1024]}
+            shadow-mapSize={[2048, 2048]}
+            shadow-radius={7}
             shadow-camera-near={0.5}
             shadow-camera-far={20}
             shadow-camera-left={-5}

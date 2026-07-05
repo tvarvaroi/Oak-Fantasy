@@ -20,7 +20,13 @@
   right: 0;
   bottom: 0;
   aspect-ratio: 5760 / 1911;
-  background: url('/treeline.webp') no-repeat center bottom / 100% 100%;
+  /* Cream scrim layered OVER the treeline (design-qa Batch A): at ≥1024 the
+     hero copy overlapped the tall trees at near-identical tone and was
+     unreadable. The gradient washes the upper trees (behind the text) into
+     cream and leaves the bottom treeline crisp — no cold/black overlay. */
+  background:
+    linear-gradient(180deg, rgba(245, 235, 216, 0.96) 0%, rgba(245, 235, 216, 0.88) 62%, rgba(245, 235, 216, 0.3) 80%, rgba(245, 235, 216, 0) 92%),
+    url('/treeline.webp') no-repeat center bottom / 100% 100%;
   pointer-events: none;
   z-index: 1;
   opacity: 0.62;

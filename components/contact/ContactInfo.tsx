@@ -3,7 +3,7 @@
 import { Mail, MapPin, Phone, Clock } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 
-import { LEGAL_INFO, isPlaceholderMode } from '@/lib/legal-info';
+import { LEGAL_INFO, isPlaceholderMode, hasPlaceholder } from '@/lib/legal-info';
 import type { Locale } from '@/lib/i18n-routes';
 
 import type { ContactCopy } from './content';
@@ -108,42 +108,31 @@ export default function ContactInfo({
           </a>
         </InfoRow>
 
-        <InfoRow icon={<Phone size={15} strokeWidth={1.8} />} label={copy.phoneLabel}>
-          {LEGAL_INFO.contactPhone.startsWith('[') ? (
-            <span style={{ color: 'var(--ink-soft)', fontStyle: 'italic' }}>
-              {LEGAL_INFO.contactPhone}
-            </span>
-          ) : (
+        {/* Rows with placeholder values are hidden (design-qa Batch A) —
+            they render automatically once real env data exists. The dashed
+            banner below explains the gap while isPlaceholderMode is on. */}
+        {!hasPlaceholder(LEGAL_INFO.contactPhone) && (
+          <InfoRow icon={<Phone size={15} strokeWidth={1.8} />} label={copy.phoneLabel}>
             <a
               href={`tel:${LEGAL_INFO.contactPhone.replace(/\s+/g, '')}`}
               style={{ color: 'var(--ink)', textDecoration: 'none' }}
             >
               {LEGAL_INFO.contactPhone}
             </a>
-          )}
-        </InfoRow>
+          </InfoRow>
+        )}
 
-        <InfoRow icon={<MapPin size={15} strokeWidth={1.8} />} label={copy.workshopLabel}>
-          {LEGAL_INFO.workshopAddress.startsWith('[') ? (
-            <span style={{ color: 'var(--ink-soft)', fontStyle: 'italic' }}>
-              {LEGAL_INFO.workshopAddress}
-            </span>
-          ) : (
+        {!hasPlaceholder(LEGAL_INFO.workshopAddress) && (
+          <InfoRow icon={<MapPin size={15} strokeWidth={1.8} />} label={copy.workshopLabel}>
             <span>{LEGAL_INFO.workshopAddress}</span>
-          )}
-        </InfoRow>
+          </InfoRow>
+        )}
 
         <InfoRow icon={<Clock size={15} strokeWidth={1.8} />} label={copy.hoursLabel}>
           <span style={{ display: 'block' }}>{hours.weekdays}</span>
-          <span
-            style={{
-              display: 'block',
-              color: hours.saturday.includes('[') ? 'var(--ink-soft)' : 'var(--ink)',
-              fontStyle: hours.saturday.includes('[') ? 'italic' : 'normal',
-            }}
-          >
-            {hours.saturday}
-          </span>
+          {!hasPlaceholder(hours.saturday) && (
+            <span style={{ display: 'block' }}>{hours.saturday}</span>
+          )}
           <span style={{ display: 'block' }}>{hours.sunday}</span>
         </InfoRow>
 

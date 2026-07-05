@@ -405,8 +405,10 @@ const en: AtelierContent = {
   },
   place: {
     eyebrow: 'The workshop as a place',
-    h2Line1: 'The place where the',
-    h2Em: 'work',
+    // Batch A fix: the EN heading was left mid-sentence ("The place where the
+    // work") — RO source of truth is "Locul unde se face treaba."
+    h2Line1: 'The place where the work',
+    h2Em: 'gets done.',
     paragraphs: [
       'Our workshop is a room of about sixty square meters, somewhere in the Carpathians. It has good natural light until around four in the afternoon, then we turn on the lamps. In winter the sun comes in directly through the east window in the morning — that is when we do the work that needs a careful eye: fine sanding, assembly. In summer we stay more in the shaded part, where the temperature stays stable.',
       "It smells of oak — a sweet, slightly tart smell that clings to clothes and hair. The sound depends on what we are doing: the motors of the table saw and router are the loud ones, but we use them one at a time, not all day. Most of the time we work with hand tools — and then it is quiet, just saw, rasp, sandpaper.",

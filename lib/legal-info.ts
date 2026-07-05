@@ -55,3 +55,12 @@ export const LEGAL_INFO = {
 // surfaces that show legal data (ContactInfo sidebar, footer, future legal
 // pages). Pre-launch this flips to false once env vars are populated.
 export const isPlaceholderMode = LEGAL_INFO.companyName === '[DENUMIRE_SRL]';
+
+// Per-field placeholder detection (design-qa Batch A, 2026-07-05). Rows whose
+// value still holds a `[TOKEN]` default must NOT render publicly — the row
+// appears automatically once the real value lands in env, zero code changes.
+// `includes` (not startsWith) because composite strings embed the token
+// mid-string (e.g. 'Sâmbătă: [PROGRAM_SAMBATA]').
+export function hasPlaceholder(value: string): boolean {
+  return value.includes('[');
+}

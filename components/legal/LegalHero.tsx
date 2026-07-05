@@ -1,13 +1,14 @@
 'use client';
 
 import { motion, useReducedMotion } from 'framer-motion';
+import { hasPlaceholder } from '@/lib/legal-info';
 
 interface LegalHeroProps {
   eyebrow: string;
   title: string;
-  // Pre-launch the date is a [PLACEHOLDER] string; once lawyer-approved
-  // copy lands, it becomes an ISO-formatted date rendered in the user's
-  // locale. We pass the rendered string through unchanged either way.
+  // Pre-launch the date is a [PLACEHOLDER] string — the whole "last updated"
+  // line is hidden until lawyer-approved copy lands with a real date
+  // (design-qa Batch A: never render [TOKEN] text publicly).
   lastUpdated: string;
   lastUpdatedLabel: string;
 }
@@ -62,35 +63,37 @@ export default function LegalHero({
           {title}
         </motion.h1>
 
-        <motion.p
-          className="font-lora"
-          style={{
-            marginTop: 18,
-            fontSize: '0.88rem',
-            lineHeight: 1.6,
-            color: 'var(--ink-soft)',
-            opacity: 0.85,
-          }}
-          initial={prefersReduced ? false : { opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <span className="label-caps" style={{ color: 'var(--ink-soft)', fontSize: '0.62rem' }}>
-            {lastUpdatedLabel}
-          </span>{' '}
-          <span
-            className="font-caveat"
+        {!hasPlaceholder(lastUpdated) && (
+          <motion.p
+            className="font-lora"
             style={{
-              color: 'var(--oak-warm)',
-              fontSize: '1.25rem',
-              marginLeft: 6,
-              transform: 'rotate(-1deg)',
-              display: 'inline-block',
+              marginTop: 18,
+              fontSize: '0.88rem',
+              lineHeight: 1.6,
+              color: 'var(--ink-soft)',
+              opacity: 0.85,
             }}
+            initial={prefersReduced ? false : { opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
           >
-            {lastUpdated}
-          </span>
-        </motion.p>
+            <span className="label-caps" style={{ color: 'var(--ink-soft)', fontSize: '0.62rem' }}>
+              {lastUpdatedLabel}
+            </span>{' '}
+            <span
+              className="font-caveat"
+              style={{
+                color: 'var(--oak-warm)',
+                fontSize: '1.25rem',
+                marginLeft: 6,
+                transform: 'rotate(-1deg)',
+                display: 'inline-block',
+              }}
+            >
+              {lastUpdated}
+            </span>
+          </motion.p>
+        )}
       </div>
     </section>
   );

@@ -1137,3 +1137,30 @@ NEXT (din audit, 🟡): security headers, PDP content 300+, bundle 3D izolat, ll
   /cos H1 clar. Gates: typecheck+lint+i18n+build ✓, e2e 199/199 ✓, hydration 0 ✓,
   baselines 72 regen (founder review înainte de push).
 - NEXT (founder): prioritizare batch-uri A/B/C din raport; commit + push tot.
+
+2026-07-05 — DESIGN BATCH A: 2 critice (root cause) + 5 fix-uri vizibile
+- 🔴 ProductTease @768 = FALS ALARM (artefact captură: lazy images mid-flight în
+  stitch fullPage; RM captura fără scroll). Runtime cu scroll uman: toate imaginile
+  se încarcă. Fix REAL = protocolul design-qa (decode-wait cu Promise.race timeout
+  6s — decode() pe imagini lazy ASCUNSE nu se rezolvă NICIODATĂ în Chromium, vezi
+  gotcha; + RM primește scroll-priming).
+- 🔴 /despre EN mobil = clipping geometric (overlay 572px > banner fix 380px,
+  overflow hidden, ancorat bottom). Fix: .workshopBanner min-height + flex,
+  .workshopOverlay în flow → banner crește (635px la 375, h2 inside, ambele locale)
+  + scrim întărit warm-bark (rezolvă și lizibilitatea 🟡4a).
+- 🟡 atelier EN: „The place where the work gets done." (era neterminat).
+- 🟡 /tocatoare hero: gradient cream peste treeline (3 iterații, v3 = paragraful
+  lizibil, trunchiurile crisp jos).
+- 🟡 Hero 3D: fake-ul de C-cutout (disc Ø1.16 + cilindru deschis + capsule 3D care
+  străpungeau placa = „blob-ul") ELIMINAT → slot decal plat (THREE.Shape rounded-rect)
+  flush pe ambele fețe; umbră shadowMaterial #5C3A20 @0.13 + shadow-radius 7 +
+  mapSize 2048 (era negru dur @0.22).
+- 🟡 WorkshopSection „banda goală" = text cu opacity pe scrollYProgress al secțiunii
+  (vizibil abia la progress 0.45-0.6 = după ce textul ieșea din viewport pe mobil)
+  → RevealLines rescrise pe whileInView per-linie (stagger 0.09s).
+- 🟡 Placeholders: hasPlaceholder() în lib/legal-info.ts; rânduri ascunse condiționat
+  în Footer (telefon/adresă/sâmbătă/operator/CUI), ContactInfo, LegalCompanyInfo
+  (Row → null), LegalHero (ultima actualizare). Apar automat când datele intră în env.
+  Verificat runtime: ZERO token-uri [] pe home/contact/termeni RO+EN.
+- Verificare: 52 capturi design-qa + 4 assert-uri runtime (toate PASS) + review
+  vizual pe toate zonele reparate. Gates: typecheck/lint/i18n/build ✓.

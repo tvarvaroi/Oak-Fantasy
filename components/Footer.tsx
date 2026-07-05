@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useRef, useEffect, useState } from 'react';
 
-import { LEGAL_INFO } from '@/lib/legal-info';
+import { LEGAL_INFO, hasPlaceholder } from '@/lib/legal-info';
 import { localizedPath } from '@/lib/i18n-routes';
 
 /* ─── Bottom decorative branch ───────────────────────────────────
@@ -307,12 +307,18 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
                 </a>
               </FooterInfoRow>
 
-              <FooterInfoRow label={nav.contactPhoneLabel}>
-                <FooterValue value={LEGAL_INFO.contactPhone} />
-              </FooterInfoRow>
+              {/* Placeholder rows are hidden until real env values land
+                  (design-qa Batch A) — never render [TOKEN] text publicly. */}
+              {!hasPlaceholder(LEGAL_INFO.contactPhone) && (
+                <FooterInfoRow label={nav.contactPhoneLabel}>
+                  <FooterValue value={LEGAL_INFO.contactPhone} />
+                </FooterInfoRow>
+              )}
 
               <FooterInfoRow label={nav.contactAddressLabel}>
-                <FooterValue value={LEGAL_INFO.workshopAddress} />
+                {!hasPlaceholder(LEGAL_INFO.workshopAddress) && (
+                  <FooterValue value={LEGAL_INFO.workshopAddress} />
+                )}
                 <span
                   className="font-lora"
                   style={{ display: 'block', fontSize: '0.82rem', color: 'rgba(245,235,216,0.4)', lineHeight: 1.5 }}
@@ -325,9 +331,11 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
                 <span className="font-lora" style={{ display: 'block', fontSize: '0.88rem', color: 'rgba(245,235,216,0.55)', lineHeight: 1.55 }}>
                   {hours.weekdays}
                 </span>
-                <span className="font-lora" style={{ display: 'block', fontSize: '0.88rem', color: hours.saturday.includes('[') ? 'rgba(245,235,216,0.35)' : 'rgba(245,235,216,0.55)', fontStyle: hours.saturday.includes('[') ? 'italic' : 'normal', lineHeight: 1.55 }}>
-                  {hours.saturday}
-                </span>
+                {!hasPlaceholder(hours.saturday) && (
+                  <span className="font-lora" style={{ display: 'block', fontSize: '0.88rem', color: 'rgba(245,235,216,0.55)', lineHeight: 1.55 }}>
+                    {hours.saturday}
+                  </span>
+                )}
                 <span className="font-lora" style={{ display: 'block', fontSize: '0.88rem', color: 'rgba(245,235,216,0.55)', lineHeight: 1.55 }}>
                   {hours.sunday}
                 </span>
@@ -414,15 +422,22 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
               {nav.brandDesc}
             </p>
 
-            {/* operator legal info — pulls from LEGAL_INFO (placeholder-aware) */}
-            <div className="flex flex-col gap-1.5">
-              <FooterInfoRow label={nav.operatorLabel}>
-                <FooterValue value={LEGAL_INFO.companyName} />
-              </FooterInfoRow>
-              <FooterInfoRow label={nav.cuiLabel}>
-                <FooterValue value={LEGAL_INFO.cui} />
-              </FooterInfoRow>
-            </div>
+            {/* operator legal info — rows hidden while values are placeholders;
+                they appear automatically once real env data lands (Batch A) */}
+            {(!hasPlaceholder(LEGAL_INFO.companyName) || !hasPlaceholder(LEGAL_INFO.cui)) && (
+              <div className="flex flex-col gap-1.5">
+                {!hasPlaceholder(LEGAL_INFO.companyName) && (
+                  <FooterInfoRow label={nav.operatorLabel}>
+                    <FooterValue value={LEGAL_INFO.companyName} />
+                  </FooterInfoRow>
+                )}
+                {!hasPlaceholder(LEGAL_INFO.cui) && (
+                  <FooterInfoRow label={nav.cuiLabel}>
+                    <FooterValue value={LEGAL_INFO.cui} />
+                  </FooterInfoRow>
+                )}
+              </div>
+            )}
 
             {/* copper divider */}
             <div style={{ width: 32, height: 1, backgroundColor: 'var(--copper)', opacity: 0.3 }} aria-hidden />

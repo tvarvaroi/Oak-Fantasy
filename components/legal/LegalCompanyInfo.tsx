@@ -1,4 +1,4 @@
-import { LEGAL_INFO, isPlaceholderMode } from '@/lib/legal-info';
+import { LEGAL_INFO, isPlaceholderMode, hasPlaceholder } from '@/lib/legal-info';
 
 interface LegalCompanyInfoProps {
   sectionLabel: string;
@@ -12,8 +12,11 @@ interface LegalCompanyInfoProps {
   placeholderBanner: string;
 }
 
+// Rows with placeholder values render nothing (design-qa Batch A) — the row
+// appears automatically once the real value lands in env. The dashed banner
+// below the list explains the gap while isPlaceholderMode is on.
 function Row({ label, value }: { label: string; value: string }) {
-  const isPlaceholder = value.startsWith('[');
+  if (hasPlaceholder(value)) return null;
   return (
     <div className="grid grid-cols-[minmax(120px,180px)_1fr] gap-3 items-baseline">
       <span
@@ -25,11 +28,9 @@ function Row({ label, value }: { label: string; value: string }) {
       <span
         className="font-lora"
         style={{
-          color: isPlaceholder ? 'var(--ink-soft)' : 'var(--ink)',
-          fontStyle: isPlaceholder ? 'italic' : 'normal',
+          color: 'var(--ink)',
           fontSize: '0.95rem',
           lineHeight: 1.55,
-          opacity: isPlaceholder ? 0.85 : 1,
         }}
       >
         {value}

@@ -85,56 +85,30 @@ function SignatureSVG({ signing }: { signing: boolean }) {
   );
 }
 
-/* ─── Single animated line ───────────────────────────────────────── */
-function RevealLine({
-  line,
-  scrollYProgress,
-  lineStart,
-  lineEnd,
-}: {
-  line: string;
-  scrollYProgress: ReturnType<typeof useScroll>['scrollYProgress'];
-  lineStart: number;
-  lineEnd: number;
-}) {
+/* ─── Paragraph block with staggered line-by-line reveal ──────────
+   Batch A fix (design-qa audit): the old version drove each line's opacity
+   from the SECTION's scrollYProgress (lines fully visible only at progress
+   0.45-0.6). On mobile/tablet the text sits at the TOP of a very tall
+   section, so those thresholds were reached only after the text had already
+   scrolled past the viewport — users saw a big "empty band" of invisible
+   copy. whileInView reveals each line when the LINE itself is on screen,
+   which is correct at every viewport height. */
+function RevealLines({ lines }: { lines: string[] }) {
   const prefersReduced = useReducedMotion();
-  const opacity = useTransform(scrollYProgress, [lineStart, lineEnd], [0, 1]);
-  const y = useTransform(scrollYProgress, [lineStart, lineEnd], [18, 0]);
-  return (
-    <motion.span style={prefersReduced ? {} : { opacity, y, display: 'block' }}>
-      {line}
-    </motion.span>
-  );
-}
-
-/* ─── Paragraph block with line-by-line scroll reveal ───────────── */
-function RevealLines({
-  lines,
-  scrollYProgress,
-  startAt,
-  endAt,
-}: {
-  lines: string[];
-  scrollYProgress: ReturnType<typeof useScroll>['scrollYProgress'];
-  startAt: number;
-  endAt: number;
-}) {
-  const count = lines.length;
   return (
     <div className="flex flex-col" style={{ gap: '0.55em' }}>
-      {lines.map((line, i) => {
-        const lineStart = startAt + (i / count) * (endAt - startAt) * 0.7;
-        const lineEnd = lineStart + (endAt - startAt) * 0.3;
-        return (
-          <RevealLine
-            key={i}
-            line={line}
-            scrollYProgress={scrollYProgress}
-            lineStart={lineStart}
-            lineEnd={lineEnd}
-          />
-        );
-      })}
+      {lines.map((line, i) => (
+        <motion.span
+          key={i}
+          style={{ display: 'block' }}
+          initial={prefersReduced ? false : { opacity: 0, y: 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-8%' }}
+          transition={{ duration: 0.55, delay: i * 0.09, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {line}
+        </motion.span>
+      ))}
     </div>
   );
 }
@@ -360,12 +334,7 @@ export default function WorkshopSection({ language }: { language: 'ro' | 'en' })
                 color: 'var(--ink-soft)',
               }}
             >
-              <RevealLines
-                lines={c.body1}
-                scrollYProgress={scrollYProgress}
-                startAt={0.08}
-                endAt={0.45}
-              />
+              <RevealLines lines={c.body1} />
             </div>
 
             {/* body 2 */}
@@ -377,12 +346,7 @@ export default function WorkshopSection({ language }: { language: 'ro' | 'en' })
                 color: 'var(--ink-soft)',
               }}
             >
-              <RevealLines
-                lines={c.body2}
-                scrollYProgress={scrollYProgress}
-                startAt={0.28}
-                endAt={0.6}
-              />
+              <RevealLines lines={c.body2} />
             </div>
 
             {/* pull quote */}

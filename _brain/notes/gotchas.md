@@ -993,3 +993,20 @@ Trei pattern-uri care apar în screenshots fullPage Playwright și NU sunt bug-u
    reproduce pe ambele locale + verifică runtime cu scroll lent.
 **Unealtă:** imagini prea înalte pentru review → segmentare cu ffmpeg crop
 (`scratchpad/split-tall.sh` pattern; fără dependențe noi — sharp/pngjs nu-s instalate).
+
+## 2026-07-05 — `img.decode()` pe imagini lazy ASCUNSE nu se rezolvă niciodată (Chromium) → hang total
+
+**Simptom:** Scriptul de captură design-qa (Batch A) rula fără să producă niciun
+screenshot — nici după 4+ minute, fără eroare, fără timeout.
+**Cauză reală:** Pasul nou „așteaptă încărcarea imaginilor lazy" folosea
+`Promise.all(images.map(i => i.decode()))`. Pentru o imagine `loading=lazy` care e
+`display:none` (ex. layout-ul duplicat al altui breakpoint — track-ul desktop al
+ProductTease la 375px), algoritmul de lazy-load din Chromium NU pornește niciodată
+(imaginea nu intersectează), iar `decode()` rămâne PENDING pentru totdeauna — nu
+resolve, nu reject (deci `.catch()` nu ajută). Un singur `<img>` ascuns blochează
+tot `Promise.all` → tot scriptul.
+**Fix:** `Promise.race([Promise.all(decode-uri), timeout 6s])` — obligatoriu de
+fiecare dată când aștepți decode pe TOATE imaginile din pagină.
+**Lecție:** Promise-urile care pot rămâne pending etern (nu doar reject) cer race
+cu timeout, nu doar catch. Documentat și în skill-ul design-qa + scripts/design-qa-capture.mjs.
+**Fișiere:** scripts/design-qa-capture.mjs (primeScroll), ~/.claude/skills/design-qa/SKILL.md.

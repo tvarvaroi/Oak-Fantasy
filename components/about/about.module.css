@@ -47,9 +47,18 @@
 
 /* ── Workshop ─────────────────────────────────────────── */
 .workshop { padding: 0; background: var(--cream-warm); position: relative; }
-.workshopBanner { position: relative; height: clamp(380px, 52vw, 560px); overflow: hidden; }
-.workshopBanner::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(31, 24, 16, .55), rgba(31, 24, 16, 0) 60%); }
-.workshopOverlay { position: absolute; left: 0; right: 0; bottom: 0; padding: 60px 48px; color: var(--cream-warm); z-index: 2; max-width: 1200px; margin: 0 auto; display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; flex-wrap: wrap; }
+/* Banner GROWS with its overlay content (design-qa Batch A fix): the old
+   fixed height + absolute bottom-anchored overlay clipped the heading at the
+   top on mobile/tablet (overlay 549-572px > banner 380px — the EN heading was
+   fully invisible at 375). Overlay now lives in flow; min-height keeps the
+   cinematic size on desktop where the content is short. */
+.workshopBanner { position: relative; min-height: clamp(380px, 52vw, 560px); overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; }
+/* Scrim strengthened + taller (audit: white text was illegible over the light
+   upper part of the image; the copper cross-link was washed out). Warm bark
+   tone, not black — fades out by 80% so the top of the image stays visible. */
+.workshopBanner::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(31, 24, 16, .68) 0%, rgba(31, 24, 16, .44) 45%, rgba(31, 24, 16, 0) 80%); }
+.workshopOverlay { position: relative; width: 100%; padding: clamp(180px, 26vw, 240px) 48px 60px; color: var(--cream-warm); z-index: 2; max-width: 1200px; margin: 0 auto; display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; flex-wrap: wrap; }
+@media (max-width: 640px) { .workshopOverlay { padding-left: 24px; padding-right: 24px; } }
 .workshopOverlay .eyebrow { color: var(--copper); margin-bottom: 14px; }
 .workshopOverlay h2 { font-family: var(--font-caudex); font-size: clamp(1.8rem, 3.4vw, 2.6rem); line-height: 1.18; max-width: 520px; }
 .workshopOverlay p { font-family: var(--font-lora); font-size: 1rem; line-height: 1.78; color: rgba(245, 235, 216, .85); max-width: 480px; }
@@ -61,7 +70,7 @@
 /* ── Values ───────────────────────────────────────────── */
 .values { background: var(--cream-warm); padding: 120px 0; }
 .valuesWrap { max-width: 1200px; margin: 0 auto; padding: 0 48px; }
-.valuesHead { display: flex; justify-content: space-between; align-items: end; margin-bottom: 48px; gap: 40px; flex-wrap: wrap; }
+.valuesHead { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 48px; gap: 40px; flex-wrap: wrap; }
 .valuesHead h2 { font-family: var(--font-caudex); font-size: clamp(1.8rem, 3.4vw, 2.6rem); font-weight: 700; line-height: 1.15; margin-top: 8px; }
 .valuesLead { font-family: var(--font-lora); font-size: 1rem; color: var(--ink-soft); max-width: 340px; line-height: 1.75; }
 .valuesGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }

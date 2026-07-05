@@ -298,3 +298,30 @@ findings. GSAP scos din Navbar = GSAP dispare din First Load JS pe paginile inte
 e input-ul founder-ului pentru batch-urile de fix — NIMIC din raport nu s-a reparat în
 afara Navbar-ului (scope discipline). Verificare 199/199 e2e + 72 baselines regen +
 hydration 0 + runtime checks pe cele 3 findings ambigue (toate rezolvate/false alarm).
+
+## 2026-07-05 — Design Batch A: root-cause pe 2 critice + 5 fix-uri vizuale
+
+**Pattern descoperit:** (1) **Două „critice" din audit erau atacabile doar prin
+systematic-debugging, nu prin fix direct**: ProductTease @768 s-a dovedit artefact
+de captură (lazy images mid-flight în stitch-ul fullPage + captura RM fără scroll),
+iar /despre EN era geometrie pură (overlay 572px > banner fix 380px cu overflow
+hidden — măsurat runtime cu getBoundingClientRect înainte și după fix). Regula:
+findings vizuale din screenshots = verifică runtime ÎNAINTE de fix (assert-uri
+scriptabile: h2 inside banner, zero token-uri, opacity la scroll). (2) **`img.decode()`
+pe imagini lazy ascunse (display:none) rămâne PENDING etern în Chromium** — orice
+așteptare pe decode-uri cere `Promise.race` cu timeout, nu doar catch (a blocat
+complet capture-ul; gotcha dedicat). (3) **Scroll-driven opacity (useTransform pe
+scrollYProgress al secțiunii) e fragil pe secțiuni înalte mobile** — pragurile de
+progress se ating după ce elementul a ieșit din viewport; whileInView per-element
+e corect la orice înălțime. (4) **Ascundere condiționată de placeholders**:
+`hasPlaceholder()` (includes '[') + rând nerandat = pattern aplicat în 4 componente;
+datele apar automat din env, zero cod la lansare.
+**Aplicat la:** lib/legal-info.ts, Footer, ContactInfo, LegalCompanyInfo, LegalHero,
+about.module.css (workshopBanner flow + scrim), tocatoare.module.css (gradient cream
+v3 peste treeline), atelier/content.ts (EN „gets done."), CuttingBoard3D (slot decal
+plat în loc de fake C-cutout; umbră #5C3A20 @0.13 + radius 7), WorkshopSection
+(RevealLines whileInView), scripts/design-qa-capture.mjs + skill design-qa (decode
+race + RM priming).
+**De ce contează:** Auditul rămâne credibil doar dacă protocolul de captură nu
+fabrică findings — cele 2 reguli noi (decode race, RM priming) sunt permanente în
+skill. Toate cele 7 fix-uri verificate cu 52 capturi + 4 assert-uri runtime.

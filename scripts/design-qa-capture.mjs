@@ -51,16 +51,35 @@ async function settle(page) {
 }
 
 // Scroll through the page to trigger whileInView / IntersectionObserver
-// animations, then return to top so the fullPage stitch shows real content.
+// animations AND native lazy-image loads, then wait for every image to finish
+// decoding before returning to top. Without the decode wait, the fullPage
+// stitch captures lazy images mid-flight as blank rectangles — a false
+// finding (Batch A root cause, 2026-07-05).
 async function primeScroll(page) {
   await page.evaluate(async () => {
     const step = window.innerHeight * 0.7;
     for (let y = 0; y <= document.body.scrollHeight; y += step) {
       window.scrollTo(0, y);
-      await new Promise((r) => setTimeout(r, 120));
+      await new Promise((r) => setTimeout(r, 160));
     }
-    window.scrollTo(0, 0);
   });
+  // NOTE: decode() on a hidden lazy image (display:none — e.g. the other
+  // breakpoint's layout) never settles in Chromium, because the lazy-load
+  // algorithm never starts for non-intersecting images. Race with a hard
+  // timeout so one hidden <img> can't hang the whole capture run.
+  await page
+    .evaluate(() =>
+      Promise.race([
+        Promise.all(
+          [...document.images].map((img) =>
+            img.complete ? Promise.resolve() : img.decode().catch(() => {}),
+          ),
+        ),
+        new Promise((resolve) => setTimeout(resolve, 6000)),
+      ]),
+    )
+    .catch(() => {});
+  await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(700);
 }
 
@@ -306,14 +325,18 @@ async function main() {
     });
   }
 
-  // ── 6. reduced-motion runs (NO scroll priming — tests content visibility) ─
+  // ── 6. reduced-motion runs — WITH scroll priming. RM verifies content is
+  // visible without animations; it does not disable lazy loading, so a
+  // no-scroll capture would show below-fold images blank (false finding).
+  // Animation defects still surface: with RM emulated, anything stuck at
+  // opacity 0 after priming is a real bug.
   for (const [key, slug] of [['home', ''], ['atelier', 'atelier'], ['tocatoare', 'tocatoare']]) {
     for (const vp of [VIEWPORTS[0], VIEWPORTS[3]]) {
       await tryStep(`reduced-motion-${key}-${vp.name}`, async () => {
         const { page, ctx } = await newPage(browser, vp, { reducedMotion: true });
         await page.goto(`${BASE}/ro${slug ? `/${slug}` : ''}`);
         await settle(page);
-        await page.waitForTimeout(800);
+        await primeScroll(page);
         await shot(page, 'reduced-motion', `${key}-rm--ro--${vp.name}`);
         await ctx.close();
       });
