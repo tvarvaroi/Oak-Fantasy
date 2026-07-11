@@ -346,3 +346,20 @@ inventar comentat), WorkshopSection.tsx + ProductTease.tsx (h2 unic).
 **De ce contează:** SEO #8/#12/#14 închise. 🚨 De reținut: promovarea CSP la
 enforce = schimbi numele header-ului în next.config.js DUPĂ verificarea pe
 Vercel prod (violările apar în consola browserului).
+
+## 2026-07-11 — Landing cadouri Faza 1: pattern „design-first, build la assets"
+
+**Pattern descoperit:** Pentru pagini noi dependente de assets (poze) — Faza 1 = design
+doc + copy final + DESIGN SPEC BRIEF self-contained (tokens hex + fonturi + structură +
+ratio-uri sloturi foto, consumabil de Claude Design fără acces la codebase) + brief foto
+prioritizat P1/P2/P3 scris pentru fotograf. Build-ul e gated pe cadrele P1. Research
+vizual cu agenți (5-6 site-uri premium + incumbenții RO) înainte de structură = decizii
+de layout cu dovezi, nu gust. CRO pt cadouri: gravura vizibilă ÎN hero, navigație pe
+ocazie/destinatar, povestea meșterului mid-page, promisiune de livrare PE DATĂ (feature
+funcțional cu calcul zile lucrătoare, nu copy static), zero mecanici de urgență.
+**Aplicat la:** docs/plans/landing-cadouri-design.md + landing-cadouri-photo-brief.md;
+skills marketingskills (cro+copywriting) folosite prima dată — framework-urile lor de
+structură/claritate au ghidat wireframe-ul și copy-ul.
+**De ce contează:** Template reutilizabil pentru orice pagină nouă cu dependență de
+assets (ex. /ingrijire cu poze proces). Claude Design în buclă: spec brief aprobat →
+prototip vizual founder → build cu țintă vizuală clară — reduce iterațiile de design-qa.

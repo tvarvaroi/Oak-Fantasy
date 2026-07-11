@@ -1190,3 +1190,53 @@ NEXT (din audit, 🟡): security headers, PDP content 300+, bundle 3D izolat, ll
   (fără update) = dovada că animația e pixel-identică.
 - NEXT: după deploy, verifică consola pe Vercel prod o perioadă → promovează
   CSP din Report-Only în enforce (schimbi numele header-ului în next.config.js).
+
+2026-07-09 — KEYWORD RESEARCH RO (raport, zero cod)
+- Metodă onestă fără DataForSEO: Google suggest API public (hl=ro&gl=ro) = semnal
+  REAL de autocomplete + SERP-observed + inferență, fiecare keyword etichetat cu sursa.
+  ZERO volume inventate. 4 agenți paraleli.
+- Verdicte: PRIMAR = familia „tocător din lemn de stejar/lemn masiv" („tocător"
+  simplu = tocător de CRENGI pentru Google — de evitat!). AUR = „tocator personalizat"
+  cu arbore pe destinatari (nași în 4 arbori separate; SERP-ul = gift-shop-uri MDF,
+  #1 domeniu mort). „fund de lemn" = registru tradițional pt conținut. „charcuterie"
+  NU e termen de produs în RO („traducere/meaning" în sugestii). End-grain/heirloom
+  aproape nerevendicat (2 apariții în 6 SERP-uri).
+- Livrabil: docs/keyword-research-2026-07.md (clustere + mapare keyword→pagină pt
+  toate 10 PDP-urile cu meta_title recomandate + calendar sezonal + top 10 acțiuni).
+- NEXT founder: decide landing-ul cadouri (recomandare DA), umple meta_title/long_desc
+  în admin, apoi blog #1 „Ce ulei pentru tocător".
+
+2026-07-09 — INSTALARE marketingskills (Corey Haines) cu security audit
+- Audit manual pe clone izolat (411 fișiere, commit 33218ff = v2.8.1): VERDICT SAFE.
+  Skills = doar prompt content (fără injection, fără hidden comments, fără citire
+  secrete — singura instrucțiune de fișier = convenția .agents/product-marketing.md).
+  65 CLI-uri JS: fetch DOAR la API-urile oficiale ale serviciilor numite, env doar
+  cheile proprii, ZERO child_process/eval, un singur fs.read (wistia SRT, user-supplied).
+  Zero dependențe npm (sendgrid/webflow require = doar în snippet-uri de documentație).
+  Shell scripts = lint pt contributori (nu le rulăm). GitHub Action = CI-only.
+- Instalat SELECTIV 8/46 skills în ~/.claude/skills/ (native names, fără evals/):
+  cro, copywriting, copy-editing, ab-testing, analytics, emails, offers, signup.
+  SKIP: cold-email/prospecting/sms (nu facem outreach), ads/aso/social/video (nu încă),
+  seo-audit/ai-seo/schema/site-architecture/programmatic-seo (avem claude-seo),
+  restul (paywalls, pricing, referrals, marketing-council etc.) — la nevoie, re-audit.
+- Pin: .provenance în ~/.claude/skills/cro/ cu commit-ul auditat — orice update viitor
+  = re-clone + re-audit, nu update silențios.
+- Utilizare imediată: cro + copywriting pe landing-ul de cadouri (keyword research
+  2026-07) și PDP content; emails pe secvențele tranzacționale viitoare.
+
+2026-07-11 — LANDING CADOURI FAZA 1: design doc + copy RO/EN + brief foto (zero cod)
+- Research vizual (2 agenți): model = Ugmonk („premium fără presiune”, povestea
+  meșterului mid-page) + mecanicile de cadou Words with Boards (gravura ÎN hero,
+  ocazii, making-of > configurator). Gap deținut: „comandat azi → ajunge până la
+  [dată]” + „vezi exact ce primești și cine îl face” — nimeni nu le face (RO sau US).
+  Anti-patterns: discount-hero/countdown, umor-șablon, catalog sprawl, stock photos.
+- Decizii founder: slug /tocatoare-personalizate (label nav „Cadouri”), Tier 1 poziția 2,
+  FĂRĂ configurator v1, schema BreadcrumbList+ItemList+FAQPage (FAQ = doar AI-citability).
+- Livrabile: docs/plans/landing-cadouri-design.md (8 secțiuni wireframe + mobile-first
+  + SEO + DESIGN SPEC BRIEF self-contained pt Claude Design + build requirements —
+  inclusiv promisiunea de dată ca FEATURE cu calcul zile lucrătoare + sărbători RO) +
+  copy complet RO/EN (în doc §4) + docs/plans/landing-cadouri-photo-brief.md (shot list
+  prioritizat P1/P2/P3 pt fotograf; P1.1 = hero gravură close-up „Maria & Andrei · 2026”;
+  include PDP 1:1 ≥1500px toate 10 SKU + top-down end-grain).
+- NEXT: founder prototipează în Claude Design cu spec brief-ul (§6); build-ul AȘTEAPTĂ
+  pozele P1 + produsele reale. La build: PATHNAMES key `cadouri`, design-qa, baselines.
