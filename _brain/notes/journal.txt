@@ -1240,3 +1240,29 @@ NEXT (din audit, 🟡): security headers, PDP content 300+, bundle 3D izolat, ll
   include PDP 1:1 ≥1500px toate 10 SKU + top-down end-grain).
 - NEXT: founder prototipează în Claude Design cu spec brief-ul (§6); build-ul AȘTEAPTĂ
   pozele P1 + produsele reale. La build: PATHNAMES key `cadouri`, design-qa, baselines.
+
+2026-07-14 — ADDENDUM LEGAL: date firmă FINALE + livrare doar RO + social real
+- Date firmă finale (ROOBO PELLETS S.R.L, CUI 39549528, J2018001030021, sediu Arad,
+  200 RON capital, TVA neplătitor, CAEN 3109, +40 774 905 182, oakfantasy2026@gmail.com)
+  → env-driven via lib/legal-info.ts; valorile CANONICE în .env.example + .env.local;
+  founder le pune în Vercel (toate mediile) + redeploy.
+- OMISE PERMANENT public (founder): reprezentant legal (câmp ȘTERS din LEGAL_INFO),
+  IBAN, adresa atelierului (workshopAddress = constant '[NEAFISAT_PUBLIC]', fără env —
+  structural imposibil de afișat; narativ „vestul României").
+- Livrare doar România: Termeni (sectionOverride 'delivery' cu FinalFact — pattern
+  retur statutory: fapta definitivă + LegalPlaceholder cât copy-ul de avocat e pending),
+  checkout pas 1 (notă vizibilă paper-aged), PDP (rând cu icon curier sub gravare).
+- TVA neplătitor: Termeni override 'prices-payment' + notă sub totalul din ReviewStep.
+- Social REAL: LEGAL_INFO.social (IG @oakfantasy — handle corectat din @oakfantasy.ro,
+  FB share link, TikTok @oak_fantasy) → Footer 3 linkuri cu icoane line-art + Organization
+  sameAs în entity graph. Adresa Organization = sediul (Arad), nu Transilvania.
+- Email public: gmail default în LEGAL_INFO (env poate suprascrie); atelier@oakfantasy.ro
+  din tocatoare/content.ts → LEGAL_INFO.contactEmail (DRY); llms.txt actualizat
+  (email + social + shipping RO-only + region western Romania).
+- Verificare: 22/22 checks runtime pe prod build cu env final (footer/contact/termeni/
+  PDP/checkout/JSON-LD, zero token-uri, zero info@ vechi). isPlaceholderMode = fals
+  complet cu env-ul pus.
+- NOTĂ deschisă (nemodificat, de decis de founder): copy-ul existent zice „inima
+  Transilvaniei" (WorkshopSection homepage) și „Carpathians" (llms.txt/atelier) —
+  narativ founder = „vestul României". Arad e vestul; Transilvania e discutabil.
+  Schimbarea de copy narativ = task separat dacă founder-ul o vrea.

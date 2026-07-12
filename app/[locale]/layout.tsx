@@ -4,7 +4,7 @@ import { Caudex, Caveat, Lora } from 'next/font/google';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import PageTransition from '@/components/PageTransition';
 import { isLocale, type Locale } from '@/lib/i18n-routes';
-import { LEGAL_INFO } from '@/lib/legal-info';
+import { LEGAL_INFO, hasPlaceholder } from '@/lib/legal-info';
 import '../globals.css';
 
 const caudex = Caudex({
@@ -32,9 +32,9 @@ const SITE_URL = 'https://oakfantasy.ro';
 
 // Sitewide entity graph (SEO audit fix #4). Organization + WebSite with stable
 // @id anchors — subpages (despre/atelier/contact/termeni) reference these ids
-// instead of re-declaring disconnected copies. sameAs is intentionally OMITTED
-// until real social profiles exist (a generic instagram.com link would be a
-// placeholder entity signal — worse than none).
+// instead of re-declaring disconnected copies. sameAs = REAL social profiles
+// (live 2026-07-11). Address = registered HQ (public registry data, Arad);
+// the WORKSHOP address is permanently unlisted (founder decision) — never emit.
 function entityGraph(locale: Locale) {
   return {
     '@context': 'https://schema.org',
@@ -51,16 +51,23 @@ function entityGraph(locale: Locale) {
             : 'Atelier românesc mic care lucrează manual tocătoare din stejar din Carpați.',
         foundingDate: '2026',
         email: LEGAL_INFO.contactEmail,
-        // Placeholder-aware (audit fix #11): the street address joins the
-        // schema automatically once NEXT_PUBLIC_WORKSHOP_ADDRESS is real —
-        // never emit a "[ADRESA_ATELIER]" token to crawlers.
+        // Placeholder-aware (audit fix #11): fields join the schema
+        // automatically once env values land — never emit a "[TOKEN]".
+        ...(hasPlaceholder(LEGAL_INFO.contactPhone)
+          ? {}
+          : { telephone: LEGAL_INFO.contactPhone.replace(/\s+/g, '') }),
+        sameAs: [
+          LEGAL_INFO.social.instagram,
+          LEGAL_INFO.social.facebook,
+          LEGAL_INFO.social.tiktok,
+        ],
         address: {
           '@type': 'PostalAddress',
-          ...(LEGAL_INFO.workshopAddress.startsWith('[')
+          ...(hasPlaceholder(LEGAL_INFO.hqAddress)
             ? {}
-            : { streetAddress: LEGAL_INFO.workshopAddress }),
+            : { streetAddress: LEGAL_INFO.hqAddress, addressLocality: 'Arad' }),
           addressCountry: 'RO',
-          addressRegion: 'Transilvania',
+          addressRegion: 'Arad',
         },
       },
       {

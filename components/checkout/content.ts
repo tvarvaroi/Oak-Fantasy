@@ -9,6 +9,8 @@ export interface CheckoutContent {
 
   // Step 1
   shippingHeading: string;
+  shippingRegionNote: string;
+  vatNote: string;
   loginPrompt: string;
   loginLink: string;
   orderingAsPrefix: string;
@@ -61,6 +63,8 @@ export const CHECKOUT_CONTENT: Record<Locale, CheckoutContent> = {
     priceUnit: 'RON',
 
     shippingHeading: 'Date de livrare',
+    shippingRegionNote: 'Momentan livrăm doar în România.',
+    vatNote: 'Prețurile sunt finale. Societatea nu este plătitoare de TVA.',
     loginPrompt: 'Ai deja cont?',
     loginLink: 'Conectează-te',
     orderingAsPrefix: 'Comanzi ca',
@@ -114,6 +118,8 @@ export const CHECKOUT_CONTENT: Record<Locale, CheckoutContent> = {
     priceUnit: 'RON',
 
     shippingHeading: 'Shipping details',
+    shippingRegionNote: 'We currently ship only within Romania.',
+    vatNote: 'Prices are final. The company is not registered for VAT.',
     loginPrompt: 'Already have an account?',
     loginLink: 'Sign in',
     orderingAsPrefix: 'Ordering as',

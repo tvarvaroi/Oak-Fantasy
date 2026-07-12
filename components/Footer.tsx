@@ -145,6 +145,35 @@ function InstagramIcon() {
   );
 }
 
+function FacebookIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <rect x="2" y="2" width="20" height="20" rx="6" stroke="currentColor" strokeWidth="1.5" />
+      <path
+        d="M15.5 8h-1.7c-.5 0-.8.35-.8.9V11h2.4l-.35 2.4H13v6.1h-2.6v-6.1H8.5V11h1.9V8.6c0-1.9 1.15-3.1 3-3.1h2.1V8z"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function TikTokIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <rect x="2" y="2" width="20" height="20" rx="6" stroke="currentColor" strokeWidth="1.5" />
+      <path
+        d="M12.6 6.5v8.1a2.6 2.6 0 1 1-2.2-2.57M12.6 6.5c.2 1.8 1.55 3.2 3.4 3.4v2.1c-1.3 0-2.5-.45-3.4-1.2"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 /* ─── Main Footer ────────────────────────────────────────────────── */
 
 export default function Footer({ language }: { language: 'ro' | 'en' }) {
@@ -341,18 +370,42 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
                 </span>
               </FooterInfoRow>
 
-              {/* instagram — channel of communication, grouped here (D6) */}
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 transition-opacity duration-200 hover:opacity-80"
-                style={{ color: 'rgba(245,235,216,0.5)', textDecoration: 'none', width: 'fit-content', marginTop: 2 }}
-                aria-label="Instagram"
-              >
-                <InstagramIcon />
-                <span className="font-lora" style={{ fontSize: '0.82rem' }}>@oakfantasy.ro</span>
-              </a>
+              {/* social — REAL profiles (2026-07-11), single source LEGAL_INFO.social */}
+              <div className="flex flex-col gap-2" style={{ marginTop: 2 }}>
+                <a
+                  href={LEGAL_INFO.social.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 transition-opacity duration-200 hover:opacity-80"
+                  style={{ color: 'rgba(245,235,216,0.5)', textDecoration: 'none', width: 'fit-content' }}
+                  aria-label="Instagram"
+                >
+                  <InstagramIcon />
+                  <span className="font-lora" style={{ fontSize: '0.82rem' }}>@oakfantasy</span>
+                </a>
+                <a
+                  href={LEGAL_INFO.social.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 transition-opacity duration-200 hover:opacity-80"
+                  style={{ color: 'rgba(245,235,216,0.5)', textDecoration: 'none', width: 'fit-content' }}
+                  aria-label="Facebook"
+                >
+                  <FacebookIcon />
+                  <span className="font-lora" style={{ fontSize: '0.82rem' }}>Oak Fantasy</span>
+                </a>
+                <a
+                  href={LEGAL_INFO.social.tiktok}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 transition-opacity duration-200 hover:opacity-80"
+                  style={{ color: 'rgba(245,235,216,0.5)', textDecoration: 'none', width: 'fit-content' }}
+                  aria-label="TikTok"
+                >
+                  <TikTokIcon />
+                  <span className="font-lora" style={{ fontSize: '0.82rem' }}>@oak_fantasy</span>
+                </a>
+              </div>
             </div>
           </motion.div>
 

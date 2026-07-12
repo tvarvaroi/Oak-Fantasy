@@ -126,6 +126,22 @@ export default function ProductInfo({
         </div>
       ) : null}
 
+      {/* Shipping area (final legal data, 2026-07-11): Romania-only + cost */}
+      <p
+        className="font-lora flex items-center gap-2"
+        style={{ fontSize: '0.85rem', color: 'var(--ink-soft)' }}
+      >
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden style={{ flexShrink: 0 }}>
+          <path
+            d="M3 7h11v9H3zM14 10h4l3 3v3h-7M7.5 19a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5zM17.5 19a1.75 1.75 0 1 0 0-3.5 1.75 1.75 0 0 0 0 3.5z"
+            stroke="var(--oak-warm)"
+            strokeWidth="1.4"
+            strokeLinejoin="round"
+          />
+        </svg>
+        {c.shippingNote}
+      </p>
+
       {/* Stock status (Task 4.1) — binary only, never the exact count. */}
       <div className="flex items-center gap-2">
         <span

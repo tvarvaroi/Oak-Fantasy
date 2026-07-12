@@ -103,6 +103,10 @@ export default function ReviewStep({
           <span className="font-caudex" style={{ color: 'var(--oak-deep)', fontWeight: 700, fontSize: '1.1rem' }}>{c.total}</span>
           <span className="font-caudex" style={{ color: 'var(--ink)', fontWeight: 700, fontSize: '1.3rem' }}>{formatPriceRon(total, locale)} {c.priceUnit}</span>
         </div>
+        {/* VAT status (final legal data, 2026-07-11): non-VAT-payer — prices final */}
+        <p className="font-lora" style={{ fontSize: '0.78rem', color: 'var(--ink-soft)', marginTop: 6, opacity: 0.85 }}>
+          {c.vatNote}
+        </p>
       </div>
 
       {/* Terms */}

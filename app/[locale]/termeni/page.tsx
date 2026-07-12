@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import LegalLayout from '@/components/legal/LegalLayout';
+import LegalPlaceholder from '@/components/legal/LegalPlaceholder';
 import LegalShell from '@/components/legal/LegalShell';
 import { TERMS_CONTENT } from '@/components/legal/terms/content';
 import { LEGAL_INFO } from '@/lib/legal-info';
@@ -81,9 +82,62 @@ function buildJsonLd(locale: Locale) {
   };
 }
 
+// Final, founder-confirmed facts (2026-07-11) injected as section overrides
+// while the full lawyer copy is still pending. Same pattern as /retur's
+// statutory note: definitive sentence + the shared "in preparation" body.
+const TERMS_FINAL_FACTS = {
+  ro: {
+    delivery: 'Livrăm exclusiv pe teritoriul României.',
+    pricesVat:
+      'Toate prețurile afișate pe site sunt exprimate în RON și sunt finale. Societatea nu este plătitoare de TVA.',
+  },
+  en: {
+    delivery: 'We deliver exclusively within the territory of Romania.',
+    pricesVat:
+      'All prices on the site are expressed in RON and are final. The company is not registered for VAT.',
+  },
+} as const;
+
+function FinalFact({ text }: { text: string }) {
+  return (
+    <p
+      className="font-lora"
+      style={{
+        margin: '0 0 14px',
+        padding: '10px 14px',
+        fontSize: '0.95rem',
+        lineHeight: 1.7,
+        color: 'var(--ink)',
+        borderLeft: '2px solid var(--oak-warm)',
+        backgroundColor: 'rgba(139,94,60,0.06)',
+        borderRadius: '0 6px 6px 0',
+      }}
+    >
+      {text}
+    </p>
+  );
+}
+
 export default function Page({ params }: { params: { locale: string } }) {
   if (!isLocale(params.locale)) notFound();
   const locale: Locale = params.locale;
+  const facts = TERMS_FINAL_FACTS[locale];
+
+  const overrides = {
+    delivery: (
+      <>
+        <FinalFact text={facts.delivery} />
+        <LegalPlaceholder locale={locale} />
+      </>
+    ),
+    'prices-payment': (
+      <>
+        <FinalFact text={facts.pricesVat} />
+        <LegalPlaceholder locale={locale} />
+      </>
+    ),
+  };
+
   return (
     <>
       <script
@@ -91,7 +145,11 @@ export default function Page({ params }: { params: { locale: string } }) {
         dangerouslySetInnerHTML={{ __html: ldSafe(buildJsonLd(locale)) }}
       />
       <LegalShell routeKey="terms" locale={locale}>
-        <LegalLayout content={TERMS_CONTENT[locale]} locale={locale} />
+        <LegalLayout
+          content={TERMS_CONTENT[locale]}
+          locale={locale}
+          sectionOverrides={overrides}
+        />
       </LegalShell>
     </>
   );

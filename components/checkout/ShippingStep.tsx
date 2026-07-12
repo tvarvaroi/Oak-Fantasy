@@ -32,6 +32,22 @@ export default function ShippingStep({
         {c.shippingHeading}
       </h2>
 
+      {/* Romania-only shipping (final legal data, 2026-07-11) — visible, not buried */}
+      <p
+        className="font-lora"
+        style={{
+          fontSize: '0.88rem',
+          color: 'var(--ink-soft)',
+          backgroundColor: 'var(--paper-aged)',
+          border: '1px solid rgba(139,94,60,0.2)',
+          borderRadius: 6,
+          padding: '8px 12px',
+          margin: 0,
+        }}
+      >
+        {c.shippingRegionNote}
+      </p>
+
       {isLoggedIn && email ? (
         <p className="font-lora" style={{ fontSize: '0.88rem', color: 'var(--ink-soft)' }}>
           {c.orderingAsPrefix} <span style={{ color: 'var(--oak-deep)', fontWeight: 500 }}>{email}</span>.

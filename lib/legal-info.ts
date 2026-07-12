@@ -9,42 +9,51 @@
 // MUST read from LEGAL_INFO, never hard-code strings.
 
 export const LEGAL_INFO = {
-  // Firma legală (parent SRL — woodworking)
+  // Firma legală (final data 2026-07-11 — values live in Vercel env, see
+  // .env.example for the canonical set; placeholders remain the fallback so
+  // a missing env never renders wrong data, it renders nothing).
   companyName: process.env.NEXT_PUBLIC_COMPANY_NAME ?? '[DENUMIRE_SRL]',
   cui: process.env.NEXT_PUBLIC_COMPANY_CUI ?? '[CUI]',
   regCom: process.env.NEXT_PUBLIC_COMPANY_REG_COM ?? '[REG_COM]',
   capitalSocial: process.env.NEXT_PUBLIC_COMPANY_CAPITAL ?? '[CAPITAL_SOCIAL]',
-  reprezentantLegal:
-    process.env.NEXT_PUBLIC_COMPANY_LEGAL_REP ?? '[REPREZENTANT_LEGAL]',
   vatStatus: process.env.NEXT_PUBLIC_COMPANY_VAT_STATUS ?? '[TVA_STATUS]',
   caen: process.env.NEXT_PUBLIC_COMPANY_CAEN ?? '[CAEN_PRINCIPAL]',
 
-  // Adrese
+  // Adrese. Sediul social e informație de registru public (afișată în legal).
+  // ⚠ Adresa ATELIERULUI e OMISĂ PERMANENT din public (decizie founder
+  // 2026-07-11) — nu e env-driven ca să nu poată apărea din greșeală;
+  // hasPlaceholder() o ascunde structural peste tot. Narativ: „vestul României".
   hqAddress: process.env.NEXT_PUBLIC_COMPANY_ADDRESS ?? '[ADRESA_SEDIU]',
-  workshopAddress:
-    process.env.NEXT_PUBLIC_WORKSHOP_ADDRESS ?? '[ADRESA_ATELIER]',
+  workshopAddress: '[NEAFISAT_PUBLIC]',
 
-  // Contact
-  contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? 'info@oakfantasy.ro',
+  // Contact. Emailul public e date publice — default real, env poate suprascrie.
+  contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? 'oakfantasy2026@gmail.com',
   contactPhone:
     process.env.NEXT_PUBLIC_CONTACT_PHONE ?? '[TELEFON_CONTACT]',
 
-  // Working hours — aligned with Footer (sprint 1 truth source).
-  // Saturday is intentionally placeholder until founder decides post-launch.
+  // Working hours — final (founder 2026-07-11): Mon–Fri 09:00–17:00.
   workingHours: {
-    weekdays: 'Luni–Vineri: 9–17',
-    saturday: 'Sâmbătă: [PROGRAM_SAMBATA]',
+    weekdays: 'Luni–Vineri: 09:00–17:00',
+    saturday: 'Sâmbătă: Închis',
     sunday: 'Duminică: Închis',
   },
   workingHoursEn: {
-    weekdays: 'Monday–Friday: 9–17',
-    saturday: 'Saturday: [PROGRAM_SAMBATA]',
+    weekdays: 'Monday–Friday: 09:00–17:00',
+    saturday: 'Saturday: Closed',
     sunday: 'Sunday: Closed',
   },
 
   // Brand info
   brandName: 'Oak Fantasy',
   brandDomain: 'oakfantasy.ro',
+
+  // Social — real, live profiles (2026-07-11). Public constants, no env.
+  // Displayed handle: @oakfantasy (Instagram), @oak_fantasy (TikTok).
+  social: {
+    instagram: 'https://www.instagram.com/oakfantasy',
+    facebook: 'https://www.facebook.com/share/1Cqy62SdUd/',
+    tiktok: 'https://www.tiktok.com/@oak_fantasy',
+  },
 
   // External regulatory links (no placeholder needed — public URLs).
   anpcUrl: 'https://anpc.ro',

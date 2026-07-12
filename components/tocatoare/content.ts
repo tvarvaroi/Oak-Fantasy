@@ -1,4 +1,5 @@
 import type { Locale } from '@/lib/i18n-routes';
+import { LEGAL_INFO } from '@/lib/legal-info';
 
 export type Tier = 'entry' | 'core' | 'premium' | 'hero';
 
@@ -92,7 +93,7 @@ export const TOCATOARE_CONTENT: Record<Locale, TocatoareContent> = {
       heading: 'Nu te poți hotărî?',
       body: 'Scrie-ne și te ajutăm să alegi tocătorul potrivit pentru bucătăria ta.',
       button: 'Contactează-ne',
-      email: 'atelier@oakfantasy.ro',
+      email: LEGAL_INFO.contactEmail,
     },
   },
   en: {
@@ -150,7 +151,7 @@ export const TOCATOARE_CONTENT: Record<Locale, TocatoareContent> = {
       heading: "Can't decide?",
       body: "Write to us and we'll help you choose the right board for your kitchen.",
       button: 'Get in touch',
-      email: 'atelier@oakfantasy.ro',
+      email: LEGAL_INFO.contactEmail,
     },
   },
 };

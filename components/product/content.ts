@@ -11,6 +11,8 @@ export interface ProductDetailContent {
   weight: string;
   engravingTitle: string;
   engravingNote: string;
+  // Keep in sync with lib/config/shipping.ts (25 RON flat / free ≥ 500 RON).
+  shippingNote: string;
   addToCart: string;
   cartComingSoon: string;
   saleLabel: string;
@@ -32,6 +34,7 @@ export const PRODUCT_DETAIL_CONTENT: Record<Locale, ProductDetailContent> = {
     weight: 'Greutate',
     engravingTitle: 'Gravare personalizată',
     engravingNote: 'Disponibilă la cerere — o adaugi la finalizarea comenzii.',
+    shippingNote: 'Livrare doar în România · 25 RON · gratuit peste 500 RON',
     addToCart: 'Adaugă în coș',
     cartComingSoon: 'Coșul de cumpărături vine în curând.',
     saleLabel: 'Reducere',
@@ -51,6 +54,7 @@ export const PRODUCT_DETAIL_CONTENT: Record<Locale, ProductDetailContent> = {
     weight: 'Weight',
     engravingTitle: 'Custom engraving',
     engravingNote: 'Available on request — add it at checkout.',
+    shippingNote: 'Ships only within Romania · 25 RON · free over 500 RON',
     addToCart: 'Add to cart',
     cartComingSoon: 'The shopping cart is coming soon.',
     saleLabel: 'Sale',
