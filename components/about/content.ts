@@ -5,7 +5,7 @@ import type { Locale } from '@/lib/i18n-routes';
 //      (full diacritics; the exact word "nealtoit" is intentional — never
 //      substitute with "natural/neprelucrat").
 // EN = founder-approved translations (sign-off 2026-05-18): US spelling,
-//      "Built to last", "wild Carpathian oak", workshop line stays as the
+//      "Built to last", "wild Romanian oak", workshop line stays as the
 //      section H2 ("Sawdust on the floor, oil on our fingers.").
 
 export interface ProcessStep {
@@ -87,7 +87,7 @@ const ro: AboutContent = {
     title: 'Despre Oak Fantasy — Atelier de tocătoare din stejar românesc',
     // 146 chars; includes "tocător din lemn de stejar", "manual", "atelier românesc".
     description:
-      'Tocător din lemn de stejar lucrat manual într-un atelier românesc mic. Stejar din Carpați, finisaj food-safe, fără linie de producție, fără grabă.',
+      'Tocător din lemn de stejar lucrat manual într-un atelier mic din vestul României. Stejar românesc, finisaj food-safe, fără linie de producție, fără grabă.',
   },
   hero: {
     eyebrow: 'Despre noi',
@@ -101,14 +101,14 @@ const ro: AboutContent = {
     eyebrow: 'Procesul',
     h2: 'Cinci pași între copac și bucătărie.',
     subHeading: 'De la copac la bucătărie',
-    lead: 'De la stejarul nealtoit din Carpați până la tocătorul pe care îl primești acasă — fiecare etapă cere timp, atenție și mâinile aceluiași om.',
+    lead: 'De la stejarul nealtoit din pădurile noastre până la tocătorul pe care îl primești acasă — fiecare etapă cere timp, atenție și mâinile aceluiași om.',
     steps: [
       {
         num: '01',
         tick: 'Pas unu',
         title: 'Alegerea lemnului',
-        body: 'Cumpărăm stejar de la oameni din zona Carpaților, doar bucăți cu desen frumos și fără noduri în lemnul de muncă. Restul îl folosim pentru alte lucruri.',
-        bodyCompact: 'Cumpărăm stejar din zona Carpaților, doar bucăți cu desen frumos. Restul îl folosim pentru alte lucruri.',
+        body: 'Cumpărăm stejar de la oameni din vestul țării, doar bucăți cu desen frumos și fără noduri în lemnul de muncă. Restul îl folosim pentru alte lucruri.',
+        bodyCompact: 'Cumpărăm stejar din vestul țării, doar bucăți cu desen frumos. Restul îl folosim pentru alte lucruri.',
         placeholder: 'oak log · forest edge · light',
       },
       {
@@ -152,7 +152,7 @@ const ro: AboutContent = {
     h2Line2Em: 'Un singur copac.',
     paragraphs: [
       'În atelierul nostru, fiecare tocător începe ca o bucată de stejar românesc — uscată încet, ani de zile, până când lemnul devine stabil și gata să primească mâna omului. Tăiem, lipim și finisăm fiecare placă singuri, fără linie de producție, fără grabă. Asta înseamnă că nu putem face mii pe lună. Înseamnă, în schimb, că fiecare tocător care iese din atelierul nostru poartă semnele unei singure perechi de mâini și ale unui singur copac.',
-      'Stejarul din Carpați e dens, închis la culoare, cu desen frumos pe oriunde îl tai. E lemnul potrivit pentru ceva ce vei folosi în fiecare zi pentru următorii zece, douăzeci, treizeci de ani. Asta facem noi — obiecte care durează cât bucătăria.',
+      'Stejarul românesc e dens, închis la culoare, cu desen frumos pe oriunde îl tai. E lemnul potrivit pentru ceva ce vei folosi în fiecare zi pentru următorii zece, douăzeci, treizeci de ani. Asta facem noi — obiecte care durează cât bucătăria.',
       'Nu suntem o fabrică. Suntem un atelier mic, român, care crede că un tocător din lemn poate fi un obiect care merită păstrat.',
     ],
   },
@@ -160,7 +160,7 @@ const ro: AboutContent = {
     eyebrow: 'Atelierul',
     h2: 'Cu rumeguș pe podele și ulei pe degete.',
     paragraph:
-      'Lucrăm într-un atelier mic, undeva în zona Carpaților, unde lumina e bună dimineața și liniștită seara. Aici tăiem, șlefuim și împachetăm fiecare tocător. Aici primim și mesajele voastre. Nu e showroom — e atelier.',
+      'Lucrăm într-un atelier mic, în vestul României, unde lumina e bună dimineața și liniștită seara. Aici tăiem, șlefuim și împachetăm fiecare tocător. Aici primim și mesajele voastre. Nu e showroom — e atelier.',
     placeholder: 'workshop interior · golden hour · wide shot',
     crossLinkLabel: 'Vezi atelierul în detaliu',
   },
@@ -203,7 +203,7 @@ const en: AboutContent = {
     title: 'About Oak Fantasy — Romanian oak cutting board workshop',
     // ~152 chars; mirrors RO with EN keywords (oak cutting boards, handmade, Romanian workshop).
     description:
-      'Handmade oak cutting boards from a small Romanian workshop. Carpathian oak, food-safe finish, no production line, no rush — built to last for decades.',
+      'Handmade oak cutting boards from a small workshop in western Romania. Romanian oak, food-safe finish, no production line, no rush — built to last for decades.',
   },
   hero: {
     eyebrow: 'About us',
@@ -217,14 +217,14 @@ const en: AboutContent = {
     eyebrow: 'The process',
     h2: 'Five steps between the tree and your kitchen.',
     subHeading: 'From tree to kitchen',
-    lead: 'From wild Carpathian oak to the board that arrives at your home — every stage takes time, attention, and the same pair of hands.',
+    lead: 'From wild Romanian oak to the board that arrives at your home — every stage takes time, attention, and the same pair of hands.',
     steps: [
       {
         num: '01',
         tick: 'Step one',
         title: 'Choosing the wood',
-        body: 'We buy oak from people in the Carpathian region — only pieces with beautiful grain and no knots in the working surface. The rest we use for other things.',
-        bodyCompact: 'We buy oak from the Carpathian region, only pieces with beautiful grain. The rest we use for other things.',
+        body: 'We buy oak from people in western Romania — only pieces with beautiful grain and no knots in the working surface. The rest we use for other things.',
+        bodyCompact: 'We buy oak from western Romania, only pieces with beautiful grain. The rest we use for other things.',
         placeholder: 'oak log · forest edge · light',
       },
       {
@@ -268,7 +268,7 @@ const en: AboutContent = {
     h2Line2Em: 'A single tree.',
     paragraphs: [
       'In our workshop, every board begins as a piece of Romanian oak — dried slowly, over years, until the wood is stable and ready for a human hand. We cut, glue and finish each board ourselves, with no production line, no rush. It means we can’t make thousands a month. It means, instead, that every board that leaves our workshop carries the marks of a single pair of hands and a single tree.',
-      'Carpathian oak is dense, dark, with beautiful grain wherever you cut it. It’s the right wood for something you’ll use every day for the next ten, twenty, thirty years. That’s what we make — objects that last as long as the kitchen.',
+      'Romanian oak is dense, dark, with beautiful grain wherever you cut it. It’s the right wood for something you’ll use every day for the next ten, twenty, thirty years. That’s what we make — objects that last as long as the kitchen.',
       'We are not a factory. We are a small Romanian workshop that believes a wooden cutting board can be an object worth keeping.',
     ],
   },
@@ -276,7 +276,7 @@ const en: AboutContent = {
     eyebrow: 'The workshop',
     h2: 'Sawdust on the floor, oil on our fingers.',
     paragraph:
-      'We work in a small workshop, somewhere in the Carpathian region, where the light is good in the morning and quiet in the evening. Here we cut, sand and pack every board. Here we also receive your messages. It’s not a showroom — it’s a workshop.',
+      'We work in a small workshop in western Romania, where the light is good in the morning and quiet in the evening. Here we cut, sand and pack every board. Here we also receive your messages. It’s not a showroom — it’s a workshop.',
     placeholder: 'workshop interior · golden hour · wide shot',
     crossLinkLabel: 'See the workshop in detail',
   },

@@ -42,7 +42,7 @@ export const TOCATOARE_CONTENT: Record<Locale, TocatoareContent> = {
     meta: {
       title: 'Tocătoare din Stejar Românesc — Oak Fantasy',
       description:
-        'Zece modele de tocătoare din stejar de Carpați, lucrate manual. De la tocătorul de zi cu zi până la blocul de moștenire.',
+        'Zece modele de tocătoare din stejar masiv românesc, lucrate manual. De la tocătorul de zi cu zi până la blocul de moștenire.',
       ogTitle: 'Tocătoare din Stejar Românesc — Oak Fantasy',
       ogDescription:
         'Catalog complet: zece modele lucrate manual din stejar românesc, de la 180 la 1.800 RON.',
@@ -51,7 +51,7 @@ export const TOCATOARE_CONTENT: Record<Locale, TocatoareContent> = {
       eyebrow: 'Catalog · Toate modelele',
       titleStart: 'Tocătoarele',
       titleEm: 'noastre.',
-      sub: 'Zece modele, de la tocătorul de zi cu zi până la blocul de moștenire. Fiecare lucrat manual din stejar de Carpați.',
+      sub: 'Zece modele, de la tocătorul de zi cu zi până la blocul de moștenire. Fiecare lucrat manual din stejar masiv românesc.',
       note: {
         strong: 'Fiecare tocător pleacă din atelier gata de folosit.',
         rest: 'Comanzi azi, îl lucrăm și îl trimitem în 5–10 zile lucrătoare.',
@@ -100,7 +100,7 @@ export const TOCATOARE_CONTENT: Record<Locale, TocatoareContent> = {
     meta: {
       title: 'Romanian Oak Cutting Boards — Oak Fantasy',
       description:
-        'Ten models of Carpathian oak cutting boards, handcrafted. From the everyday board to the heirloom block.',
+        'Ten models of solid Romanian oak cutting boards, handcrafted. From the everyday board to the heirloom block.',
       ogTitle: 'Romanian Oak Cutting Boards — Oak Fantasy',
       ogDescription:
         'Full catalogue: ten handcrafted Romanian oak boards, from 180 to 1,800 RON.',
@@ -109,7 +109,7 @@ export const TOCATOARE_CONTENT: Record<Locale, TocatoareContent> = {
       eyebrow: 'Catalogue · All models',
       titleStart: 'Our',
       titleEm: 'boards.',
-      sub: 'Ten models, from the everyday board to the heirloom block. Each handcrafted from Carpathian oak.',
+      sub: 'Ten models, from the everyday board to the heirloom block. Each handcrafted from solid Romanian oak.',
       note: {
         strong: 'Every board leaves the workshop ready to use.',
         rest: 'Order today — we craft and ship it in 5–10 business days.',

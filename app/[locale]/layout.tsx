@@ -47,8 +47,8 @@ function entityGraph(locale: Locale) {
         logo: `${SITE_URL}/3D_Cutting_Board_Model_Design.svg`,
         description:
           locale === 'en'
-            ? 'A small Romanian workshop hand-crafting oak cutting boards from Carpathian oak.'
-            : 'Atelier românesc mic care lucrează manual tocătoare din stejar din Carpați.',
+            ? 'A small workshop in western Romania hand-crafting solid-oak cutting boards.'
+            : 'Atelier mic din vestul României care lucrează manual tocătoare din stejar masiv.',
         foundingDate: '2026',
         email: LEGAL_INFO.contactEmail,
         // Placeholder-aware (audit fix #11): fields join the schema
@@ -109,7 +109,7 @@ export async function generateMetadata({
     return {
       ...shared,
       title: 'Oak Fantasy — Romanian Oak Cutting Boards',
-      description: 'Handcrafted cutting boards from Carpathian oak. Made with love in Romania.',
+      description: 'Solid-oak cutting boards handcrafted in a small workshop in western Romania.',
       openGraph: {
         title: 'Oak Fantasy — Romanian Oak Cutting Boards',
         description: 'From Romanian oak, cut and finished one by one in our workshop.',
@@ -120,7 +120,7 @@ export async function generateMetadata({
   return {
     ...shared,
     title: 'Oak Fantasy — Tocătoare din stejar românesc',
-    description: 'Tocătoare lucrate manual din stejar din Carpați. Făcut cu drag în România.',
+    description: 'Tocătoare din stejar masiv, lucrate manual într-un atelier din vestul României. Făcut cu drag în România.',
     openGraph: {
       title: 'Oak Fantasy — Tocătoare din stejar românesc',
       description: 'Din lemn de stejar românesc, tăiat și finisat unul câte unul în atelierul nostru.',

@@ -332,8 +332,8 @@ const columns: Column[] = [
     Ornament: OakLeafSVG,
     labelRo: 'Origine',
     labelEn: 'Origin',
-    titleRo: 'Stejar din Carpați',
-    titleEn: 'Carpathian Oak',
+    titleRo: 'Stejar românesc',
+    titleEn: 'Romanian Oak',
     bodyRo:
       'Fiecare bucată de lemn vine din păduri certificate din munții Bucegi și Apuseni — crăci doborâte natural, uscate lent, respectate din rădăcină până în fibră.',
     bodyEn:
@@ -346,9 +346,9 @@ const columns: Column[] = [
     titleRo: 'Lucrat manual',
     titleEn: 'Made by hand',
     bodyRo:
-      'Atelierul nostru din inima Transilvaniei cioplește, șlefuiește și finisează fiecare tocător cu mâinile — fără linii de producție, fără grabă, fără compromis.',
+      'Atelierul nostru din vestul României cioplește, șlefuiește și finisează fiecare tocător cu mâinile — fără linii de producție, fără grabă, fără compromis.',
     bodyEn:
-      'Our workshop in the heart of Transylvania shapes, sands and finishes every board by hand — no production lines, no rush, no compromise.',
+      'Our workshop in western Romania shapes, sands and finishes every board by hand — no production lines, no rush, no compromise.',
   },
   {
     Ornament: HeartLeavesSVG,

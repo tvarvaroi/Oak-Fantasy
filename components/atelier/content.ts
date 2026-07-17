@@ -146,11 +146,11 @@ const ro: AtelierContent = {
     title: 'Atelierul Oak Fantasy — Cum se face fiecare tocător din stejar',
     // 143 chars
     description:
-      'Atelier mic în Carpați. Stejar românesc, uscat 6–12 luni, șase unelte. Cum lucrăm manual fiecare tocător — de la lemn la ceară de albine.',
+      'Atelier mic în vestul României. Stejar românesc, uscat 6–12 luni, șase unelte. Cum lucrăm manual fiecare tocător — de la lemn la ceară de albine.',
   },
   hero: {
     eyebrow: 'Documentar · Atelier',
-    h1Line1: 'Un atelier mic, în zona Carpaților.',
+    h1Line1: 'Un atelier mic, în vestul României.',
     h1Line2Em: 'Și o singură regulă:',
     h1Line2Tail: 'nu grăbim lemnul.',
     sub: 'Un loc, șase unelte, o zi de lucru · Atelier Oak Fantasy',
@@ -223,7 +223,7 @@ const ro: AtelierContent = {
     h2Line1: 'Locul unde se face',
     h2Em: 'treaba.',
     paragraphs: [
-      'Atelierul nostru e o încăpere de vreo șaizeci de metri pătrați, undeva în zona Carpaților. Are lumină naturală bună până pe la patru după-amiaza, apoi aprindem lămpile. Iarna intră soarele direct pe geamul de est dimineața — atunci facem treaba care cere ochi bun, șlefuit fin, asamblare. Vara stăm mai mult în partea umbrită, unde temperatura rămâne stabilă.',
+      'Atelierul nostru e o încăpere de vreo șaizeci de metri pătrați, în vestul României, unde tâmplăria are rădăcini vechi. Are lumină naturală bună până pe la patru după-amiaza, apoi aprindem lămpile. Iarna intră soarele direct pe geamul de est dimineața — atunci facem treaba care cere ochi bun, șlefuit fin, asamblare. Vara stăm mai mult în partea umbrită, unde temperatura rămâne stabilă.',
       'Miroase a stejar — un miros dulce, ușor acrișor, care se ține în haine și în păr. Sunetul depinde de ce facem: motoarele de la planoiul circular și freză sunt cele zgomotoase, dar le folosim pe rând și nu toată ziua. Cel mai mult timp lucrăm cu unelte de mână — și atunci e liniște, doar fierăstrău, raspel, șmirghel.',
     ],
     placeholderTop: 'workshop wide · 60sqm · east window',
@@ -331,11 +331,11 @@ const en: AtelierContent = {
     title: 'Oak Fantasy Workshop — How every oak cutting board is made',
     // 142 chars
     description:
-      'Small workshop in the Carpathians. Romanian oak, dried 6–12 months, six tools. How we handcraft every cutting board — from wood to beeswax.',
+      'Small workshop in western Romania. Romanian oak, dried 6–12 months, six tools. How we handcraft every cutting board — from wood to beeswax.',
   },
   hero: {
     eyebrow: 'Documentary · Workshop',
-    h1Line1: 'A small workshop in the Carpathians.',
+    h1Line1: 'A small workshop in western Romania.',
     h1Line2Em: 'And one rule:',
     h1Line2Tail: "we don't rush the wood.",
     sub: 'One place, six tools, one working day · Oak Fantasy Workshop',
@@ -410,7 +410,7 @@ const en: AtelierContent = {
     h2Line1: 'The place where the work',
     h2Em: 'gets done.',
     paragraphs: [
-      'Our workshop is a room of about sixty square meters, somewhere in the Carpathians. It has good natural light until around four in the afternoon, then we turn on the lamps. In winter the sun comes in directly through the east window in the morning — that is when we do the work that needs a careful eye: fine sanding, assembly. In summer we stay more in the shaded part, where the temperature stays stable.',
+      'Our workshop is a room of about sixty square meters, in western Romania, where woodworking runs old and deep. It has good natural light until around four in the afternoon, then we turn on the lamps. In winter the sun comes in directly through the east window in the morning — that is when we do the work that needs a careful eye: fine sanding, assembly. In summer we stay more in the shaded part, where the temperature stays stable.',
       "It smells of oak — a sweet, slightly tart smell that clings to clothes and hair. The sound depends on what we are doing: the motors of the table saw and router are the loud ones, but we use them one at a time, not all day. Most of the time we work with hand tools — and then it is quiet, just saw, rasp, sandpaper.",
     ],
     placeholderTop: 'workshop wide · 60sqm · east window',

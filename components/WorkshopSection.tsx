@@ -120,7 +120,7 @@ const copy = {
     eyebrow: 'Atelierul',
     title: ['Un loc unde', 'lemnul capătă', 'suflet.'],
     body1: [
-      'Intrați în atelierul nostru din inima Transilvaniei.',
+      'Intrați în atelierul nostru din vestul României.',
       'Miros de rumeguș proaspăt, lumina de după-amiază filtrată',
       'prin geam, sunetul rindelei pe stejar — asta e Oak Fantasy',
       'înainte să fie un produs.',
@@ -139,7 +139,7 @@ const copy = {
     eyebrow: 'The Workshop',
     title: ['A place where', 'wood gains', 'a soul.'],
     body1: [
-      'Step into our workshop in the heart of Transylvania.',
+      'Step into our workshop in western Romania.',
       'Fresh sawdust scent, afternoon light filtered',
       'through the window, the sound of a plane on oak — this is Oak',
       'Fantasy before it becomes a product.',
@@ -265,7 +265,7 @@ export default function WorkshopSection({ language }: { language: 'ro' | 'en' })
                   border: '1px solid rgba(139,94,60,0.2)',
                 }}
               >
-                {language === 'ro' ? 'Transilvania · Atelier propriu' : 'Transylvania · Own workshop'}
+                {language === 'ro' ? 'Vestul României · Atelier propriu' : 'Western Romania · Own workshop'}
               </span>
             </motion.div>
           </div>

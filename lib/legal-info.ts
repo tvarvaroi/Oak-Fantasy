@@ -9,27 +9,28 @@
 // MUST read from LEGAL_INFO, never hard-code strings.
 
 export const LEGAL_INFO = {
-  // Firma legală (final data 2026-07-11 — values live in Vercel env, see
-  // .env.example for the canonical set; placeholders remain the fallback so
-  // a missing env never renders wrong data, it renders nothing).
-  companyName: process.env.NEXT_PUBLIC_COMPANY_NAME ?? '[DENUMIRE_SRL]',
-  cui: process.env.NEXT_PUBLIC_COMPANY_CUI ?? '[CUI]',
-  regCom: process.env.NEXT_PUBLIC_COMPANY_REG_COM ?? '[REG_COM]',
-  capitalSocial: process.env.NEXT_PUBLIC_COMPANY_CAPITAL ?? '[CAPITAL_SOCIAL]',
-  vatStatus: process.env.NEXT_PUBLIC_COMPANY_VAT_STATUS ?? '[TVA_STATUS]',
-  caen: process.env.NEXT_PUBLIC_COMPANY_CAEN ?? '[CAEN_PRINCIPAL]',
+  // Firma legală — date FINALE și PUBLICE (registrul comerțului), hardcodate
+  // ca default (decizie founder 2026-07-15: fără dependență de env). Env vars
+  // rămân ca override OPȚIONAL — mecanismul hasPlaceholder() rămâne sănătos:
+  // un env setat greșit pe un „[TOKEN]" tot ascunde rândul, nu afișează junk.
+  companyName: process.env.NEXT_PUBLIC_COMPANY_NAME ?? 'ROOBO PELLETS S.R.L',
+  cui: process.env.NEXT_PUBLIC_COMPANY_CUI ?? '39549528',
+  regCom: process.env.NEXT_PUBLIC_COMPANY_REG_COM ?? 'J2018001030021',
+  capitalSocial: process.env.NEXT_PUBLIC_COMPANY_CAPITAL ?? '200 RON',
+  vatStatus: process.env.NEXT_PUBLIC_COMPANY_VAT_STATUS ?? 'neplătitor de TVA',
+  caen: process.env.NEXT_PUBLIC_COMPANY_CAEN ?? '3109',
 
   // Adrese. Sediul social e informație de registru public (afișată în legal).
   // ⚠ Adresa ATELIERULUI e OMISĂ PERMANENT din public (decizie founder
   // 2026-07-11) — nu e env-driven ca să nu poată apărea din greșeală;
   // hasPlaceholder() o ascunde structural peste tot. Narativ: „vestul României".
-  hqAddress: process.env.NEXT_PUBLIC_COMPANY_ADDRESS ?? '[ADRESA_SEDIU]',
+  hqAddress:
+    process.env.NEXT_PUBLIC_COMPANY_ADDRESS ?? 'Str. Orion nr. 24, Arad, jud. Arad',
   workshopAddress: '[NEAFISAT_PUBLIC]',
 
-  // Contact. Emailul public e date publice — default real, env poate suprascrie.
+  // Contact — date publice, default real; env poate suprascrie.
   contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? 'oakfantasy2026@gmail.com',
-  contactPhone:
-    process.env.NEXT_PUBLIC_CONTACT_PHONE ?? '[TELEFON_CONTACT]',
+  contactPhone: process.env.NEXT_PUBLIC_CONTACT_PHONE ?? '+40 774 905 182',
 
   // Working hours — final (founder 2026-07-11): Mon–Fri 09:00–17:00.
   workingHours: {

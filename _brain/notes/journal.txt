@@ -1266,3 +1266,25 @@ NEXT (din audit, 🟡): security headers, PDP content 300+, bundle 3D izolat, ll
   Transilvaniei" (WorkshopSection homepage) și „Carpathians" (llms.txt/atelier) —
   narativ founder = „vestul României". Arad e vestul; Transilvania e discutabil.
   Schimbarea de copy narativ = task separat dacă founder-ul o vrea.
+
+2026-07-15 — DATE FIRMĂ HARDCODATE CA DEFAULT + NARATIV „VESTUL ROMÂNIEI"
+- PARTE 1: valorile finale (publice, registru) au devenit DEFAULT-urile din
+  lib/legal-info.ts — zero dependență de env (decizie founder: nu se mai pun
+  cele 9 env vars în Vercel). Env rămâne override opțional; hasPlaceholder
+  rămâne sănătos (env greșit pe [TOKEN] tot ascunde). .env.example: bloc
+  comentat, marcat override-opțional. Scos blocul adăugat de mine din .env.local.
+- PARTE 2: 40 înlocuiri în 8 fișiere, grep ZERO pe stem-uri (Transilvan|
+  Transylvan|Carpath|Carpaț) — ATENȚIE la genitivele românești: „Transilvaniei"
+  NU conține „Transilvania" (grep cu stem, nu cu forma de bază!). Regula:
+  atelier-geografie → „vestul României"; identitate lemn generică → „stejar
+  românesc"/„Romanian oak"; sourcing specific (Bucegi/Apuseni) PĂSTRAT (claim
+  real de proveniență, nu în lista founder-ului). Footer contactRegion →
+  „Arad, România" (sediul e public). O frază de tradiție adăugată natural în
+  atelier/place („unde tâmplăria are rădăcini vechi" / „where woodworking runs
+  old and deep") — NU rescriere de secțiuni.
+- ⚠ FLAG founder: tagline-ul EN din llms.txt schimbat „From Carpathian oak, by
+  hand." → „From Romanian oak, by hand." (cerința zero-rămășițe). CLAUDE.md §6
+  (brand doc) încă listează tagline-ul vechi — decizie de brand la founder dacă
+  actualizăm documentul.
+- Verificare: 16/16 runtime pe default-uri (fără env): date firmă complete,
+  zero tokens, zero narativ vechi pe 9 pagini.
