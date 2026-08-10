@@ -192,25 +192,12 @@
   z-index: 2;
 }
 .toolImg {
+  position: relative;
+  overflow: hidden;
   aspect-ratio: 16 / 10;
-  background:
-    linear-gradient(135deg, rgba(139, 94, 60, 0.1), rgba(90, 107, 60, 0.1)),
-    repeating-linear-gradient(135deg, rgba(139, 94, 60, 0.08) 0 16px, rgba(139, 94, 60, 0.14) 16px 20px);
+  /* Warm fallback while the photo loads (was the striped placeholder). */
+  background: linear-gradient(135deg, rgba(139, 94, 60, 0.1), rgba(90, 107, 60, 0.1));
   border-bottom: 1px solid rgba(139, 94, 60, 0.18);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.toolImg span {
-  font-family: ui-monospace, Menlo, monospace;
-  font-size: 0.7rem;
-  color: var(--ink-soft);
-  background: var(--cream-warm);
-  padding: 5px 10px;
-  border-radius: 4px;
-  border: 1px solid rgba(139, 94, 60, 0.2);
-  max-width: 80%;
-  text-align: center;
 }
 .toolBody {
   padding: 28px 28px 30px;
@@ -278,8 +265,11 @@
 }
 .placeSide { display: flex; flex-direction: column; gap: 16px; }
 .placeImg {
+  position: relative;
+  overflow: hidden;
   height: 280px;
   border-radius: 8px;
+  border: 1px solid rgba(139, 94, 60, 0.25);
 }
 .placeImg:nth-child(2) {
   height: 220px;

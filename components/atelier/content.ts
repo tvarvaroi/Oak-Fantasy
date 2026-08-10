@@ -21,8 +21,10 @@ export interface Tool {
   role: string;
   /** 1-3 sentence description. */
   desc: string;
-  /** Monospace caption inside the striped image placeholder. */
-  placeholder: string;
+  /** Card photo (stock, Pexels — see docs/stock-credits.md). Same path both locales. */
+  image: string;
+  /** Honest alt text for the stock photo (describes what is pictured, not our claims). */
+  imageAlt: string;
 }
 
 export interface DayMoment {
@@ -87,9 +89,11 @@ export interface AtelierContent {
     h2Em: string;
     /** Trailing period or word after em, if any. */
     paragraphs: [string, string];
-    /** Two placeholder captions for the stacked image column. */
-    placeholderTop: string;
-    placeholderBottom: string;
+    /** Alt texts for the two stacked photos (stock — detail shots on purpose,
+        never a wide shot: the copy describes OUR space, a stock wide shot
+        of someone else's workshop would visibly contradict it). */
+    imageTopAlt: string;
+    imageBottomAlt: string;
   };
   day: {
     eyebrow: string;
@@ -179,42 +183,48 @@ const ro: AtelierContent = {
         name: 'Planou circular Bosch GTS 635-216',
         role: 'Unealta cu care începe orice tocător.',
         desc: 'Tăie scândurile la dimensiuni precise. Lama subțire, ghidaj fix, masă mare. Pentru tăieri repetate la aceeași dimensiune, nu există ceva mai bun.',
-        placeholder: 'circular saw · bench · wide framing',
+        image: '/stock/atelier-tool-circular-saw.webp',
+        imageAlt: 'Pânză de fierăstrău circular tăind o scândură de stejar',
       },
       {
         tag: 'Featured · Margine',
         name: 'Freză verticală cu ghidaj',
         role: 'Marginile plăcute la atingere, nu tăioase.',
         desc: 'Pentru rotunjirea marginilor și mânerelor. Bity de 6mm și 12mm, R profile.',
-        placeholder: 'router · edge profile · curl',
+        image: '/stock/atelier-tool-router.webp',
+        imageAlt: 'Mână ghidând o placă de stejar prin freză',
       },
       {
         tag: 'Asamblare',
         name: 'Presă manuală cu șuruburi (4 buc.)',
         role: 'Patru prese, 24 de ore, niciodată mai puțin.',
         desc: 'Pentru lipirea plăcilor în bloc. Patru prese pe un bloc de 35×25cm, presiune uniformă.',
-        placeholder: '4 clamps · glue line',
+        image: '/stock/atelier-tool-clamps.webp',
+        imageAlt: 'Prese cu șuruburi strângând plăci de lemn la lipire',
       },
       {
         tag: 'Aplatizare',
         name: 'Rindeluitor electric Makita KP0810',
         role: 'Suprafețe perfect plane după lipire.',
         desc: 'Tăieri subțiri, pe direcția fibrei, până când blocul e perfect plan.',
-        placeholder: 'electric planer · shavings',
+        image: '/stock/atelier-tool-planer.webp',
+        imageAlt: 'Placă de lemn trecută printr-un rindeluitor electric, cu așchii',
       },
       {
         tag: 'Șlefuit',
         name: 'Șlefuitor orbital Festool ETS 150/3',
         role: 'De la 80 la 320. Fără apăsare, fără grabă.',
         desc: 'Patru-cinci graduri de hârtie abrazivă. Mișcare circulară, fără apăsare, fără grabă.',
-        placeholder: 'orbital sander · close-up',
+        image: '/stock/atelier-tool-sander.webp',
+        imageAlt: 'Șlefuitor orbital pe o placă de stejar',
       },
       {
         tag: 'Detalii',
         name: 'Set unelte de mână',
         role: 'Fierăstrău, raspele, ciocan, daltă, șubler digital.',
         desc: 'Pentru detalii care nu cer motor. Tăieri fine, ajustări, măsurători. Unelte care durează zeci de ani dacă sunt îngrijite — și pe care le folosim aproape la fel de mult ca electricele.',
-        placeholder: 'hand tools wall · low light',
+        image: '/stock/atelier-tool-hand-tools.webp',
+        imageAlt: 'Dălți cu mânere de lemn pe un suport de perete',
       },
     ],
   },
@@ -226,8 +236,8 @@ const ro: AtelierContent = {
       'Atelierul nostru e o încăpere de vreo șaizeci de metri pătrați, în vestul României, unde tâmplăria are rădăcini vechi. Are lumină naturală bună până pe la patru după-amiaza, apoi aprindem lămpile. Iarna intră soarele direct pe geamul de est dimineața — atunci facem treaba care cere ochi bun, șlefuit fin, asamblare. Vara stăm mai mult în partea umbrită, unde temperatura rămâne stabilă.',
       'Miroase a stejar — un miros dulce, ușor acrișor, care se ține în haine și în păr. Sunetul depinde de ce facem: motoarele de la planoiul circular și freză sunt cele zgomotoase, dar le folosim pe rând și nu toată ziua. Cel mai mult timp lucrăm cu unelte de mână — și atunci e liniște, doar fierăstrău, raspel, șmirghel.',
     ],
-    placeholderTop: 'workshop wide · 60sqm · east window',
-    placeholderBottom: 'workbench detail · sawdust · tools',
+    imageTopAlt: 'Banc de lucru vechi lângă o fereastră, în lumină naturală',
+    imageBottomAlt: 'Așchii de lemn și creioane pe un blat de lucru',
   },
   day: {
     eyebrow: 'O zi în atelier',
@@ -364,42 +374,48 @@ const en: AtelierContent = {
         name: 'Bosch GTS 635-216 table saw',
         role: 'The tool every cutting board starts with.',
         desc: "Cuts boards to precise dimensions. Thin blade, fixed guide, large table. For repeated cuts at the same size, nothing's better.",
-        placeholder: 'circular saw · bench · wide framing',
+        image: '/stock/atelier-tool-circular-saw.webp',
+        imageAlt: 'Circular saw blade cutting an oak board',
       },
       {
         tag: 'Featured · Edge',
         name: 'Plunge router with edge guide',
         role: 'Edges pleasant to touch, not sharp.',
         desc: 'For rounding edges and handles. 6mm and 12mm bits, R profile.',
-        placeholder: 'router · edge profile · curl',
+        image: '/stock/atelier-tool-router.webp',
+        imageAlt: 'Hand guiding an oak board through a router',
       },
       {
         tag: 'Assembly',
         name: 'Manual screw clamps (4 pcs.)',
         role: 'Four clamps, 24 hours, never less.',
         desc: 'For glueing planks into a block. Four clamps on a 35×25cm block, uniform pressure.',
-        placeholder: '4 clamps · glue line',
+        image: '/stock/atelier-tool-clamps.webp',
+        imageAlt: 'Screw clamps holding glued wood boards',
       },
       {
         tag: 'Flattening',
         name: 'Makita KP0810 hand planer',
         role: 'Perfectly flat surfaces after glueing.',
         desc: 'Thin cuts, along the grain, until the block is perfectly flat.',
-        placeholder: 'electric planer · shavings',
+        image: '/stock/atelier-tool-planer.webp',
+        imageAlt: 'Wood board fed through an electric planer, with shavings',
       },
       {
         tag: 'Sanding',
         name: 'Festool ETS 150/3 orbital sander',
         role: 'From 80 to 320. No pressure, no rush.',
         desc: 'Four-five grits of sandpaper. Circular motion, no pressure, no rush.',
-        placeholder: 'orbital sander · close-up',
+        image: '/stock/atelier-tool-sander.webp',
+        imageAlt: 'Orbital sander on an oak board',
       },
       {
         tag: 'Details',
         name: 'Hand tool set',
         role: 'Saw, rasps, hammer, chisel, digital caliper.',
         desc: "For details that don't need a motor. Fine cuts, adjustments, measurements. Tools that last decades if cared for — and we use them almost as much as the electric ones.",
-        placeholder: 'hand tools wall · low light',
+        image: '/stock/atelier-tool-hand-tools.webp',
+        imageAlt: 'Wooden-handled chisels on a wall rack',
       },
     ],
   },
@@ -413,8 +429,8 @@ const en: AtelierContent = {
       'Our workshop is a room of about sixty square meters, in western Romania, where woodworking runs old and deep. It has good natural light until around four in the afternoon, then we turn on the lamps. In winter the sun comes in directly through the east window in the morning — that is when we do the work that needs a careful eye: fine sanding, assembly. In summer we stay more in the shaded part, where the temperature stays stable.',
       "It smells of oak — a sweet, slightly tart smell that clings to clothes and hair. The sound depends on what we are doing: the motors of the table saw and router are the loud ones, but we use them one at a time, not all day. Most of the time we work with hand tools — and then it is quiet, just saw, rasp, sandpaper.",
     ],
-    placeholderTop: 'workshop wide · 60sqm · east window',
-    placeholderBottom: 'workbench detail · sawdust · tools',
+    imageTopAlt: 'Old workbench by a window, in natural light',
+    imageBottomAlt: 'Wood shavings and pencils on a worktop',
   },
   day: {
     eyebrow: 'A day in the workshop',

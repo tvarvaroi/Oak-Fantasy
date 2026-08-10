@@ -221,12 +221,14 @@ export default function WorkshopSection({ language }: { language: 'ro' | 'en' })
               className="absolute inset-0"
               style={prefersReduced ? {} : { y: imageY }}
             >
+              {/* Stock (Pexels, free commercial license — see docs/stock-credits.md).
+                  Neutral close-up: hands + hand plane + shavings, no identifiable person. */}
               <Image
-                src="/workshop.webp"
+                src="/stock/workshop-hands-plane.webp"
                 alt={
                   language === 'ro'
-                    ? 'Atelier Oak Fantasy — mâini lucrând stejar'
-                    : 'Oak Fantasy workshop — hands working oak'
+                    ? 'Mâini lucrând lemnul cu rindeaua, așchii pe bancul de lucru'
+                    : 'Hands working wood with a hand plane, shavings on the bench'
                 }
                 fill
                 priority

@@ -60,7 +60,8 @@ export interface AboutContent {
     eyebrow: string;
     h2: string;
     paragraph: string;
-    placeholder: string;
+    /** Alt text for the full-bleed banner photo (stock — neutral, no claims about our space). */
+    imageAlt: string;
     /** Cross-link label rendered in workshop banner overlay -> /atelier. */
     crossLinkLabel: string;
   };
@@ -161,7 +162,7 @@ const ro: AboutContent = {
     h2: 'Cu rumeguș pe podele și ulei pe degete.',
     paragraph:
       'Lucrăm într-un atelier mic, în vestul României, unde lumina e bună dimineața și liniștită seara. Aici tăiem, șlefuim și împachetăm fiecare tocător. Aici primim și mesajele voastre. Nu e showroom — e atelier.',
-    placeholder: 'workshop interior · golden hour · wide shot',
+    imageAlt: 'Banc de lucru cu lemn și o lampă aprinsă, în lumină caldă',
     crossLinkLabel: 'Vezi atelierul în detaliu',
   },
   values: {
@@ -277,7 +278,7 @@ const en: AboutContent = {
     h2: 'Sawdust on the floor, oil on our fingers.',
     paragraph:
       'We work in a small workshop in western Romania, where the light is good in the morning and quiet in the evening. Here we cut, sand and pack every board. Here we also receive your messages. It’s not a showroom — it’s a workshop.',
-    placeholder: 'workshop interior · golden hour · wide shot',
+    imageAlt: 'Workbench with wood and a lit lamp, in warm light',
     crossLinkLabel: 'See the workshop in detail',
   },
   values: {

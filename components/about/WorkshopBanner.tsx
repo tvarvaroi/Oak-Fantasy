@@ -1,19 +1,18 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import type { AboutContent } from './content';
 import Reveal from './Reveal';
-import PlaceholderImage from './PlaceholderImage';
 import { localizedPath, type Locale } from '@/lib/i18n-routes';
 import styles from './about.module.css';
 
 // Workshop — v2-timeline.html:174-187. Full-bleed banner + bottom gradient
 // (about.module.css .workshopBanner::after) + overlay text.
-// Task 4.5 DECIDED: striped placeholder (no real photo). The bundled
-// workshop.webp is a mislabeled PNG / magazine mockup — not used.
-// 2026-05-27 addition: cross-link to /atelier in the overlay, pointing the
-// reader to the full workshop documentary page.
-// TODO: replace with real workshop photo when the founder supplies one.
+// 2026-08-10: stock photo (Pexels, free commercial license — see
+// docs/stock-credits.md). Deliberately a neutral atmospheric detail
+// (workbench + lamp), NOT a wide shot of someone else's workshop — the
+// page copy describes our real space, so the image must not contradict it.
 
 export default function WorkshopBanner({
   content,
@@ -30,10 +29,13 @@ export default function WorkshopBanner({
       {/* No id="atelier" on /despre: collides with homepage anchor; user is
           already on the page, no in-page nav needed (founder decision). */}
       <div className={styles.workshopBanner}>
-        {/* TODO: replace with real workshop photo (golden hour, wide shot, no faces) */}
-        <PlaceholderImage
-          caption={workshop.placeholder}
+        <Image
+          src="/stock/despre-banner-workbench.webp"
+          alt={workshop.imageAlt}
+          fill
+          sizes="100vw"
           className={styles.workshopBannerImg}
+          style={{ objectFit: 'cover' }}
         />
         <Reveal className={styles.workshopOverlay}>
           <div>

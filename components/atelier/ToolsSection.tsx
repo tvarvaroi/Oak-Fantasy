@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Reveal from '@/components/about/Reveal';
 import type { AtelierContent } from './content';
 import styles from './atelier.module.css';
@@ -30,7 +31,15 @@ export default function ToolsSection({ content }: { content: AtelierContent }) {
               <article className={styles.toolCard}>
                 <span className={styles.toolTag}>{tool.tag}</span>
                 <div className={styles.toolImg}>
-                  <span>{tool.placeholder}</span>
+                  {/* Stock (Pexels, free commercial license — docs/stock-credits.md).
+                      Generic close-ups on purpose: no faces, no readable tool brands. */}
+                  <Image
+                    src={tool.image}
+                    alt={tool.imageAlt}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px"
+                    style={{ objectFit: 'cover' }}
+                  />
                 </div>
                 <div className={styles.toolBody}>
                   <h3>{tool.name}</h3>
