@@ -28,8 +28,21 @@ const PAGES = [
 ];
 
 test.describe('Visual regression', () => {
+  // 2026-08-10: 60s (was default 30s). The homepage now carries 5 photos +
+  // a video poster; against the dev server every run cold-starts the
+  // /_next/image optimizer, and first-hit optimization during the fullPage
+  // stitch pushed home-{ro,en} past 30s on the tablet project. Verified the
+  // captures themselves are stable (0-pixel diff between consecutive shots
+  // against a prod build) — this is purely dev-server image-pipeline latency.
+  test.setTimeout(60_000);
   for (const { path, name } of PAGES) {
     test(`${name} screenshot matches baseline`, async ({ page }) => {
+      // Ambient <video> loops (CraftVideoTease) would capture a random frame
+      // per run. Stub play() so videos never start — the static poster is the
+      // only state screenshots ever see. Deterministic across runs.
+      await page.addInitScript(() => {
+        HTMLMediaElement.prototype.play = () => Promise.resolve();
+      });
       await page.goto(path);
       await page.waitForLoadState('networkidle');
       // Atelier has 10 Reveal sections — fullPage screenshot scrolls during
@@ -47,6 +60,23 @@ test.describe('Visual regression', () => {
           }
           window.scrollTo(0, 0);
         });
+        // 2026-08-10: the pre-scroll now also triggers lazy stock photos
+        // (tools + place). Wait for their decode or the capture races the
+        // dev-server image optimizer and flakes (~3% diff on the place
+        // images). Same decode-race pattern as scripts/design-qa-capture.mjs
+        // — the hard timeout is mandatory (hidden lazy images never settle).
+        await page
+          .evaluate(() =>
+            Promise.race([
+              Promise.all(
+                Array.from(document.images).map((img) =>
+                  img.complete ? Promise.resolve() : img.decode().catch(() => {}),
+                ),
+              ),
+              new Promise((resolve) => setTimeout(resolve, 6000)),
+            ]),
+          )
+          .catch(() => {});
       }
       await page.waitForTimeout(1500);
       await expect(page).toHaveScreenshot(`${name}.png`, {
