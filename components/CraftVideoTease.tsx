@@ -88,22 +88,6 @@ function CornerOrnament({ corner, drawn, delay }: { corner: Corner; drawn: boole
   );
 }
 
-/* ─── Play icon ──────────────────────────────────────────────────── */
-
-function PlayIcon() {
-  return (
-    <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-      <circle cx="36" cy="36" r="35" stroke="rgba(245,235,216,0.25)" strokeWidth="1.5" />
-      <circle cx="36" cy="36" r="27" stroke="rgba(245,235,216,0.12)" strokeWidth="1" />
-      <path
-        d="M 30 24 L 50 36 L 30 48 Z"
-        fill="var(--cream-warm)"
-        opacity="0.9"
-      />
-    </svg>
-  );
-}
-
 /* ─── Decorative twig divider ────────────────────────────────────── */
 function TwigDivider({ drawn }: { drawn: boolean }) {
   return (
@@ -135,6 +119,7 @@ function TwigDivider({ drawn }: { drawn: boolean }) {
 export default function CraftVideoTease({ language }: { language: 'ro' | 'en' }) {
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLDivElement>(null);
+  const videoElRef = useRef<HTMLVideoElement>(null);
   const [drawn, setDrawn] = useState(false);
   const prefersReduced = useReducedMotion();
 
@@ -145,6 +130,14 @@ export default function CraftVideoTease({ language }: { language: 'ro' | 'en' })
       ([entry]) => {
         if (entry.isIntersecting) {
           setDrawn(true);
+          // Lazy playback: the video has preload="none" + poster, so nothing
+          // is fetched until the section scrolls into view. Reduced-motion
+          // users keep the static poster (no autoplay).
+          if (!prefersReduced) {
+            videoElRef.current?.play().catch(() => {
+              /* autoplay can be blocked — poster stays, which is fine */
+            });
+          }
           obs.disconnect();
         }
       },
@@ -152,20 +145,18 @@ export default function CraftVideoTease({ language }: { language: 'ro' | 'en' })
     );
     obs.observe(el);
     return () => obs.disconnect();
-  }, []);
+  }, [prefersReduced]);
 
   const copy = {
     ro: {
       eyebrow: 'Procesul nostru',
       title: 'Vedere din atelier',
-      sub: 'Câteva minute din ziua unui tocător — de la bușteanul de stejar brut până la uleiul de finisare.',
-      coming: 'Video în curând',
+      sub: 'Rumeguș, unelte și lemn — o privire scurtă peste blatul de lucru.',
     },
     en: {
       eyebrow: 'Our process',
       title: 'A view from the workshop',
-      sub: "A few minutes from a board's day — from rough oak log to finishing oil.",
-      coming: 'Video coming soon',
+      sub: 'Sawdust, tools and wood — a short look across the workbench.',
     },
   }[language];
 
@@ -257,7 +248,11 @@ export default function CraftVideoTease({ language }: { language: 'ro' | 'en' })
             <CornerOrnament key={corner} corner={corner} drawn={drawn} delay={0.1 + i * 0.08} />
           ))}
 
-          {/* 16:9 placeholder */}
+          {/* 16:9 ambient loop — stock footage (Pexels, free commercial
+              license — docs/stock-credits.md). Neutral content on purpose:
+              tools + shavings on a workbench, no people. Muted background
+              loop, lazy (preload="none" + play on intersect), poster as
+              reduced-motion / fallback state. */}
           <div
             className="relative overflow-hidden"
             style={{
@@ -265,97 +260,22 @@ export default function CraftVideoTease({ language }: { language: 'ro' | 'en' })
               borderRadius: 14,
               border: '1px solid rgba(139,94,60,0.2)',
               boxShadow: '0 20px 70px rgba(31,24,16,0.15), 0 4px 20px rgba(31,24,16,0.08)',
+              // Warm dark backdrop until the poster/first frame paints.
+              background: 'linear-gradient(135deg, #2D3A1F 0%, #1F1810 45%, #2A2218 100%)',
             }}
           >
-            {/* gradient placeholder background */}
-            <div
-              className="absolute inset-0"
-              style={{
-                background: `
-                  radial-gradient(ellipse at 30% 40%, rgba(90,107,60,0.45) 0%, transparent 55%),
-                  radial-gradient(ellipse at 70% 65%, rgba(139,94,60,0.3) 0%, transparent 50%),
-                  linear-gradient(135deg, #2D3A1F 0%, #1F1810 45%, #2A2218 100%)
-                `,
-              }}
-              aria-hidden
+            <video
+              ref={videoElRef}
+              className="absolute inset-0 h-full w-full object-cover"
+              src="/stock/craft-loop.mp4"
+              poster="/stock/craft-loop-poster.webp"
+              muted
+              loop
+              playsInline
+              preload="none"
+              aria-hidden="true"
+              tabIndex={-1}
             />
-
-            {/* wood grain texture overlay */}
-            <div
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                backgroundImage: `repeating-linear-gradient(
-                  168deg,
-                  transparent,
-                  transparent 18px,
-                  rgba(184,115,51,0.03) 18px,
-                  rgba(184,115,51,0.03) 19px
-                )`,
-              }}
-              aria-hidden
-            />
-
-            {/* atmospheric glow */}
-            <div
-              className="absolute pointer-events-none"
-              style={{
-                top: '15%',
-                left: '20%',
-                width: '35%',
-                height: '50%',
-                borderRadius: '50%',
-                background: 'radial-gradient(ellipse, rgba(201,166,107,0.18) 0%, transparent 70%)',
-                filter: 'blur(24px)',
-              }}
-              aria-hidden
-            />
-
-            {/* "coming soon" label top-left */}
-            <div className="absolute top-5 left-5">
-              <span
-                className="label-caps px-3 py-1.5 rounded"
-                style={{
-                  backgroundColor: 'rgba(31,24,16,0.6)',
-                  color: 'rgba(245,235,216,0.5)',
-                  fontSize: '0.58rem',
-                  letterSpacing: '0.2em',
-                  backdropFilter: 'blur(6px)',
-                  border: '1px solid rgba(245,235,216,0.08)',
-                }}
-              >
-                {copy.coming}
-              </span>
-            </div>
-
-            {/* play button centred */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <motion.button
-                type="button"
-                aria-label={language === 'ro' ? 'Redă videoclipul' : 'Play video'}
-                className="relative flex items-center justify-center"
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'default',
-                  padding: 0,
-                }}
-                whileHover={prefersReduced ? {} : { scale: 1.08 }}
-                transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-              >
-                {/* pulsing ring */}
-                <motion.div
-                  className="absolute rounded-full"
-                  style={{
-                    width: 96,
-                    height: 96,
-                    border: '1px solid rgba(245,235,216,0.12)',
-                  }}
-                  animate={prefersReduced ? {} : { scale: [1, 1.35, 1], opacity: [0.5, 0, 0.5] }}
-                  transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
-                />
-                <PlayIcon />
-              </motion.button>
-            </div>
 
             {/* bottom caption bar */}
             <div
