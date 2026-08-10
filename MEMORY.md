@@ -363,3 +363,56 @@ structură/claritate au ghidat wireframe-ul și copy-ul.
 **De ce contează:** Template reutilizabil pentru orice pagină nouă cu dependență de
 assets (ex. /ingrijire cu poze proces). Claude Design în buclă: spec brief aprobat →
 prototip vizual founder → build cu țintă vizuală clară — reduce iterațiile de design-qa.
+
+---
+
+## 2026-08-10 — Inventar media + plan stock (docs/media-inventory.md)
+
+**Pattern descoperit:** Inventarul complet de sloturi media = grep pe `<Image`/`next/image` +
+`<video>` + `background-image|url(` + `placeholder` peste app/+components/, apoi citire punctuală
+pentru ratio/rol. Rezultat surprinzător: site-ul are DOAR 2 foto-uri „reale" în cod în afara
+produselor (workshop.webp pe homepage — mislabeled mockup marcat „not used" în decizia /despre
+dar LIVE în WorkshopSection.tsx:224 — și cele 4 product-*.webp din era Bolt în ProductTease,
+1,5–2MB fiecare, proveniență neclară). Restul = placeholder-e stripate intenționate (/despre
+banner, /atelier 6 unelte + 2 place + 4 articole) + slot video 16:9 fără element `<video>`.
+Zero video în tot codul. next.config.js permite doar `*.supabase.co` la images + CSP img-src
+fără CDN-uri stock → hosted stock ar cere 2 schimbări de config; local `/public` = zero.
+**Aplicat la:** docs/media-inventory.md (tabel complet cu file:line + categorii PRODUS/BRAND/
+DECOR-SVG/STOCK-NEUTRU/STOCK-DECOR/VIDEO + plan căutare per slot + note ATENȚIE).
+**De ce contează:** (1) Sloturile ⚠️ unde stock contrazice copy-ul: WorkshopPlace „workshop
+wide · 60sqm" e cel mai riscant (afirmație verificabilă vizual) — alternativa = cadre-detaliu,
+nu wide-shot. (2) Regula anti-portret: mâini + unelte OK, față de meșter NU (contrazice
+„atelierul nostru"). (3) OG_IMAGE pe toate paginile interioare = logo pătrat declarat 1200×630
+(mismatch ratio) — upgrade ieftin într-un task viitor. (4) 5 fișiere >500KB în /public de
+recomprimat la task 2 indiferent de decizii.
+
+---
+
+## 2026-08-10 — Task 2: umplere media stock (Pexels) + video loop + produse reale în tease
+
+**Pattern descoperit:** (1) **Sourcing stock fără API keys**: Unsplash napi cere auth acum
+(„Authorization required"), dar Pexels merge complet keyless: WebFetch pe pagina de căutare →
+listă de photo-page URLs; download direct `images.pexels.com/photos/{id}/pexels-photo-{id}.jpeg?w=1920`;
+pentru video, og:video de pe pagina video dă `videos.pexels.com/video-files/...mp4`. Verificare
+vizuală OBLIGATORIE cu Read pe fiecare candidat (am respins 6: branduri lizibile Ryobi/DeWalt,
+fețe vizibile, culori reci, magazie de grădină). (2) **Video ambient în React**: `<video muted
+loop playsInline preload="none" poster>` + play() din IntersectionObserver-ul existent, gated pe
+`!prefersReducedMotion` → zero LCP impact, RM = poster static. Scenă STATICĂ (flat-lay) = loop
+fără saltul vizibil de la cut + compresie excelentă (14,9s 1080p CRF28 = 1,8MB). (3) **Video în
+visual regression** = frame nedeterminist → `addInitScript` cu stub `HTMLMediaElement.prototype.play
+= () => Promise.resolve()` în spec → doar posterul e capturat vreodată. Playwright fullPage
+screenshot poate să și blocheze („Unable to capture screenshot") cu video în play — pause înainte
+de capture la retry. (4) **ProductTease static cu produse reale**: pozele hero din Supabase
+Storage extrase în `/public/products/` + data map actualizat manual cu numele/dimensiunile reale —
+zero refactor server-side pentru homepage (pagina e 'use client').
+**Aplicat la:** public/stock/ (12 fișiere) + public/products/ (4), ProductTease (4 produse reale:
+taur-alb/pește/valuri/live-edge), WorkshopSection (P1), WorkshopBanner+about/content.ts (P4,
+imageAlt), atelier/content.ts+ToolsSection+WorkshopPlace (P5×6+P6×2, captions „60sqm" eliminate),
+CraftVideoTease (P3 rescris cu <video>), visual-regression.spec.ts (stub play), docs/stock-credits.md.
+Șterse: workshop.webp + 4× product-*.webp (6,9MB scoși de pe homepage).
+**De ce contează:** (1) Evidența de licență per fișier stă în docs/stock-credits.md — orice asset
+stock nou intră ACOLO înainte de commit. (2) Alt-textele stock = descriu ce SE VEDE, nu afirmații
+despre noi („Banc de lucru sub fereastră", NU „atelierul nostru de 60mp"). (3) Copy-ul
+CraftVideoTease ajustat onest la ce arată loop-ul („o privire scurtă peste blatul de lucru").
+(4) Rămas pre-existent, flagat founder-ului: /despre CTA „Lansăm în octombrie." (RO+EN) contrazice
+magazinul live — de curățat într-un task de copy.
