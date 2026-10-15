@@ -1086,3 +1086,26 @@ RO|EN e în drawer sub lg → testul trebuie să deschidă drawer-ul întâi.
 poți separa regresiile de datoria acumulată. „199/199 pe 4 iulie" nu mai spunea nimic
 după 6 commit-uri de copy/SEO fără teste actualizate.
 **Fișiere:** tests/e2e/{atelier,despre,homepage,tocatoare,seo,shared-components}.spec.ts.
+
+## 2026-10-15 — `innerText` returnează textul cu `text-transform` aplicat
+
+**Simptom:** smoke-ul căuta „Comenzi de confirmat" în `main.innerText()` și nu găsea,
+deși StatCard-ul era pe ecran.
+**Cauză:** eticheta are clasa `label-caps` (`text-transform: uppercase`); spre deosebire
+de `textContent`, `innerText` reflectă CSS-ul → „COMENZI DE CONFIRMAT".
+**Fix:** regex case-insensitive pe `innerText`, sau `textContent` când vrei textul brut.
+**Fișiere:** scripts/smoke-ramburs-order.mjs.
+
+## 2026-10-15 — Smoke cu admin temporar (service role) + curățare după run întrerupt
+
+**Pattern:** `scripts/smoke-ramburs-order.mjs` creează un admin temporar cu
+`sb.auth.admin.createUser({ email_confirm: true })` + `profiles.role='admin'` (trigger-ul
+`handle_new_user` creează rândul; upsert-ul doar îl promovează), rulează fluxul de admin
+în Playwright și îl șterge în `finally`. Credențiale reale, dacă există:
+`SMOKE_ADMIN_EMAIL` / `SMOKE_ADMIN_PASSWORD` în `.env.local`.
+**Atenție:** un `check` care aruncă ÎNAINTE de pasul de anulare lasă comanda de test în
+`pending_cod` cu stoc rezervat (s-a întâmplat la primul run: OF-2026-0007). Curățare =
+`release_stock` RPC per item + `status='cancelled'` + rând în `order_status_history`
+(aceeași rețetă ca webhook-ul `expired`). Comenzile de test rămân în DB ca `cancelled`,
+cu `admin_notes` SMOKE.
+**Fișiere:** scripts/smoke-ramburs-order.mjs, .env.example.

@@ -1379,3 +1379,39 @@ GATES FINALE: typecheck ✓ lint ✓ check:i18n ✓ (4 warnings pre-existente ad
   bug-uri în testele noi (vezi gotcha „Suita e2e era ROȘIE de luni de zile") → după
   mentenanța testelor: 277 + 39 passed, 0 failed, 2 skipped · baselines: 72/72 regenerate
   (40 modificate — Navbar e global) · hydration 0 · design-qa 142 capturi + 60 element-level.
+
+═══════════════════════════════════════════════════════════════════
+2026-10-15 — PLATĂ DOAR RAMBURS; STRIPE DORMANT; CONFIRMARE MANUALĂ; BADGE ADMIN [LIVRAT]
+═══════════════════════════════════════════════════════════════════
+INVENTAR (înainte de a tăia): rezervarea stocului se făcea DEJA la plasare pentru
+  ambele metode (RPC create_order, strict); webhook-ul Stripe doar elibera la expired.
+  Ramburs era complet funcțional din Sprint 3 (pending_cod + emailuri la plasare +
+  markOrderPaid). NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY nu era folosită nicăieri. Zero
+  teste e2e pe checkout. DB live: 6 comenzi de test, toate cancelled, rezervat 0.
+IMPLEMENTAT:
+- lib/config/payments.ts: CARD_PAYMENTS_ENABLED (NEXT_PUBLIC_ENABLE_CARD_PAYMENTS, default
+  off) + DEFAULT_PAYMENT_METHOD='cod'.
+- Checkout 2 pași (Livrare → Rezumat): CheckoutContent cu STEPS derivat din flag,
+  PaymentStep nemontat (dormant), StepIndicator generic; ReviewStep: panou „Ramburs la
+  livrare" (data-testid cod-info) + termen de livrare în locul etichetei metodei.
+- place-order: paymentMethod forțat 'cod' server-side când flag-ul e off (ramura Stripe
+  inaccesibilă). Webhook: 410 „Card payments disabled" înainte de orice.
+- status.ts: pending_cod → „Nouă, de confirmat" (+ ORDER_STATUS_LABELS_EN), NEW_ORDER_
+  STATUS, ADMIN_ORDER_STATUSES (fără pending_payment când cardul e off) folosit de pills +
+  dropdown. Badge: countOrdersToConfirm() în lib/admin/orders.ts → (protected)/layout →
+  AdminShell → AdminSidebar (lângă „Comenzi", copper, data-testid orders-to-confirm-badge)
+  + StatCard „Comenzi de confirmat" pe dashboard (dashboard.ts orders.toConfirm).
+- Email client ramburs: „Am primit comanda ta. O verificăm, o pregătim și plătești
+  curierului la livrare." (+EN). Termeni: FinalFact nou „Plata se face exclusiv ramburs…".
+- .env.example: bloc Stripe DORMANT + SMOKE_ADMIN_EMAIL/PASSWORD. Doc reactivare:
+  _brain/notes/payments-dormant-stripe.md.
+- design-qa-capture: scenariul de checkout pe 2 pași. tests/e2e/checkout.spec.ts NOU
+  (2 pași, fără radio, panou cod, gate termeni, webhook 410, Termeni ramburs, EN).
+SMOKE scripts/smoke-ramburs-order.mjs pe prod build + DB live: 25/25 — plasare → pending_cod
+  / cod / pending, item, reserved +1, history „Order created", stock_movements
+  order_reserved → admin temporar (creat + șters prin service role): badge=1, StatCard,
+  dropdown fără „Așteaptă plata", confirm → confirmed, „Marchează plătit" → paid + audit,
+  cancel → cancelled + reserved înapoi la 0 + order_cancelled + 4 rânduri history, badge 0.
+  Primul run s-a oprit la un check (innerText uppercase, vezi gotcha) și a lăsat OF-2026-
+  0007 în pending_cod → curățat cu release_stock + cancelled + history. Comenzile de test
+  rămân cancelled (OF-2026-0007, -0008).

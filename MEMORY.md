@@ -443,3 +443,30 @@ sunt review-ul real; matricea full-page rămâne pentru regresii de chrome.
 **De ce contează:** Site-ul e coerent pentru lansarea din noiembrie: zero relicve de waitlist,
 toate CTA-urile duc la magazinul real, pozele de produs se văd integral, OG corect în
 previews, bundle cu 800KB mai mic pe home. Flag deschis: OF-10 (ceas) în catalog „Tocătoare".
+
+---
+
+## 2026-10-15 — Ramburs-only: Stripe dormant prin flag, confirmare manuală, smoke E2E cu admin temporar
+
+**Pattern descoperit:** (1) **Inventar înainte de a tăia**: „rezervarea stocului depinde de
+webhook" era o premisă falsă — RPC-ul `create_order` rezerva la plasare pentru ambele
+metode; fără inventar aș fi „mutat" ceva care era deja la locul lui. (2) **Un singur flag
+pentru o integrare dormantă**: `CARD_PAYMENTS_ENABLED` gated în 4 locuri (UI pași, server
+forțează metoda, webhook 410, enum-uri admin filtrate) — codul rămâne, revenirea = env.
+Flag NEXT_PUBLIC pentru că UI client + server trebuie să fie de acord; boolean, nu secret.
+(3) **Pașii de checkout ca listă derivată** (`STEPS: StepKind[]`) în loc de `1|2|3`
+hardcodat — un pas dispare fără să rescrii logica de navigare. (4) **Smoke E2E real pe
+DB live** cu Playwright pentru client + admin temporar creat/șters prin
+`auth.admin.createUser` + `profiles.role`, verificări directe în DB după fiecare pas
+(status, payment_status, history, inventory.quantity_reserved, stock_movements). Un check
+care aruncă înainte de cleanup lasă comandă + stoc rezervat → curăță cu rețeta webhook-ului
+expired. (5) `innerText` aplică `text-transform` (label-caps) — compară case-insensitive.
+(6) `next dev` și `next start` NU pot rula simultan din același `.next`: dev-ul
+suprascrie build-ul de producție (pagini fără CSS/JS pe serverul prod).
+**Aplicat la:** lib/config/payments.ts, components/checkout/*, lib/orders/{place-order,
+status}.ts, app/api/webhooks/stripe, admin (layout/shell/sidebar/dashboard/comenzi),
+emails/OrderConfirmationClient, termeni/page.tsx, .env.example, scripts/smoke-ramburs-
+order.mjs, tests/e2e/checkout.spec.ts, _brain/notes/payments-dormant-stripe.md.
+**De ce contează:** Lansarea nu mai depinde de KYC Stripe live + webhook în prod. Founder-ul
+are inbox-ul „Nouă, de confirmat" cu badge și filtrează gravările înainte de producție.
+Reactivarea cardului = 3 env + endpoint webhook, documentat.

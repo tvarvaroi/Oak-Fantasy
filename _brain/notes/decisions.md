@@ -352,3 +352,28 @@ produs de pe PDP (file-based > config-based); static = zero runtime, determinist
 de slideshow (prea mort), `opengraph-image.tsx` per segment (conflict PDP), `sharp` ca
 devDependency pentru thumbs/OG (pachet nou, optimizatorul `next/image` local + `next/og`
 fac același lucru fără instalări).
+
+## 2026-10-15 — Plată DOAR ramburs la lansare; Stripe DORMANT prin flag; confirmare manuală
+
+**Decizie:** (1) Singura metodă de plată = ramburs (numerar la curier). (2) Stripe NU se
+șterge: `CARD_PAYMENTS_ENABLED` (`lib/config/payments.ts`, env `NEXT_PUBLIC_ENABLE_CARD_
+PAYMENTS`, default off) scoate pasul de plată din checkout, forțează `cod` server-side,
+face webhook-ul să răspundă 410 și ascunde `pending_payment` din admin. Pachet, SDK,
+webhook, migrații, emailuri = neatinse. (3) Checkout în 2 pași (Livrare → Rezumat).
+(4) Confirmare MANUALĂ: comanda intră în `pending_cod` („Nouă, de confirmat"), founder-ul
+o trece în `confirmed` după ce verifică gravarea; fără email la confirmare în v1.
+(5) Încasarea = „Marchează plătit" manual când curierul remite banii; NU legată de
+`delivered`. (6) Badge „comenzi de confirmat" în sidebar + StatCard pe dashboard, count
+HEAD pe `status = pending_cod` în layout-ul protejat.
+
+**Motiv:** simplifică lansarea (fără KYC Stripe live, fără webhook în prod) + preferința
+founder-ului. Manual > automat pentru că clientul nu simte diferența (vede „comandă
+primită" oricum), iar founder-ul câștigă un filtru pe gravare și pe comenzi suspecte
+înainte de orice muncă; stocul e rezervat la plasare în ambele variante (RPC
+`create_order`), deci fără oversell. Flag NEXT_PUBLIC pentru că UI-ul client și server-ul
+trebuie să vadă același răspuns; e boolean, nu secret.
+
+**Alternative respinse:** ștergerea codului Stripe (founder vrea revenire ușoară),
+confirmare automată (pierde filtrul pe gravare), rezervare stoc la confirmare în loc de
+plasare (ar permite oversell între plasare și confirmare), auto-paid la `delivered`
+(remiterea ramburs vine mai târziu decât livrarea).
