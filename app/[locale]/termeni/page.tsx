@@ -90,11 +90,16 @@ const TERMS_FINAL_FACTS = {
     delivery: 'Livrăm exclusiv pe teritoriul României.',
     pricesVat:
       'Toate prețurile afișate pe site sunt exprimate în RON și sunt finale. Societatea nu este plătitoare de TVA.',
+    // 2026-10-15 founder decision: cash on delivery is the only payment method.
+    payment:
+      'Plata se face exclusiv ramburs, în numerar, la livrare, direct curierului. Momentan nu acceptăm plata online cu cardul.',
   },
   en: {
     delivery: 'We deliver exclusively within the territory of Romania.',
     pricesVat:
       'All prices on the site are expressed in RON and are final. The company is not registered for VAT.',
+    payment:
+      'Payment is made exclusively by cash on delivery, in cash, directly to the courier. We do not currently accept online card payments.',
   },
 } as const;
 
@@ -133,6 +138,7 @@ export default function Page({ params }: { params: { locale: string } }) {
     'prices-payment': (
       <>
         <FinalFact text={facts.pricesVat} />
+        <FinalFact text={facts.payment} />
         <LegalPlaceholder locale={locale} />
       </>
     ),

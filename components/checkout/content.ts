@@ -39,10 +39,13 @@ export interface CheckoutContent {
   freeShippingHint: string;
   leadTime: string;
 
-  // Step 3
+  // Step 3 (step 2 while card payments are dormant)
   reviewHeading: string;
   shippingToLabel: string;
   paymentLabel: string;
+  /** Cash-on-delivery info panel shown in the review step (ramburs-only mode). */
+  codInfoTitle: string;
+  codInfoBody: string;
   subtotal: string;
   total: string;
   termsPrefix: string;
@@ -95,6 +98,8 @@ export const CHECKOUT_CONTENT: Record<Locale, CheckoutContent> = {
     reviewHeading: 'Rezumat comandă',
     shippingToLabel: 'Livrare către',
     paymentLabel: 'Plată',
+    codInfoTitle: 'Ramburs la livrare',
+    codInfoBody: 'Plătești curierului, în numerar, când primești coletul.',
     subtotal: 'Subtotal',
     total: 'Total',
     termsPrefix: 'Sunt de acord cu',
@@ -150,6 +155,8 @@ export const CHECKOUT_CONTENT: Record<Locale, CheckoutContent> = {
     reviewHeading: 'Order summary',
     shippingToLabel: 'Shipping to',
     paymentLabel: 'Payment',
+    codInfoTitle: 'Cash on delivery',
+    codInfoBody: 'You pay the courier in cash when the parcel arrives.',
     subtotal: 'Subtotal',
     total: 'Total',
     termsPrefix: 'I agree to the',

@@ -5,6 +5,7 @@ import { getServiceSupabase } from '@/lib/supabase-server';
 import { checkoutSchema } from '@/lib/schemas/checkout';
 import { localizedPath, isLocale, type Locale } from '@/lib/i18n-routes';
 import { getStripe, isStripeConfigured } from '@/lib/stripe/server';
+import { CARD_PAYMENTS_ENABLED, DEFAULT_PAYMENT_METHOD } from '@/lib/config/payments';
 import { createOrder } from './create-order';
 import { sendOrderEmails } from './send-order-emails';
 
@@ -30,6 +31,11 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResu
   if (!input.items?.length) return { ok: false, error: 'empty' };
   const locale: Locale = isLocale(input.locale) ? input.locale : 'ro';
   const data = parsed.data;
+
+  // Ramburs-only mode (2026-10-15): whatever the client sent, the only accepted
+  // method is cash on delivery. Server-side so a crafted request can't reach
+  // the dormant Stripe branch.
+  if (!CARD_PAYMENTS_ENABLED) data.paymentMethod = DEFAULT_PAYMENT_METHOD;
 
   const user = await getUser();
 
@@ -60,15 +66,18 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResu
 
   const thankYouPath = `${localizedPath('multumim', locale)}/${created.orderId}`;
 
-  // Ramburs — no online payment, the order is placed now (pending_cod). Send
-  // both emails here (best-effort, D5 — never blocks the confirmation). The
-  // card path emails fire later from the webhook, on payment confirmation.
+  // Ramburs — no online payment, the order is placed now (pending_cod; the
+  // founder confirms it manually in /admin before production). Stock was
+  // reserved atomically inside create_order. Send both emails here
+  // (best-effort, D5 — never blocks the confirmation). The card path emails
+  // fire later from the webhook, on payment confirmation.
   if (data.paymentMethod === 'cod') {
     await sendOrderEmails(created.orderId);
     return { ok: true, mode: 'thankyou', path: thankYouPath };
   }
 
-  // Card — Stripe Checkout (hosted).
+  // Card — Stripe Checkout (hosted). DORMANT while CARD_PAYMENTS_ENABLED is
+  // false (unreachable: paymentMethod is forced to 'cod' above).
   if (!isStripeConfigured()) {
     return { ok: false, error: 'stripe_unconfigured' };
   }

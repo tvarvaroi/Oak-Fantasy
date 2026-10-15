@@ -3,6 +3,7 @@ import type Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe/server';
 import { getServiceSupabase } from '@/lib/supabase-server';
 import { sendOrderEmails } from '@/lib/orders/send-order-emails';
+import { CARD_PAYMENTS_ENABLED } from '@/lib/config/payments';
 
 // Stripe webhook (Task 3.4). Lives under /api (excluded from middleware). Must
 // read the RAW body for signature verification. Handles:
@@ -92,6 +93,13 @@ async function handleExpired(session: Stripe.Checkout.Session) {
 }
 
 export async function POST(request: Request) {
+  // DORMANT (2026-10-15): card payments are switched off, so no Stripe event
+  // can be legitimate. Answer before touching Stripe or the DB. See
+  // _brain/notes/payments-dormant-stripe.md for reactivation.
+  if (!CARD_PAYMENTS_ENABLED) {
+    return new Response('Card payments disabled', { status: 410 });
+  }
+
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!secret) {
     return new Response('Webhook not configured', { status: 500 });

@@ -11,6 +11,7 @@ import { localizedPath, type Locale } from '@/lib/i18n-routes';
 import { useCartStore, cartSubtotal } from '@/lib/store/cart';
 import { useHydrated } from '@/lib/hooks/useHydrated';
 import { checkoutSchema, STEP_FIELDS, type CheckoutData } from '@/lib/schemas/checkout';
+import { CARD_PAYMENTS_ENABLED, DEFAULT_PAYMENT_METHOD } from '@/lib/config/payments';
 import { placeOrder } from '@/lib/orders/place-order';
 import { CHECKOUT_CONTENT } from './content';
 import StepIndicator from './StepIndicator';
@@ -25,13 +26,30 @@ export interface CheckoutPrefill {
   phone?: string;
 }
 
+// Step flow (2026-10-15, founder decision: ramburs only). With card payments
+// dormant the "Plată" step is gone: Livrare → Rezumat. With the flag on, the
+// original 3-step flow (Livrare → Plată → Rezumat) comes back untouched.
+type StepKind = 'shipping' | 'payment' | 'review';
+const STEPS: StepKind[] = CARD_PAYMENTS_ENABLED
+  ? ['shipping', 'payment', 'review']
+  : ['shipping', 'review'];
+// Fields validated before leaving each step (review has the terms checkbox,
+// validated by the final submit).
+const FIELDS_BY_KIND: Record<StepKind, (keyof CheckoutData)[]> = {
+  shipping: STEP_FIELDS[1],
+  payment: STEP_FIELDS[2],
+  review: [],
+};
+
 export default function CheckoutContent({ locale, prefill }: { locale: Locale; prefill: CheckoutPrefill }) {
   const router = useRouter();
   const hydrated = useHydrated();
   const items = useCartStore((s) => s.items);
   const c = CHECKOUT_CONTENT[locale];
 
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [step, setStep] = useState(1); // 1-based index into STEPS
+  const kind = STEPS[step - 1];
+  const lastStep = STEPS.length;
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,7 +65,7 @@ export default function CheckoutContent({ locale, prefill }: { locale: Locale; p
       county: '',
       postalCode: '',
       notes: '',
-      paymentMethod: 'cod',
+      paymentMethod: DEFAULT_PAYMENT_METHOD,
       termsAccepted: false,
     },
   });
@@ -62,8 +80,9 @@ export default function CheckoutContent({ locale, prefill }: { locale: Locale; p
   const subtotal = cartSubtotal(items);
 
   const goNext = async () => {
-    const valid = await methods.trigger(STEP_FIELDS[step as 1 | 2]);
-    if (valid) setStep((s) => Math.min(3, s + 1) as 1 | 2 | 3);
+    const fields = FIELDS_BY_KIND[kind];
+    const valid = fields.length ? await methods.trigger(fields) : true;
+    if (valid) setStep((s) => Math.min(lastStep, s + 1));
   };
 
   const submitOrder = methods.handleSubmit(async (data) => {
@@ -101,12 +120,14 @@ export default function CheckoutContent({ locale, prefill }: { locale: Locale; p
 
   const onFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (step < 3) {
+    if (step < lastStep) {
       void goNext();
     } else {
       void submitOrder();
     }
   };
+
+  const stepLabels = STEPS.map((k) => c.steps[k]);
 
   const toggleLanguage = () => router.push(localizedPath('checkout', locale === 'ro' ? 'en' : 'ro'));
 
@@ -126,20 +147,21 @@ export default function CheckoutContent({ locale, prefill }: { locale: Locale; p
           ) : (
             <FormProvider {...methods}>
               <form onSubmit={onFormSubmit} noValidate>
-                <StepIndicator current={step} labels={[c.steps.shipping, c.steps.payment, c.steps.review]} />
+                <StepIndicator current={step} labels={stepLabels} />
 
-                {step === 1 ? (
+                {kind === 'shipping' ? (
                   <ShippingStep content={c} locale={locale} isLoggedIn={prefill.isLoggedIn} email={prefill.email} />
                 ) : null}
-                {step === 2 ? <PaymentStep content={c} locale={locale} subtotalBani={subtotal} /> : null}
-                {step === 3 ? <ReviewStep content={c} locale={locale} items={items} subtotalBani={subtotal} /> : null}
+                {/* PaymentStep stays dormant: only mounted when card payments are enabled. */}
+                {kind === 'payment' ? <PaymentStep content={c} locale={locale} subtotalBani={subtotal} /> : null}
+                {kind === 'review' ? <ReviewStep content={c} locale={locale} items={items} subtotalBani={subtotal} /> : null}
 
                 {/* Nav */}
                 <div className="flex items-center justify-between gap-4" style={{ marginTop: 32 }}>
                   {step > 1 ? (
                     <button
                       type="button"
-                      onClick={() => setStep((s) => Math.max(1, s - 1) as 1 | 2 | 3)}
+                      onClick={() => setStep((s) => Math.max(1, s - 1))}
                       className="font-caudex transition-opacity hover:opacity-70"
                       style={{ color: 'var(--ink-soft)', fontSize: '0.95rem' }}
                     >
@@ -163,7 +185,7 @@ export default function CheckoutContent({ locale, prefill }: { locale: Locale; p
                       boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12), 0 2px 6px rgba(31,24,16,0.2)',
                     }}
                   >
-                    {step < 3 ? c.continue : submitting ? c.placing : c.placeOrder}
+                    {step < lastStep ? c.continue : submitting ? c.placing : c.placeOrder}
                   </button>
                 </div>
 

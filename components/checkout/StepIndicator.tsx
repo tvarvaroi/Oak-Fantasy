@@ -1,11 +1,12 @@
 import { Check } from 'lucide-react';
 
-// 3-step progress indicator for checkout.
-export default function StepIndicator({ current, labels }: { current: 1 | 2 | 3; labels: string[] }) {
+// Progress indicator for checkout. 2 steps while card payments are dormant
+// (Livrare · Rezumat), 3 with the payment step enabled (2026-10-15).
+export default function StepIndicator({ current, labels }: { current: number; labels: string[] }) {
   return (
     <ol className="flex items-center" style={{ marginBottom: 36 }}>
       {labels.map((label, i) => {
-        const step = (i + 1) as 1 | 2 | 3;
+        const step = i + 1;
         const done = step < current;
         const active = step === current;
         return (

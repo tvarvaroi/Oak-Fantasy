@@ -6,6 +6,7 @@ import { useFormContext } from 'react-hook-form';
 import { FieldError } from '@/components/auth/fields';
 import { formatPriceRon } from '@/components/tocatoare/content';
 import { shippingCost } from '@/lib/config/shipping';
+import { CARD_PAYMENTS_ENABLED } from '@/lib/config/payments';
 import { localizedPath, type Locale } from '@/lib/i18n-routes';
 import type { CartItem } from '@/lib/store/cart';
 import type { CheckoutData } from '@/lib/schemas/checkout';
@@ -35,6 +36,29 @@ export default function ReviewStep({
   const paymentLabel = d.paymentMethod === 'stripe_card' ? c.cardLabel : c.codLabel;
 
   const rowStyle: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', alignItems: 'center' };
+
+  // Ramburs-only mode (card payments dormant, 2026-10-15): there is no payment
+  // step, so the review step carries the cash-on-delivery panel + the delivery
+  // lead time that used to live in PaymentStep.
+  const codPanel = (
+    <div
+      style={{
+        backgroundColor: 'var(--paper-aged)',
+        border: '1px solid rgba(92,58,32,0.2)',
+        borderLeft: '3px solid var(--oak-warm)',
+        borderRadius: '0 8px 8px 0',
+        padding: '12px 14px',
+      }}
+      data-testid="cod-info"
+    >
+      <p className="font-caudex" style={{ color: 'var(--oak-deep)', fontWeight: 700, fontSize: '0.95rem' }}>
+        {c.codInfoTitle}
+      </p>
+      <p className="font-lora" style={{ color: 'var(--ink-soft)', fontSize: '0.84rem', lineHeight: 1.55, marginTop: 2 }}>
+        {c.codInfoBody}
+      </p>
+    </div>
+  );
 
   return (
     <div className="flex flex-col gap-6">
@@ -83,9 +107,13 @@ export default function ReviewStep({
           <p className="label-caps" style={{ color: 'var(--ink-soft)', fontSize: '0.6rem', marginBottom: 4 }}>
             {c.paymentLabel}
           </p>
-          <p className="font-lora" style={{ color: 'var(--ink)', fontSize: '0.88rem' }}>
-            {paymentLabel}
-          </p>
+          {CARD_PAYMENTS_ENABLED ? (
+            <p className="font-lora" style={{ color: 'var(--ink)', fontSize: '0.88rem' }}>
+              {paymentLabel}
+            </p>
+          ) : (
+            codPanel
+          )}
         </div>
       </div>
 
@@ -107,6 +135,11 @@ export default function ReviewStep({
         <p className="font-lora" style={{ fontSize: '0.78rem', color: 'var(--ink-soft)', marginTop: 6, opacity: 0.85 }}>
           {c.vatNote}
         </p>
+        {!CARD_PAYMENTS_ENABLED ? (
+          <p className="font-lora" style={{ fontSize: '0.8rem', color: 'var(--ink-soft)' }}>
+            {ship === 0 ? c.leadTime : `${c.freeShippingHint} ${c.leadTime}`}
+          </p>
+        ) : null}
       </div>
 
       {/* Terms */}
