@@ -38,7 +38,8 @@ test.describe('/despre page + path-localized routing', () => {
 
   test('EN /about body has no Romanian diacritics', async ({ page }) => {
     await page.goto('/en/about');
-    const text = (await page.locator('body').textContent()) ?? '';
+    // innerText: the inline RSC payload carries the RO not-found boundary.
+    const text = await page.evaluate(() => document.body.innerText);
     expect(text).not.toMatch(/[ăâîșțĂÂÎȘȚ]/);
   });
 });

@@ -16,8 +16,8 @@ const ALL_PAGES = [
   { path: '/en/about',            title: /About Oak Fantasy/i },
   { path: '/ro/atelier',          title: /Atelierul Oak Fantasy/i },
   { path: '/en/workshop',         title: /Oak Fantasy Workshop/i },
-  { path: '/ro/tocatoare',        title: /Tocătoarele noastre/i },
-  { path: '/en/cutting-boards',   title: /Our cutting boards/i },
+  { path: '/ro/tocatoare',        title: /Tocătoare din Stejar Românesc/i },
+  { path: '/en/cutting-boards',   title: /Romanian Oak Cutting Boards/i },
 ];
 
 const PAGES_WITH_FULL_SEO = [
@@ -92,7 +92,8 @@ test.describe('JSON-LD — Catalog family (/tocatoare)', () => {
     test(`${path} — BreadcrumbList + ItemList JSON-LD scripts present`, async ({ page }) => {
       await page.goto(path);
       const scripts = page.locator('script[type="application/ld+json"]');
-      await expect(scripts).toHaveCount(2);
+      // 3 since 2026-07-02: Organization/WebSite @graph (layout) + Breadcrumb + ItemList
+      await expect(scripts).toHaveCount(3);
 
       const payloads = await scripts.allTextContents();
       const types = payloads

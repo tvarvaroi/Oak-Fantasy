@@ -12,13 +12,14 @@ test.describe('/tocatoare page', () => {
   test('RO route /ro/tocatoare returns 200 + correct title', async ({ page }) => {
     const res = await page.goto('/ro/tocatoare');
     expect(res?.status()).toBe(200);
-    await expect(page).toHaveTitle(/Tocătoarele noastre/i);
+    // 2026-07-02 SEO: keyword title "Tocătoare din Stejar Românesc — Oak Fantasy"
+    await expect(page).toHaveTitle(/Tocătoare din Stejar Românesc/i);
   });
 
   test('EN route /en/cutting-boards returns 200 + correct title', async ({ page }) => {
     const res = await page.goto('/en/cutting-boards');
     expect(res?.status()).toBe(200);
-    await expect(page).toHaveTitle(/Our cutting boards/i);
+    await expect(page).toHaveTitle(/Romanian Oak Cutting Boards/i);
   });
 
   test('Wrong-locale slug /en/tocatoare redirects to /en/cutting-boards', async ({ page }) => {
@@ -37,7 +38,9 @@ test.describe('/tocatoare page', () => {
     await page.goto('/ro/tocatoare');
     const main = page.locator('main');
     await expect(main).toContainText('Tocătoarele');
-    await expect(main).toContainText('Lansăm în octombrie');
+    // 2026-10-15: pre-launch "Lansăm în octombrie" copy is gone site-wide;
+    // the hero note carries the live-shop promise instead.
+    await expect(main).toContainText('gata de folosit');
   });
 
   test('EN page has no Romanian-only characters in main content', async ({ page }) => {
@@ -47,7 +50,7 @@ test.describe('/tocatoare page', () => {
     // ă â î ș ț + uppercase variants — none should appear in EN main copy
     expect(text).not.toMatch(/[ăâîșțĂÂÎȘȚ]/);
     await expect(main).toContainText('Our');
-    await expect(main).toContainText('Launching in October');
+    await expect(main).toContainText('ready to use');
   });
 
   test('Hero shows eyebrow + heading + sub on RO', async ({ page }) => {
@@ -73,7 +76,9 @@ test.describe('/tocatoare page', () => {
 
   test('Bottom CTA renders with mailto link', async ({ page }) => {
     await page.goto('/ro/tocatoare');
-    const mail = page.locator('a[href^="mailto:atelier@oakfantasy.ro"]');
+    // 2026-07-14: the public address is LEGAL_INFO.contactEmail (gmail), so
+    // assert on the mailto scheme inside <main>, not on a hardcoded address.
+    const mail = page.locator('main a[href^="mailto:"]');
     await expect(mail).toHaveCount(1);
     await expect(mail).toContainText(/Contactează-ne/i);
   });
@@ -81,7 +86,8 @@ test.describe('/tocatoare page', () => {
   test('JSON-LD BreadcrumbList + ItemList scripts are present', async ({ page }) => {
     await page.goto('/ro/tocatoare');
     const scripts = page.locator('script[type="application/ld+json"]');
-    await expect(scripts).toHaveCount(2);
+    // 3 since 2026-07-02: Organization/WebSite @graph (layout) + Breadcrumb + ItemList
+    await expect(scripts).toHaveCount(3);
     const payloads = await scripts.allTextContents();
     const types = payloads
       .map((p) => {
@@ -104,20 +110,26 @@ test.describe('/tocatoare page', () => {
     const emptyCount = await empty.count();
     if (cardCount > 0) {
       expect(emptyCount).toBe(0);
-      // Card structure sanity: tier chip + price + a CTA
-      await expect(cards.first().locator('a[href*="interested_product"]').first()).toHaveCount(1);
+      // Card structure sanity: the card links to its product detail page
+      await expect(cards.first().locator('a[href^="/ro/tocatoare/"]').first()).toHaveCount(1);
     } else {
       expect(emptyCount).toBe(1);
       await expect(empty).toContainText(/Pădurea e liniștită|forest is quiet/i);
     }
   });
 
-  test('If cards are visible, CTAs route to /[locale]?interested_product=slug#waitlist', async ({ page }) => {
+  test('If cards are visible, CTAs route to the PDP /ro/tocatoare/[slug] (no waitlist relics)', async ({ page }) => {
     await page.goto('/ro/tocatoare');
     const cards = page.locator('[data-product]');
     const n = await cards.count();
     test.skip(n === 0, 'No active products on this DB yet — skipping CTA-href assertion');
-    const href = await cards.first().locator('a[href*="interested_product"]').first().getAttribute('href');
-    expect(href).toMatch(/^\/ro\?interested_product=[a-z0-9-]+#waitlist$/);
+    const href = await cards.first().locator('a[href^="/ro/tocatoare/"]').first().getAttribute('href');
+    expect(href).toMatch(/^\/ro\/tocatoare\/[a-z0-9-]+$/);
+    await expect(page.locator('a[href*="interested_product"], a[href*="#waitlist"]')).toHaveCount(0);
+  });
+
+  test('Hero has no subtitle paragraph anymore (2026-10-15 #12)', async ({ page }) => {
+    await page.goto('/ro/tocatoare');
+    await expect(page.locator('main')).not.toContainText('Zece modele');
   });
 });

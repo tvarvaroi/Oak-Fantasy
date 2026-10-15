@@ -29,7 +29,7 @@ const PAGES = [
 
 test.describe('Visual regression', () => {
   // 2026-08-10: 60s (was default 30s). The homepage now carries 5 photos +
-  // a video poster; against the dev server every run cold-starts the
+  // a 5-still slideshow; against the dev server every run cold-starts the
   // /_next/image optimizer, and first-hit optimization during the fullPage
   // stitch pushed home-{ro,en} past 30s on the tablet project. Verified the
   // captures themselves are stable (0-pixel diff between consecutive shots
@@ -37,12 +37,9 @@ test.describe('Visual regression', () => {
   test.setTimeout(60_000);
   for (const { path, name } of PAGES) {
     test(`${name} screenshot matches baseline`, async ({ page }) => {
-      // Ambient <video> loops (CraftVideoTease) would capture a random frame
-      // per run. Stub play() so videos never start — the static poster is the
-      // only state screenshots ever see. Deterministic across runs.
-      await page.addInitScript(() => {
-        HTMLMediaElement.prototype.play = () => Promise.resolve();
-      });
+      // 2026-10-15: the CraftVideoTease slideshow freezes on its first frame
+      // when `navigator.webdriver` is true (Playwright sets it), so captures
+      // are deterministic without any stub here.
       await page.goto(path);
       await page.waitForLoadState('networkidle');
       // Atelier has 10 Reveal sections — fullPage screenshot scrolls during

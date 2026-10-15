@@ -192,16 +192,21 @@ async function main() {
   }
 
   // ── 3. navbar states ──────────────────────────────────────────────────────
-  // mobile menu open (hamburger only exists < md/768 today)
-  await tryStep('navbar-menu-open-mobile', async () => {
-    const { page, ctx } = await newPage(browser, VIEWPORTS[0]);
-    await page.goto(`${BASE}/ro`);
-    await settle(page);
-    await page.getByRole('button', { name: 'Toggle menu' }).click();
-    await page.waitForTimeout(600);
-    await shot(page, 'navbar', 'menu-open--ro--mobile', { fullPage: false });
-    await ctx.close();
-  });
+  // drawer open (hamburger exists < lg/1024). The hamburger's aria-label is
+  // localized ("Meniu"/"Menu"), so select by aria-expanded like the e2e
+  // helper does; dispatchEvent bypasses the fixed-position "outside the
+  // viewport" click check on mobile emulation (2026-10-15 fix).
+  for (const vp of [VIEWPORTS[0], VIEWPORTS[1]]) {
+    await tryStep(`navbar-menu-open-${vp.name}`, async () => {
+      const { page, ctx } = await newPage(browser, vp);
+      await page.goto(`${BASE}/ro`);
+      await settle(page);
+      await page.locator('header button[aria-expanded]').dispatchEvent('click');
+      await page.waitForTimeout(600);
+      await shot(page, 'navbar', `menu-open--ro--${vp.name}`, { fullPage: false });
+      await ctx.close();
+    });
+  }
   // navbar closeup at every viewport (viewport-height shot = above the fold)
   for (const vp of VIEWPORTS) {
     await tryStep(`navbar-fold-${vp.name}`, async () => {
@@ -330,7 +335,7 @@ async function main() {
   // no-scroll capture would show below-fold images blank (false finding).
   // Animation defects still surface: with RM emulated, anything stuck at
   // opacity 0 after priming is a real bug.
-  for (const [key, slug] of [['home', ''], ['atelier', 'atelier'], ['tocatoare', 'tocatoare']]) {
+  for (const [key, slug] of [['home', ''], ['atelier', 'atelier'], ['tocatoare', 'tocatoare'], ['despre', 'despre']]) {
     for (const vp of [VIEWPORTS[0], VIEWPORTS[3]]) {
       await tryStep(`reduced-motion-${key}-${vp.name}`, async () => {
         const { page, ctx } = await newPage(browser, vp, { reducedMotion: true });

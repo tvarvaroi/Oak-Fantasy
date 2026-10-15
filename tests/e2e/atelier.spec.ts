@@ -4,13 +4,14 @@ test.describe('/atelier page + path-localized routing', () => {
   test('GET /ro/atelier returns 200', async ({ page }) => {
     const response = await page.goto('/ro/atelier');
     expect(response?.status()).toBe(200);
-    await expect(page.locator('body')).toContainText('Un atelier mic, în zona Carpaților.');
+    // 2026-07-15: narrative moved from "zona Carpaților" to "vestul României".
+    await expect(page.locator('body')).toContainText('Un atelier mic, în vestul României.');
   });
 
   test('GET /en/workshop returns 200', async ({ page }) => {
     const response = await page.goto('/en/workshop');
     expect(response?.status()).toBe(200);
-    await expect(page.locator('body')).toContainText('A small workshop in the Carpathians.');
+    await expect(page.locator('body')).toContainText('A small workshop in western Romania.');
   });
 
   test('GET /en/atelier redirects 308 to /en/workshop', async ({ page }) => {
@@ -33,7 +34,10 @@ test.describe('/atelier page + path-localized routing', () => {
 
   test('EN body has no Romanian diacritics', async ({ page }) => {
     await page.goto('/en/workshop');
-    const text = (await page.locator('body').textContent()) ?? '';
+    // innerText, not textContent: the RSC flight payload (inline <script>)
+    // carries the global RO not-found boundary ("Pagina nu există") on every
+    // page since 2026-07-02 — that is not visible copy.
+    const text = await page.evaluate(() => document.body.innerText);
     expect(text).not.toMatch(/[ăâîșțĂÂÎȘȚ]/);
   });
 
@@ -63,13 +67,24 @@ test.describe('/atelier page + path-localized routing', () => {
     await expect(sezon).toContainText('Toamna');
   });
 
-  test('Articles section has 4 "coming soon" placeholders', async ({ page }) => {
+  test('Articles placeholder section is hidden pre-launch (2026-10-15)', async ({ page }) => {
     await page.goto('/ro/atelier');
-    const articole = page.locator('#articole');
-    await articole.scrollIntoViewIfNeeded();
-    // Each card has data-coming with "Articol în pregătire"
-    const comingBadges = articole.locator('[data-coming]');
-    await expect(comingBadges).toHaveCount(4);
+    await expect(page.locator('#articole')).toHaveCount(0);
+    await expect(page.locator('[data-coming]')).toHaveCount(0);
+  });
+
+  test('Hero mosaic shows 9 product photos (no text labels)', async ({ page }) => {
+    await page.goto('/ro/atelier');
+    // next/image rewrites src to /_next/image?url=%2Fproducts%2Fatelier-… so
+    // match the URL-encoded form (and not the /stock/atelier-tool-* photos).
+    const mosaic = page.locator('img[src*="products%2Fatelier-"], img[src*="products/atelier-"]');
+    await expect(mosaic).toHaveCount(9);
+  });
+
+  test('CTA has a single button → /ro/tocatoare (ghost waitlist removed)', async ({ page }) => {
+    await page.goto('/ro/atelier');
+    await expect(page.locator('a[href="/ro/tocatoare"]:has-text("Vezi tocătoarele noastre")')).toHaveCount(1);
+    await expect(page.locator('a[href*="#waitlist"]')).toHaveCount(0);
   });
 
   test('Process section cross-link points to /despre#proces', async ({ page }) => {

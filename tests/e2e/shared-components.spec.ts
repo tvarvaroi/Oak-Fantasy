@@ -2,8 +2,9 @@ import { test, expect } from './fixtures';
 import type { Page } from '@playwright/test';
 
 // Below lg (1024px — 2026-07-03 Navbar redesign) the desktop nav is hidden and
-// the nav links live in a side drawer opened by the hamburger. The Atelier
-// route link exists in both places; the visibility/click tests need the
+// the nav links live in a side drawer opened by the hamburger. The drawer is
+// an <aside> SIBLING of <header> (not inside it), so link locators must look
+// in both: `navLink(page, href)` below. The visibility/click tests need the
 // drawer open on mobile AND tablet.
 async function openMobileMenuIfNeeded(page: Page) {
   await page.waitForLoadState('networkidle');
@@ -19,6 +20,11 @@ async function openMobileMenuIfNeeded(page: Page) {
   }
 }
 
+/** Visible primary-nav link for `href`, whether in the desktop nav or the drawer. */
+function navLink(page: Page, href: string) {
+  return page.locator(`header a[href="${href}"]:visible, aside a[href="${href}"]:visible`).first();
+}
+
 test.describe('Navbar tagline (Faza B fix)', () => {
   test('RO shows "stejar · manual"', async ({ page }) => {
     await page.goto('/ro');
@@ -32,11 +38,41 @@ test.describe('Navbar tagline (Faza B fix)', () => {
   });
 });
 
+test.describe('Navbar "Acasă" link (2026-10-15 — explicit home as first link)', () => {
+  test('RO primary nav starts with Acasă → /ro, then Tocătoare', async ({ page }) => {
+    await page.goto('/ro/despre');
+    await openMobileMenuIfNeeded(page);
+    const links = page.locator('header nav a:visible, aside nav a:visible');
+    await expect(links.first()).toContainText('Acasă');
+    await expect(links.first()).toHaveAttribute('href', '/ro');
+    await expect(links.nth(1)).toContainText('Tocătoare');
+    // No "Cadouri" yet — the landing does not exist.
+    await expect(page.locator('header a[href*="personalizate"]')).toHaveCount(0);
+  });
+
+  test('EN primary nav starts with Home → /en', async ({ page }) => {
+    await page.goto('/en/about');
+    await openMobileMenuIfNeeded(page);
+    const first = page.locator('header nav a:visible, aside nav a:visible').first();
+    await expect(first).toContainText('Home');
+    await expect(first).toHaveAttribute('href', '/en');
+  });
+
+  test('Footer account column links to login + register (no "În curând")', async ({ page }) => {
+    await page.goto('/ro');
+    const footer = page.locator('footer');
+    await expect(footer.locator('a[href="/ro/login"]')).toHaveCount(1);
+    await expect(footer.locator('a[href="/ro/inregistrare"]')).toHaveCount(1);
+    await expect(footer).not.toContainText('În curând');
+    await expect(footer.locator('a[href="/ro"]')).toHaveCount(1);
+  });
+});
+
 test.describe('Navbar Atelier link (2026-05-27 — /atelier route)', () => {
   test('RO Navbar has "Atelier" route link pointing to /ro/atelier', async ({ page }) => {
     await page.goto('/ro');
     await openMobileMenuIfNeeded(page);
-    const link = page.locator('header a[href="/ro/atelier"]:visible').first();
+    const link = navLink(page, '/ro/atelier');
     await expect(link).toBeVisible();
     await expect(link).toContainText('Atelier');
   });
@@ -44,7 +80,7 @@ test.describe('Navbar Atelier link (2026-05-27 — /atelier route)', () => {
   test('EN Navbar has "Workshop" route link pointing to /en/workshop', async ({ page }) => {
     await page.goto('/en');
     await openMobileMenuIfNeeded(page);
-    const link = page.locator('header a[href="/en/workshop"]:visible').first();
+    const link = navLink(page, '/en/workshop');
     await expect(link).toBeVisible();
     await expect(link).toContainText('Workshop');
   });
@@ -52,7 +88,7 @@ test.describe('Navbar Atelier link (2026-05-27 — /atelier route)', () => {
   test('Click Atelier on /ro navigates to /ro/atelier', async ({ page }) => {
     await page.goto('/ro');
     await openMobileMenuIfNeeded(page);
-    await page.locator('header a[href="/ro/atelier"]:visible').first().click();
+    await navLink(page, '/ro/atelier').dispatchEvent('click');
     await page.waitForURL('**/ro/atelier');
     expect(new URL(page.url()).pathname).toBe('/ro/atelier');
   });
@@ -67,7 +103,7 @@ test.describe('Navbar Atelier link (2026-05-27 — /atelier route)', () => {
     await page.evaluate(() => window.scrollTo(0, 300));
     await page.waitForTimeout(400); // wait for 0.3s color transition
     await openMobileMenuIfNeeded(page);
-    const link = page.locator('header a[href="/ro/atelier"]:visible').first();
+    const link = navLink(page, '/ro/atelier');
     await expect(link).toBeVisible();
     // Active color after scroll is var(--oak-warm) = #8B5E3C → rgb(139, 94, 60)
     const color = await link.evaluate((el) => getComputedStyle(el).color);
@@ -101,7 +137,7 @@ test.describe('Navbar Tocătoare link (2026-05-23 — /tocatoare route)', () => 
   test('RO Navbar has "Tocătoare" route link pointing to /ro/tocatoare', async ({ page }) => {
     await page.goto('/ro');
     await openMobileMenuIfNeeded(page);
-    const link = page.locator('header a[href="/ro/tocatoare"]:visible').first();
+    const link = navLink(page, '/ro/tocatoare');
     await expect(link).toBeVisible();
     await expect(link).toContainText('Tocătoare');
   });
@@ -109,7 +145,7 @@ test.describe('Navbar Tocătoare link (2026-05-23 — /tocatoare route)', () => 
   test('EN Navbar has "Cutting Boards" route link pointing to /en/cutting-boards', async ({ page }) => {
     await page.goto('/en');
     await openMobileMenuIfNeeded(page);
-    const link = page.locator('header a[href="/en/cutting-boards"]:visible').first();
+    const link = navLink(page, '/en/cutting-boards');
     await expect(link).toBeVisible();
     await expect(link).toContainText('Cutting Boards');
   });
@@ -117,7 +153,7 @@ test.describe('Navbar Tocătoare link (2026-05-23 — /tocatoare route)', () => 
   test('Click Tocătoare on /ro navigates to /ro/tocatoare', async ({ page }) => {
     await page.goto('/ro');
     await openMobileMenuIfNeeded(page);
-    await page.locator('header a[href="/ro/tocatoare"]:visible').first().click();
+    await navLink(page, '/ro/tocatoare').dispatchEvent('click');
     await page.waitForURL('**/ro/tocatoare');
     expect(new URL(page.url()).pathname).toBe('/ro/tocatoare');
   });
@@ -141,12 +177,13 @@ test.describe('Footer microTagline (Faza B fix)', () => {
     await expect(page.locator('footer')).not.toContainText('stejar');
   });
 
-  test('Footer logo image is from brand jpeg', async ({ page }) => {
+  test('Footer logo coin renders the brand SVG', async ({ page }) => {
     await page.goto('/ro');
     const logo = page.locator('footer img[alt*="Oak Fantasy logo"]').first();
     await expect(logo).toBeVisible();
     const src = await logo.getAttribute('src');
-    expect(src).toContain('WhatsApp_Image_2026-05-14');
+    // 2026-05-21 decision: the Footer coin uses the SVG brand file.
+    expect(src).toContain('3D_Cutting_Board_Model_Design');
   });
 });
 
