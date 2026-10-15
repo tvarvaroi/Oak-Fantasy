@@ -287,21 +287,17 @@ async function main() {
         await page.fill('#co-city', 'Cluj-Napoca');
         await page.selectOption('#co-county', { label: 'Cluj' });
         await page.fill('#co-postal', '400001');
+        // step 1 → step 2 = Rezumat (2026-10-15: ramburs only, the payment
+        // step is gone; the review step carries the cash-on-delivery panel).
+        // DO NOT place the order.
         await page.getByRole('button', { name: 'Continuă' }).click();
         await page.waitForTimeout(700);
-        await shot(page, 'checkout', `step2-payment--ro--${vp.name}`);
-
-        // step 2 → step 3 (choose ramburs; DO NOT place the order)
-        await page.locator('input[type="radio"][value="cod"]').check();
-        await page.waitForTimeout(300);
-        await page.getByRole('button', { name: 'Continuă' }).click();
-        await page.waitForTimeout(700);
-        await shot(page, 'checkout', `step3-review--ro--${vp.name}`);
+        await shot(page, 'checkout', `step2-review--ro--${vp.name}`);
 
         // terms validation error (order is NOT placed — checkbox unchecked)
         await page.getByRole('button', { name: 'Plasează comanda' }).click();
         await page.waitForTimeout(500);
-        await shot(page, 'checkout', `step3-terms-error--ro--${vp.name}`);
+        await shot(page, 'checkout', `step2-terms-error--ro--${vp.name}`);
         await ctx.close();
       });
     }
