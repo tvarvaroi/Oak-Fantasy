@@ -3,13 +3,10 @@ import { notFound } from 'next/navigation';
 import { ATELIER_CONTENT } from '@/components/atelier/content';
 import AtelierContent from '@/components/atelier/AtelierContent';
 import { isLocale, localizedPath, type Locale } from '@/lib/i18n-routes';
+import { OG_IMAGE_DEFAULT as OG_IMAGE } from '@/lib/seo';
 
 const SITE_URL = 'https://oakfantasy.ro';
 
-// Shared OG image with /despre until a dedicated atelier OG (workshop photo
-// 1200x630) is delivered.
-// TODO: replace with a workshop-specific OG image when the founder supplies one.
-const OG_IMAGE = '/WhatsApp_Image_2026-05-14_at_20.59.06.jpeg';
 
 const ALTERNATES_LANGS = {
   ro: '/ro/atelier',

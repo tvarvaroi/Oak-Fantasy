@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { OG_IMAGE_DEFAULT as OG_IMAGE } from '@/lib/seo';
 
 import ContactPage from '@/components/contact/ContactPage';
 import { CONTACT_CONTENT } from '@/components/contact/content';
@@ -8,7 +9,6 @@ import { isLocale, localizedPath, type Locale } from '@/lib/i18n-routes';
 
 // Canonical site URL — mirrors patterns in app/[locale]/despre/page.tsx.
 const SITE_URL = `https://${LEGAL_INFO.brandDomain}`;
-const OG_IMAGE = '/WhatsApp_Image_2026-05-14_at_20.59.06.jpeg';
 
 const ALTERNATES_LANGS = {
   ro: '/ro/contact',

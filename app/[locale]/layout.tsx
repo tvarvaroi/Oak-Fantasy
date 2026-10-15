@@ -6,6 +6,7 @@ import PageTransition from '@/components/PageTransition';
 import { isLocale, type Locale } from '@/lib/i18n-routes';
 import { LEGAL_INFO, hasPlaceholder } from '@/lib/legal-info';
 import '../globals.css';
+import { OG_IMAGE_DEFAULT, OG_IMAGE_WIDTH, OG_IMAGE_HEIGHT } from '@/lib/seo';
 
 const caudex = Caudex({
   subsets: ['latin'],
@@ -113,7 +114,7 @@ export async function generateMetadata({
       openGraph: {
         title: 'Oak Fantasy — Romanian Oak Cutting Boards',
         description: 'From Romanian oak, cut and finished one by one in our workshop.',
-        images: [{ url: '/WhatsApp_Image_2026-05-14_at_20.59.06.jpeg' }],
+        images: [{ url: OG_IMAGE_DEFAULT, width: OG_IMAGE_WIDTH, height: OG_IMAGE_HEIGHT, alt: 'Oak Fantasy' }],
       },
     };
   }
@@ -124,7 +125,7 @@ export async function generateMetadata({
     openGraph: {
       title: 'Oak Fantasy — Tocătoare din stejar românesc',
       description: 'Din lemn de stejar românesc, tăiat și finisat unul câte unul în atelierul nostru.',
-      images: [{ url: '/WhatsApp_Image_2026-05-14_at_20.59.06.jpeg' }],
+      images: [{ url: OG_IMAGE_DEFAULT, width: OG_IMAGE_WIDTH, height: OG_IMAGE_HEIGHT, alt: 'Oak Fantasy' }],
     },
   };
 }

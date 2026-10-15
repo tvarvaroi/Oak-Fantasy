@@ -3,17 +3,13 @@ import { notFound } from 'next/navigation';
 import { ABOUT_CONTENT } from '@/components/about/content';
 import AboutContent from '@/components/about/AboutContent';
 import { isLocale, localizedPath, type Locale } from '@/lib/i18n-routes';
+import { OG_IMAGE_DEFAULT as OG_IMAGE } from '@/lib/seo';
 
 // Canonical site URL — domain target per CLAUDE.md §14. Until the domain is
 // connected, Next.js still emits absolute hreflang/canonical URLs against
 // this base; OG images resolve to the same base. Vercel preview URLs won't
 // inherit; that's fine for the visible-product /despre page.
 const SITE_URL = 'https://oakfantasy.ro';
-
-// Shared with the homepage for now; per-locale /despre OG image is a future
-// content task (no /despre-specific image exists yet).
-// TODO: replace with a dedicated workshop OG image (1200x630) when available.
-const OG_IMAGE = '/WhatsApp_Image_2026-05-14_at_20.59.06.jpeg';
 
 const ALTERNATES_LANGS = {
   ro: '/ro/despre',
