@@ -14,7 +14,7 @@ export interface TocatoareContent {
     eyebrow: string;
     titleStart: string;
     titleEm: string;
-    sub: string;
+    /** 2026-10-15: `sub` removed (QA & Polish #12) — the note carries the message. */
     note: { strong: string; rest: string };
   };
   filters: { all: string; entry: string; core: string; premium: string; hero: string };
@@ -51,7 +51,6 @@ export const TOCATOARE_CONTENT: Record<Locale, TocatoareContent> = {
       eyebrow: 'Catalog · Toate modelele',
       titleStart: 'Tocătoarele',
       titleEm: 'noastre.',
-      sub: 'Zece modele, de la tocătorul de zi cu zi până la blocul de moștenire. Fiecare lucrat manual din stejar masiv românesc.',
       note: {
         strong: 'Fiecare tocător pleacă din atelier gata de folosit.',
         rest: 'Comanzi azi, îl lucrăm și îl trimitem în 5–10 zile lucrătoare.',
@@ -109,7 +108,6 @@ export const TOCATOARE_CONTENT: Record<Locale, TocatoareContent> = {
       eyebrow: 'Catalogue · All models',
       titleStart: 'Our',
       titleEm: 'boards.',
-      sub: 'Ten models, from the everyday board to the heirloom block. Each handcrafted from solid Romanian oak.',
       note: {
         strong: 'Every board leaves the workshop ready to use.',
         rest: 'Order today — we craft and ship it in 5–10 business days.',

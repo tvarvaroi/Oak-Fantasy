@@ -38,7 +38,7 @@ export default function ProductCard({ product, content, locale, inStock = true }
       <div className={styles.medallion}>
         {product.hero_image_url ? (
           // Real product photo (uploaded via /admin/produse to Supabase
-          // Storage). Fills the square medallion; the "Foto în pregătire" badge
+          // Storage). Fills the 4:3 medallion; the "Foto în pregătire" badge
           // is hidden since the photo is here.
           <Image
             src={product.hero_image_url}
@@ -46,9 +46,8 @@ export default function ProductCard({ product, content, locale, inStock = true }
             fill
             // Real card width: 3-col grid in a 1240px container (~390px),
             // 2-col ≈50vw, 1-col full width. quality 90 — product photos are
-            // the catalog's hero asset. Best results with SQUARE (1:1) source
-            // images ≥1500×1500 (see _brain product-image guidance); landscape
-            // sources get center-cropped to the square medallion.
+            // the catalog's hero asset. Frame is 4:3 (2026-10-15) to match
+            // the founder's 1448×1086 shots; a 3:2 source loses ~11% top/bottom.
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
             quality={90}
             className={styles.medallionPhoto}

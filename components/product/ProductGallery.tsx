@@ -20,9 +20,12 @@ export default function ProductGallery({
 }) {
   const [active, setActive] = useState(0);
 
+  // 2026-10-15 (QA & Polish C): 4:3 frame + object-fit: contain so every
+  // photo is 100% visible (the sources are 4:3 / 3:2, never square). The
+  // warm paper gradient below is the letterbox for the odd ratios.
   const frame: React.CSSProperties = {
     position: 'relative',
-    aspectRatio: '1',
+    aspectRatio: '4 / 3',
     borderRadius: 12,
     overflow: 'hidden',
     border: '1px solid rgba(92,58,32,0.18)',
@@ -72,7 +75,7 @@ export default function ProductGallery({
           priority
           sizes="(max-width: 900px) 100vw, 560px"
           quality={90}
-          style={{ objectFit: 'cover' }}
+          style={{ objectFit: 'contain' }}
         />
       </div>
 

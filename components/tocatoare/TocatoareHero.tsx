@@ -13,7 +13,6 @@ export default function TocatoareHero({ content }: { content: TocatoareContent }
           <h1 className={styles.heroTitle}>
             {content.hero.titleStart} <em>{content.hero.titleEm}</em>
           </h1>
-          <p className={styles.heroSub}>{content.hero.sub}</p>
         </div>
         <Reveal className={styles.heroNote}>
           <strong>{content.hero.note.strong}</strong> {content.hero.note.rest}

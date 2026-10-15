@@ -64,14 +64,6 @@
   margin-bottom: 24px;
 }
 .heroTitle em { font-style: italic; color: var(--oak-warm); }
-.heroSub {
-  font-family: var(--font-lora);
-  font-size: 1.1rem;
-  line-height: 1.75;
-  color: var(--ink-soft);
-  max-width: 560px;
-}
-
 /* Note pill — paper-aged box with copper hairline; matches v1-editorial.html
    (the "glassy" caption treatment from HANDOFF.md is used on the homepage and
    /despre subhead caption, not on /tocatoare's hero-note). */
@@ -231,10 +223,12 @@
     0 20px 40px rgba(31, 24, 16, 0.14);
 }
 
-/* Medallion image placeholder */
+/* Medallion image frame. 2026-10-15 (QA & Polish C): 1:1 → 4:3. The real
+   product photos are 1448×1086 (4:3; one is 3:2) — the square frame was
+   cropping ~25% off the sides (the black bull was almost gone). */
 .medallion {
   position: relative;
-  aspect-ratio: 1;
+  aspect-ratio: 4 / 3;
   background:
     radial-gradient(ellipse at 30% 25%, rgba(255, 255, 255, 0.35), transparent 55%),
     radial-gradient(ellipse at 70% 80%, rgba(184, 115, 51, 0.1), transparent 60%),
@@ -263,7 +257,7 @@
   background: var(--cream-warm);
   object-fit: cover;
 }
-/* Real product photo: full-bleed in the square medallion (next/image fill). */
+/* Real product photo: full-bleed in the 4:3 medallion (next/image fill). */
 .medallionPhoto {
   object-fit: cover;
 }
