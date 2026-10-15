@@ -8,8 +8,14 @@ import type { Locale } from '@/lib/i18n-routes';
 //      Brand-model strings are PRESERVED across locales verbatim.
 
 export interface HeroCell {
-  /** Label printed inside one of the 9 rotated grid cells of the hero. */
-  label: string;
+  /**
+   * One of the 9 rotated grid cells of the hero (2026-10-15: real product
+   * photos instead of tool labels). 640px WebP thumbnails of the Supabase
+   * hero images, extracted once into /public/products/atelier-*.webp.
+   * Same `src` both locales; `alt` localized.
+   */
+  src: string;
+  alt: string;
 }
 
 export interface Tool {
@@ -72,7 +78,7 @@ export interface AtelierContent {
     h1Line2Tail: string;
     sub: string;
     readTime: string;
-    /** 9 cells in 3×3 rotated grid (tools + sensors + light). */
+    /** 9 cells in 3×3 rotated grid — product photo mosaic. */
     cells: HeroCell[];
   };
   tools: {
@@ -81,7 +87,8 @@ export interface AtelierContent {
     /** Rendered with <em>. */
     h2Em: string;
     intro: string;
-    items: [Tool, Tool, Tool, Tool, Tool, Tool];
+    /** 5 tools (2026-10-15: "Set unelte de mână" removed). */
+    items: [Tool, Tool, Tool, Tool, Tool];
   };
   place: {
     eyebrow: string;
@@ -139,8 +146,8 @@ export interface AtelierContent {
   cta: {
     h2Line1: string;
     h2Em: string;
+    /** Single button → /tocatoare (ghost waitlist button removed 2026-10-15). */
     primaryLabel: string;
-    ghostLabel: string;
   };
 }
 
@@ -150,25 +157,29 @@ const ro: AtelierContent = {
     title: 'Atelierul Oak Fantasy — Cum se face fiecare tocător din stejar',
     // 143 chars
     description:
-      'Atelier mic în vestul României. Stejar românesc, uscat 6–12 luni, șase unelte. Cum lucrăm manual fiecare tocător — de la lemn la ceară de albine.',
+      'Atelier mic în vestul României. Stejar românesc, uscat 6–12 luni, cinci unelte. Cum lucrăm manual fiecare tocător — de la lemn la ceară de albine.',
   },
   hero: {
     eyebrow: 'Documentar · Atelier',
     h1Line1: 'Un atelier mic, în vestul României.',
     h1Line2Em: 'Și o singură regulă:',
     h1Line2Tail: 'nu grăbim lemnul.',
-    sub: 'Un loc, șase unelte, o zi de lucru · Atelier Oak Fantasy',
+    sub: 'Un loc, cinci unelte, o zi de lucru · Atelier Oak Fantasy',
     readTime: 'Citește în ~7 minute',
+    // Order chosen for silhouette rhythm in the 3×3 (rectangular / long /
+    // square / free-form alternate). OF-07 (frasin-stejar 300 mm) left out:
+    // at ~150px its three-tone stripes and oval handle read as noise, while
+    // OF-08 (same size) has clear dark/light contrast.
     cells: [
-      { label: 'Planou circular' },
-      { label: 'Freză verticală' },
-      { label: 'Presă cu șuruburi' },
-      { label: 'Rindeluitor electric' },
-      { label: 'Șlefuitor orbital' },
-      { label: 'Unelte de mână' },
-      { label: 'Higrometru' },
-      { label: 'Termometru' },
-      { label: 'Lumină naturală' },
+      { src: '/products/atelier-tocator-taur-alb.webp', alt: 'Tocător din stejar cu taur frezat, contur alb' },
+      { src: '/products/atelier-platou-lung-servire.webp', alt: 'Platou lung din stejar cu margine naturală' },
+      { src: '/products/atelier-ceas-custom-cerb.webp', alt: 'Ceas de perete din stejar, model cerb gravat' },
+      { src: '/products/atelier-tava-servire-premium.webp', alt: 'Tavă de servire cu model valuri și mânere metalice' },
+      { src: '/products/atelier-tocator-taur-negru.webp', alt: 'Tocător din stejar cu taur frezat, contur negru' },
+      { src: '/products/atelier-model-custom-neregulat.webp', alt: 'Tocător din stejar cu formă neregulată' },
+      { src: '/products/atelier-tocator-platou-model-peste.webp', alt: 'Platou din stejar cu pește frezat' },
+      { src: '/products/atelier-tocator-model-love.webp', alt: 'Tocător din stejar, model îndrăgostiți' },
+      { src: '/products/atelier-model-compus-stejar-frasin.webp', alt: 'Tocător din stejar și frasin cu mâner lateral' },
     ],
   },
   tools: {
@@ -179,7 +190,7 @@ const ro: AtelierContent = {
       'Nu sunt multe unelte într-un atelier care face tocătoare. Sunt cele potrivite. Fiecare cu rolul ei, fiecare aleasă cu motiv. Mai jos sunt cele pe care le folosim aproape în fiecare zi — în ordinea în care intră în lucru.',
     items: [
       {
-        tag: 'Featured · Tăiere',
+        tag: 'Tăiere',
         name: 'Planou circular Bosch GTS 635-216',
         role: 'Unealta cu care începe orice tocător.',
         desc: 'Tăie scândurile la dimensiuni precise. Lama subțire, ghidaj fix, masă mare. Pentru tăieri repetate la aceeași dimensiune, nu există ceva mai bun.',
@@ -187,7 +198,7 @@ const ro: AtelierContent = {
         imageAlt: 'Pânză de fierăstrău circular tăind o scândură de stejar',
       },
       {
-        tag: 'Featured · Margine',
+        tag: 'Margine',
         name: 'Freză verticală cu ghidaj',
         role: 'Marginile plăcute la atingere, nu tăioase.',
         desc: 'Pentru rotunjirea marginilor și mânerelor. Bity de 6mm și 12mm, R profile.',
@@ -217,14 +228,6 @@ const ro: AtelierContent = {
         desc: 'Patru-cinci graduri de hârtie abrazivă. Mișcare circulară, fără apăsare, fără grabă.',
         image: '/stock/atelier-tool-sander.webp',
         imageAlt: 'Șlefuitor orbital pe o placă de stejar',
-      },
-      {
-        tag: 'Detalii',
-        name: 'Set unelte de mână',
-        role: 'Fierăstrău, raspele, ciocan, daltă, șubler digital.',
-        desc: 'Pentru detalii care nu cer motor. Tăieri fine, ajustări, măsurători. Unelte care durează zeci de ani dacă sunt îngrijite — și pe care le folosim aproape la fel de mult ca electricele.',
-        image: '/stock/atelier-tool-hand-tools.webp',
-        imageAlt: 'Dălți cu mânere de lemn pe un suport de perete',
       },
     ],
   },
@@ -331,7 +334,6 @@ const ro: AtelierContent = {
     h2Line1: 'Ai văzut uneltele.',
     h2Em: 'Hai să vezi și tocătoarele.',
     primaryLabel: 'Vezi tocătoarele noastre',
-    ghostLabel: 'Înscrie-te pe lista de lansare',
   },
 };
 
@@ -341,25 +343,25 @@ const en: AtelierContent = {
     title: 'Oak Fantasy Workshop — How every oak cutting board is made',
     // 142 chars
     description:
-      'Small workshop in western Romania. Romanian oak, dried 6–12 months, six tools. How we handcraft every cutting board — from wood to beeswax.',
+      'Small workshop in western Romania. Romanian oak, dried 6–12 months, five tools. How we handcraft every cutting board — from wood to beeswax.',
   },
   hero: {
     eyebrow: 'Documentary · Workshop',
     h1Line1: 'A small workshop in western Romania.',
     h1Line2Em: 'And one rule:',
     h1Line2Tail: "we don't rush the wood.",
-    sub: 'One place, six tools, one working day · Oak Fantasy Workshop',
+    sub: 'One place, five tools, one working day · Oak Fantasy Workshop',
     readTime: 'Read in ~7 minutes',
     cells: [
-      { label: 'Table saw' },
-      { label: 'Plunge router' },
-      { label: 'Screw clamps' },
-      { label: 'Hand planer' },
-      { label: 'Orbital sander' },
-      { label: 'Hand tools' },
-      { label: 'Hygrometer' },
-      { label: 'Thermometer' },
-      { label: 'Natural light' },
+      { src: '/products/atelier-tocator-taur-alb.webp', alt: 'Oak cutting board with a carved bull, white outline' },
+      { src: '/products/atelier-platou-lung-servire.webp', alt: 'Long live-edge oak serving board' },
+      { src: '/products/atelier-ceas-custom-cerb.webp', alt: 'Oak wall clock with an engraved stag' },
+      { src: '/products/atelier-tava-servire-premium.webp', alt: 'Serving tray with a wave pattern and metal handles' },
+      { src: '/products/atelier-tocator-taur-negru.webp', alt: 'Oak cutting board with a carved bull, black outline' },
+      { src: '/products/atelier-model-custom-neregulat.webp', alt: 'Free-form oak cutting board' },
+      { src: '/products/atelier-tocator-platou-model-peste.webp', alt: 'Oak board with a carved fish' },
+      { src: '/products/atelier-tocator-model-love.webp', alt: 'Oak cutting board, lovers model' },
+      { src: '/products/atelier-model-compus-stejar-frasin.webp', alt: 'Oak and ash cutting board with a side handle' },
     ],
   },
   tools: {
@@ -370,7 +372,7 @@ const en: AtelierContent = {
       "There aren't many tools in a workshop that makes cutting boards. There are the right ones. Each with its role, each chosen for a reason. Below are the ones we use almost every day — in the order they come into work.",
     items: [
       {
-        tag: 'Featured · Cutting',
+        tag: 'Cutting',
         name: 'Bosch GTS 635-216 table saw',
         role: 'The tool every cutting board starts with.',
         desc: "Cuts boards to precise dimensions. Thin blade, fixed guide, large table. For repeated cuts at the same size, nothing's better.",
@@ -378,7 +380,7 @@ const en: AtelierContent = {
         imageAlt: 'Circular saw blade cutting an oak board',
       },
       {
-        tag: 'Featured · Edge',
+        tag: 'Edge',
         name: 'Plunge router with edge guide',
         role: 'Edges pleasant to touch, not sharp.',
         desc: 'For rounding edges and handles. 6mm and 12mm bits, R profile.',
@@ -408,14 +410,6 @@ const en: AtelierContent = {
         desc: 'Four-five grits of sandpaper. Circular motion, no pressure, no rush.',
         image: '/stock/atelier-tool-sander.webp',
         imageAlt: 'Orbital sander on an oak board',
-      },
-      {
-        tag: 'Details',
-        name: 'Hand tool set',
-        role: 'Saw, rasps, hammer, chisel, digital caliper.',
-        desc: "For details that don't need a motor. Fine cuts, adjustments, measurements. Tools that last decades if cared for — and we use them almost as much as the electric ones.",
-        image: '/stock/atelier-tool-hand-tools.webp',
-        imageAlt: 'Wooden-handled chisels on a wall rack',
       },
     ],
   },
@@ -524,7 +518,6 @@ const en: AtelierContent = {
     h2Line1: "You've seen the tools.",
     h2Em: "Now let's see the boards.",
     primaryLabel: 'See our cutting boards',
-    ghostLabel: 'Join the launch waitlist',
   },
 };
 

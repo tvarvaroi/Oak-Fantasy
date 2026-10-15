@@ -6,8 +6,8 @@ import type { AtelierContent } from './content';
 import styles from './atelier.module.css';
 
 // Tools — v3-catalog.html. The centerpiece of Variant C.
-// 12-col asymmetric grid: cards 1+2 span-6 (featured top row),
-// card 5 span-4, card 6 span-8 (visual asymmetry on the bottom row).
+// 12-col grid: cards 1+2 span-6 (top row), cards 3-5 span-4 (bottom row).
+// 2026-10-15: 5 tools (hand-tool set removed), "Featured ·" tags dropped.
 // Hover lift via CSS only (no framer-motion needed for hover).
 
 export default function ToolsSection({ content }: { content: AtelierContent }) {

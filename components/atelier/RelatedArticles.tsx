@@ -7,9 +7,16 @@ import styles from './atelier.module.css';
 // Related articles — v3-catalog.html. Centered head, 4-col grid of
 // placeholder article-cards with "Articol în pregătire" / "Article coming
 // soon" badge (rendered via ::after using data-coming attr).
+//
+// 2026-10-15 (QA & Polish #10): hidden pre-launch — four "coming soon"
+// placeholders read as an unfinished page. Content + markup kept; flip
+// SHOW_ARTICLES to `true` once the first real article exists (/blog).
+const SHOW_ARTICLES = false;
 
 export default function RelatedArticles({ content }: { content: AtelierContent }) {
   const { articles } = content;
+
+  if (!SHOW_ARTICLES) return null;
 
   return (
     <section className={styles.articles} id="articole">

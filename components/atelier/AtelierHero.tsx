@@ -1,12 +1,14 @@
 'use client';
 
+import Image from 'next/image';
 import Reveal from '@/components/about/Reveal';
 import type { AtelierContent } from './content';
 import styles from './atelier.module.css';
 
 // Hero — v3-catalog.html. Dark bark bg + noise overlay + 2-col grid:
 // left = eyebrow + h1 (italic em copper accent) + sub + read-time pill;
-// right = 3x3 rotated cell grid with tool/sensor/light labels.
+// right = 3x3 rotated mosaic of real product photos (2026-10-15; was a
+// grid of tool/sensor/light text labels).
 
 export default function AtelierHero({ content }: { content: AtelierContent }) {
   const { hero } = content;
@@ -26,9 +28,18 @@ export default function AtelierHero({ content }: { content: AtelierContent }) {
         </div>
         <Reveal>
           <div className={styles.heroGridVis}>
-            {hero.cells.map((cell) => (
-              <div key={cell.label} className={styles.heroCell}>
-                {cell.label}
+            {hero.cells.map((cell, i) => (
+              <div key={cell.src} className={styles.heroCell}>
+                <Image
+                  src={cell.src}
+                  alt={cell.alt}
+                  fill
+                  // Above the fold on desktop: the first row paints eagerly.
+                  priority={i < 3}
+                  sizes="(max-width: 1024px) 30vw, 180px"
+                  quality={80}
+                  style={{ objectFit: 'cover' }}
+                />
               </div>
             ))}
           </div>
