@@ -326,3 +326,29 @@
 
 **Alternative respinse:** service role pentru admin (over-privileged), bucket din
 Dashboard (ne-reproductibil), form minimal (ar fi necesitat re-work la D8).
+
+## 2026-10-15 — QA & Polish pre-launch: Three.js SCOS, video → slideshow, OG static
+
+**Decizie:** (1) Hero 3D (CuttingBoard3D, R3F + drei + three) eliminat complet și
+pachetele dezinstalate; în loc, logo-ul brand (JPEG 1254×1254) ca monedă circulară cu
+hover 1.04. (2) CraftVideoTease: video Pexels (1,8MB) → slideshow crossfade din 5 stills
+deja licențiate. (3) OG image: PNG static 1200×630 compus (poză produs + logo + tagline),
+generat o dată cu `next/og` printr-o rută temporară, NU `opengraph-image.tsx` în `[locale]`.
+(4) WaitlistSection + RelatedArticles ascunse prin flag `SHOW_* = false` (cod păstrat).
+(5) Crop poze produs: card 1:1 → 4:3 cover; PDP 4:3 + `contain` pe gradient paper-aged;
+thumbs 1:1. (6) Hero /atelier: 9 poze produs locale (640px WebP) în loc de label-uri.
+
+**Motiv:** (1) singurul consumator al Three.js era hero-ul; chunk-ul async de 675KB se
+descărca pe fiecare vizită a homepage-ului (JS total 1.926KB → 1.123KB desktop, −42%),
+plus bundle, CSP și teste mai simple. (2) 5 poze = zero bytes video, zero frame
+nedeterminist în baselines (freeze pe `navigator.webdriver`), reduced-motion = prima poză.
+(3) `opengraph-image.tsx` în segmentul `[locale]` ar fi suprascris og:image-ul cu poza
+produs de pe PDP (file-based > config-based); static = zero runtime, deterministic.
+(4) Flag în loc de ștergere: newsletter-ul revine post-lansare, articolele când există
+/blog. (5) Pozele reale sunt 4:3/3:2, zero pătrate — ratio-ul frame-ului urmează sursa.
+(6) Static local (ca ProductTease) = /atelier rămâne fără dependență de DB la render.
+
+**Alternative respinse:** nonce/skeleton pentru 3D (păstra 675KB), poster static în loc
+de slideshow (prea mort), `opengraph-image.tsx` per segment (conflict PDP), `sharp` ca
+devDependency pentru thumbs/OG (pachet nou, optimizatorul `next/image` local + `next/og`
+fac același lucru fără instalări).

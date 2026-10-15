@@ -1010,3 +1010,79 @@ fiecare dată când aștepți decode pe TOATE imaginile din pagină.
 **Lecție:** Promise-urile care pot rămâne pending etern (nu doar reject) cer race
 cu timeout, nu doar catch. Documentat și în skill-ul design-qa + scripts/design-qa-capture.mjs.
 **Fișiere:** scripts/design-qa-capture.mjs (primeScroll), ~/.claude/skills/design-qa/SKILL.md.
+
+## 2026-10-15 — Build warning „Critical dependency" NU era tailwind/line-clamp, ci @react-email
+
+**Simptom:** `npm run build` → „⚠ Compiled with warnings … ./node_modules/tailwindcss/lib/lib/
+load-config.js — Critical dependency: the request of a dependency is an expression", deși
+alias-ul `@tailwindcss/line-clamp: false` din next.config.js (gotcha 2026-06-23) era la loc.
+**Cauză reală:** Import trace-ul arată lanțul: `app/api/contact/route.ts` → `emails/*.tsx`
+→ `@react-email/components` (barrel) → `@react-email/tailwind` → `tailwindcss` la RUNTIME.
+Barrel-ul re-exportă `<Tailwind>`, pe care nu-l folosim (emailurile au paletă inline), dar
+webpack îl bundlează tot în route handler și dă peste `require()`-ul dinamic din
+`load-config.js`. Alias-ul vechi rezolva alt require (line-clamp), nu pe ăsta.
+**Fix:** `experimental.serverComponentsExternalPackages: ['@react-email/components',
+'@react-email/tailwind']` → pachetul rămâne extern (Node îl încarcă din node_modules la
+runtime, nu e bundlat). Zero cod schimbat în emails/, build curat „Compiled successfully".
+**Lecție:** La warning-uri de bundling, citește ÎNTOTDEAUNA import trace-ul complet, nu
+doar primul fișier din mesaj. Două warning-uri cu același text pot avea cauze diferite.
+**Fișiere:** next.config.js.
+
+## 2026-10-15 — `next/og` ImageResponse pe Windows: Node runtime pică, fonturile Google vin woff/EOT
+
+**Simptom (1):** Route handler cu `ImageResponse` în `runtime = 'nodejs'` → 500
+`Invalid URL … input: '.\file:\C:\…\@vercel\og\noto-sans-v27-latin-regular.ttf'`.
+**Cauză:** bug Next 14 pe Windows la încărcarea fontului implicit (path → URL). 
+**Fix:** `export const runtime = 'edge'` (merge în dev local); fișierele locale se iau prin
+`fetch(origin + '/fisier')`, nu `node:fs` (edge nu are fs); base64 fără `Buffer`.
+**Simptom (2):** „font url not found" / „Unsupported OpenType signature".
+**Cauză:** `fonts.googleapis.com/css2` servește woff (UA Firefox vechi) sau EOT (UA IE6),
+niciodată TTF curat — satori parsează DOAR TTF/OTF.
+**Fix:** TTF raw din repo google/fonts: `raw.githubusercontent.com/google/fonts/main/ofl/
+caudex/Caudex-Bold.ttf`.
+**Simptom (3):** „Cannot read properties of undefined (reading '256')" la randare.
+**Cauză:** fontul VARIABIL `Caveat[wght].ttf` nu e suportat de opentype.js-ul din satori.
+**Fix:** doar fonturi statice (Caudex Bold/Regular); Caveat scos din OG.
+**Decizie:** OG-ul e generat O DATĂ printr-o rută temporară (ștearsă) și commis static în
+`public/og/oak-fantasy-og.png` — zero runtime, PDP-urile își păstrează poza proprie ca og:image.
+**Fișiere:** lib/seo.ts, public/og/oak-fantasy-og.png.
+
+## 2026-10-15 — Playwright/node din Git Bash: argumentul `/ro` devine `C:/Program Files/Git/ro`
+
+**Simptom:** `node script.mjs https://site /ro` → `ERR_NAME_NOT_RESOLVED` la
+`https://site.appc/Program%20Files/Git/ro`.
+**Cauză:** conversia de path-uri MSYS (aceeași ca la gotcha curl 2026-06-18) se aplică
+oricărui argument care începe cu `/`, inclusiv pentru node.
+**Fix:** `MSYS_NO_PATHCONV=1 node …` sau pasează path-ul fără slash inițial.
+
+## 2026-10-15 — `.next/types` ține tipuri pentru rute ȘTERSE → `tsc --noEmit` pică
+
+**Simptom:** după ștergerea unei rute temporare (`app/api/og-gen`), `npm run typecheck` →
+`TS2307 Cannot find module '../../../../../app/api/og-gen/route.js'` din `.next/types/`.
+**Cauză:** dev server-ul generase `.next/types/app/api/og-gen/route.ts`; tsconfig include
+`.next/types/**`, iar fișierul generat nu e curățat la ștergerea rutei.
+**Fix:** `rm -r .next/types/app/api/og-gen` (sau `next build`, care regenerează tot).
+
+## 2026-10-15 — Suita e2e era ROȘIE de luni de zile (65 teste stale), nu din cauza task-ului
+
+**Simptom:** `npm run test:e2e` → 65 failed / 215 passed după QA & Polish. Primul reflex:
+„am stricat ceva". Realitate: 62 din 65 erau stale de la schimbări din iulie, 3 erau
+bug-uri în testele noi.
+**Cauze (toate pre-existente):** (1) copy „Un atelier mic, în zona Carpaților" (schimbat
+2026-07-15 → „vestul României"); (2) titlu catalog „Tocătoarele noastre" (SEO 2026-07-02
+→ „Tocătoare din Stejar Românesc"); (3) JSON-LD count 2 → 3 (entity graph @graph în
+layout din 2026-07-02); (4) Footer logo „WhatsApp jpeg" → SVG (decizie 2026-05-21!);
+(5) mailto `atelier@oakfantasy.ro` → gmail (2026-07-14); (6) **`body.textContent` include
+textul din `<script>`-urile inline** — payload-ul RSC conține boundary-ul global RO
+`app/not-found.tsx` („Pagina nu există") pe TOATE paginile EN → testele „EN fără
+diacritice" pică; fix = `document.body.innerText`; (7) **drawer-ul mobil e `<aside>`
+FRATE cu `<header>`**, nu copil → `header a[href]:visible` nu găsește NICIODATĂ linkurile
+din drawer pe mobil/tabletă; fix = helper `navLink()` cu `header a, aside a`; (8) toggle-ul
+RO|EN e în drawer sub lg → testul trebuie să deschidă drawer-ul întâi.
+**Bug-urile mele:** `img[src*="/products/atelier-"]` — next/image URL-encodează src
+(`%2Fproducts%2Fatelier-`) → match pe `atelier-`; click pe linkuri din aside fixed →
+`dispatchEvent('click')`.
+**Lecție:** înainte de orice task, rulează suita o dată pe HEAD ca baseline, altfel nu
+poți separa regresiile de datoria acumulată. „199/199 pe 4 iulie" nu mai spunea nimic
+după 6 commit-uri de copy/SEO fără teste actualizate.
+**Fișiere:** tests/e2e/{atelier,despre,homepage,tocatoare,seo,shared-components}.spec.ts.

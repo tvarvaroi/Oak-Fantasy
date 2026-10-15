@@ -1288,3 +1288,94 @@ NEXT (din audit, 🟡): security headers, PDP content 300+, bundle 3D izolat, ll
   actualizăm documentul.
 - Verificare: 16/16 runtime pe default-uri (fără env): date firmă complete,
   zero tokens, zero narativ vechi pe 9 pagini.
+
+2026-08-10 — MEDIA: inventar + stock Pexels + video loop + poze reale produs [LIVRAT]
+- TASK 1 (docs/media-inventory.md): harta completă a sloturilor imagine/video cu
+  file:line + categorii (PRODUS/BRAND/DECOR-SVG/STOCK-NEUTRU/STOCK-DECOR/VIDEO).
+  Surpriză: în afara produselor site-ul avea DOAR 2 foto „reale" (workshop.webp =
+  mockup Bolt mislabeled, LIVE în WorkshopSection; 4× product-*.webp 1,5–2MB, era
+  Bolt, proveniență neclară). Restul = placeholder-e stripate intenționat.
+- TASK 2 — sourcing stock KEYLESS pe Pexels (Unsplash napi cere auth acum):
+  WebFetch pagină căutare → photo-page URLs → download images.pexels.com/photos/
+  {id}/pexels-photo-{id}.jpeg?w=1920; video via og:video. Verificare vizuală cu Read
+  pe FIECARE candidat (respinse 6: branduri Ryobi/DeWalt, fețe, culori reci, magazie).
+  Regula anti-portret: mâini + unelte DA, fața meșterului NU.
+- Aplicat: public/stock/ (12 fișiere) + public/products/ (4 poze hero din Supabase
+  Storage); ProductTease = 4 produse reale (taur-alb/pește/valuri/live-edge, data
+  map manual — pagina e 'use client'); WorkshopSection P1; WorkshopBanner /despre P4;
+  /atelier ToolsSection P5×6 + WorkshopPlace P6×2 (captions „60sqm" ELIMINATE —
+  afirmație verificabilă vizual contrazisă de stock); CraftVideoTease rescris cu
+  <video muted loop playsInline preload="none" poster> + play() din IntersectionObserver
+  gated pe !prefersReducedMotion (RM = poster static); loop 14,9s 1080p CRF28 = 1,8MB.
+  Șterse: workshop.webp + 4× product-*.webp (6,9MB scoși de pe homepage).
+- Visual regression + video = frame nedeterminist → addInitScript stub
+  HTMLMediaElement.prototype.play = () => Promise.resolve() în spec (doar posterul se
+  capturează). fullPage screenshot poate bloca cu video în play → pause la retry.
+  Regen 24 baselines.
+- docs/stock-credits.md = evidența de licență per fișier (toate Pexels License).
+  REGULĂ: orice asset stock nou intră ACOLO înainte de commit. Alt-text stock descrie
+  ce SE VEDE, nu afirmații despre noi.
+- Commits: df9f1cf, b11b38a, 3888883, 6bb2cf1, 30edbff (toate 2026-08-10, pushate).
+- FLAG rămas: /despre AboutCTA „Lansăm în octombrie." (RO+EN) contrazice magazinul
+  live; OG_IMAGE = logo WhatsApp pătrat declarat 1200×630 pe 6 pagini interioare.
+- NOTĂ: intrarea asta a fost adăugată retroactiv pe 2026-10-15 (sesiunea din august a
+  scris doar MEMORY.md, nu journal).
+
+═══════════════════════════════════════════════════════════════════
+2026-10-15 — QA & POLISH PAGINI PUBLICE + FIX IMAGINI PRODUS [LIVRAT]
+═══════════════════════════════════════════════════════════════════
+Reluare după pauză de 3 luni (ultimul commit 2026-08-10). Task aprobat în iulie, reconfirmat
+pe starea actuală a codului înainte de implementare (brainstorming HARD GATE).
+HOME: (1) Nav „Acasă"/„Home" PRIMUL link (type:'home' → /${locale}), ordine Acasă · Tocătoare ·
+  Atelier · Despre · Contact; Footer „Navigare" oglindă. Fără „Cadouri" (ar da 404).
+  (2) Hero 3D SCOS: CuttingBoard3D.tsx șters, three + @react-three/fiber + drei + @types/three
+  dezinstalate, transpilePackages + CSP curățate (worker-src fără blob:). Logo JPEG 1254² ca
+  monedă circulară (clamp 240–400px), inel copper, hover scale 1.04 (RM: fără), priority=LCP.
+  (3) ProductTease: stretched Link către PDP real pe fiecare card (4 sluguri reale), desktop
+  + mobil. (4)+(5) „mai multe în curând" + „acces timpuriu" → „Vezi toate tocătoarele noastre"
+  → /tocatoare. (6) CraftVideoTease: video → slideshow crossfade 5 stills (planer, cleme,
+  banc rumeguș, dălți, șlefuitor; 5s/poză, fade 1s), timer gated pe IntersectionObserver +
+  document.hidden, RM = prima poză, navigator.webdriver = freeze (baselines deterministe).
+  craft-loop.mp4 + poster ȘTERSE (−1,96MB), stock-credits.md actualizat. (7) WaitlistSection
+  SHOW_WAITLIST=false (cod păstrat). ProductTease mobil: 16:9 → 4:3 (obs. advisor).
+ATELIER: (8) Hero 9 celule → mozaic 9 poze produs locale (640px WebP generate prin
+  /_next/image al serverului local, zero pachete noi). Exclus OF-07 frasin-stejar 300mm
+  (dungi + mâner oval = zgomot la 150px; OF-08 are contrast clar). Ceasul OF-10 inclus.
+  (9) „Set unelte de mână" șters (5 unelte), „Featured ·" scos; „șase unelte" → „cinci"
+  în hero.sub + meta RO/EN + llms.txt; grid 2+3 desktop, al 5-lea full-width pe tablet.
+  (10) RelatedArticles SHOW_ARTICLES=false. (11) AtelierCTA doar primary → /tocatoare.
+TOCĂTOARE: (12) hero.sub șters RO+EN (+ CSS mort). (A) 10 produse verificate pe 4 viewports.
+DESPRE: (13) root cause confirmat: globals `h2{color:ink}` bate cream-ul moștenit →
+  `.workshopOverlay h2 {color: cream}` explicit; ierarhie eyebrow .7→.86rem, crossRef
+  .72→.66rem. (14) AboutCTA: „Lansăm în octombrie" + 15% ȘTERSE → „Lucrate manual, în stoc
+  limitat." + paragraf nou; primary /tocatoare, ghost /atelier (route keys, nu ancore).
+GLOBAL: (15) Footer col. Cont: „În curând…" → Autentificare / Creează cont (localizedPath
+  login/register); `interested_product` avea ZERO consumatori în cod, doar 2 teste stale →
+  rescrise. Rămân intenționat: fallback-urile „coming soon" din cart/checkout/product
+  content.ts (nefolosite în UI), textele legale „înainte de lansare", robots Disallow.
+  (B) Eticheta „Vestul României · Atelier propriu": contrast ≈7:1, PASS, neatinsă.
+CROP (C): card .medallion 1:1 → 4:3 cover; PDP frame 4:3 + object-fit contain pe gradient
+  paper-aged (letterbox doar la 3:2 taur-negru + galeriile portret); thumbs 1:1. Verificat
+  vizual: taurul negru complet, pozele 4:3 umplu rama.
+SUPLIMENTAR: (16) OG static 1200×630 (public/og/oak-fantasy-og.png, 829KB) compus cu
+  next/og printr-o rută temporară (edge runtime, TTF raw din google/fonts, fără Caveat
+  variabil) — vezi gotchas. lib/seo.ts = constantă unică; 6 pagini + layout rewired.
+  (17) Warning „Critical dependency": root cause = @react-email/components barrel →
+  @react-email/tailwind → tailwindcss la runtime în /api/contact; fix
+  serverComponentsExternalPackages. Build: „Compiled successfully", zero warnings.
+MĂSURĂTORI: First Load JS home 286 → 282 kB (3D era chunk async, nu în metrică). JS TOTAL
+  transferat pe /ro (Playwright, prod): 1.926 KB → 1.123 KB desktop / 1.088 KB mobil (−42%);
+  chunk-ul Three.js de 675 KB a dispărut. Hydration: 0 erori; consola = doar SpeedInsights
+  404 pe localhost + GoTrueClient warning PRE-EXISTENT (verificat pe live); warning-urile
+  WebGL + zustand-deprecated de pe live au dispărut odată cu 3D.
+DESIGN-QA: capturi element-level pe toate secțiunile schimbate × 4 viewports + EN + RM
+  (scripts temporare, șterse) + matricea completă design-qa-capture. Finding unic: al 5-lea
+  card unelte orfan la 768/1024 → span 12 sub 1024. Restul PASS.
+DIACRITICE (admin, nu cod): OF-01 name_ro „Tocator din lemn masiv de stejar pentru
+  bucatarie…" → „Tocător … bucătărie…"; celelalte câmpuri RO ale OF-01 sunt corecte.
+FLAG (nerezolvat, decizie founder): OF-10 e ceas de perete în catalogul „Tocătoare".
+GATES FINALE: typecheck ✓ lint ✓ check:i18n ✓ (4 warnings pre-existente admin) build ✓ „Compiled
+  successfully" zero warnings · e2e: 65 eșecuri la prima rulare = 62 teste STALE din iulie + 3
+  bug-uri în testele noi (vezi gotcha „Suita e2e era ROȘIE de luni de zile") → după
+  mentenanța testelor: 277 + 39 passed, 0 failed, 2 skipped · baselines: 72/72 regenerate
+  (40 modificate — Navbar e global) · hydration 0 · design-qa 142 capturi + 60 element-level.

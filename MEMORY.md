@@ -416,3 +416,30 @@ despre noi („Banc de lucru sub fereastră", NU „atelierul nostru de 60mp"). 
 CraftVideoTease ajustat onest la ce arată loop-ul („o privire scurtă peste blatul de lucru").
 (4) Rămas pre-existent, flagat founder-ului: /despre CTA „Lansăm în octombrie." (RO+EN) contrazice
 magazinul live — de curățat într-un task de copy.
+
+---
+
+## 2026-10-15 — QA & Polish pre-launch: fără Three.js, slideshow, OG static, crop 4:3
+
+**Pattern descoperit:** (1) **„First Load JS" nu vede chunk-urile `next/dynamic`** — scoaterea
+Three.js a mutat metrica doar 286→282 kB, dar JS-ul total transferat pe home a scăzut cu 42%
+(1.926→1.123 KB). Raportează ÎNTOTDEAUNA ambele; „before" se măsoară pe live (= HEAD) cu același
+script Playwright ca „after" pe prod local. (2) **Determinism pentru animații pe timer** în
+baselines: `navigator.webdriver` (setat de Playwright) → freeze pe primul frame, fără stub-uri
+în spec; RM = același frame static. (3) **`next/og` fără sharp**: rută temporară pe runtime
+`edge` (Node runtime pică pe Windows), fonturi TTF raw din `google/fonts` (googleapis dă
+woff/EOT), fără fonturi variabile; rezultatul se commite static. **NU** `opengraph-image.tsx`
+în `[locale]` — ar suprascrie og:image-ul produselor de pe PDP. (4) **Thumbnails fără sharp**:
+`/_next/image?url=…&w=640&q=82` pe serverul local = WebP gata de salvat în /public.
+(5) **Warning-uri de bundling**: citește import trace-ul complet — „Critical dependency" avea
+o A DOUA cauză (@react-email barrel → tailwindcss) după fix-ul vechi de line-clamp.
+(6) **Ascunde prin flag, nu șterge** (`SHOW_WAITLIST`, `SHOW_ARTICLES`): secțiunile revin
+post-lansare cu un boolean. (7) **Screenshot-urile full-page de 10.000px nu se pot revizui**
+— capturi pe element (`locator.screenshot()`) pentru fiecare secțiune schimbată × 4 viewports
+sunt review-ul real; matricea full-page rămâne pentru regresii de chrome.
+**Aplicat la:** Hero/Navbar/Footer/ProductTease/CraftVideoTease/WaitlistSection, atelier
+(hero mozaic, tools, CTA, articles), tocatoare (hero, medallion 4:3), product/ProductGallery
+(4:3 contain), about (overlay h2 + CTA), lib/seo.ts + public/og, next.config.js, teste e2e.
+**De ce contează:** Site-ul e coerent pentru lansarea din noiembrie: zero relicve de waitlist,
+toate CTA-urile duc la magazinul real, pozele de produs se văd integral, OG corect în
+previews, bundle cu 800KB mai mic pe home. Flag deschis: OF-10 (ceas) în catalog „Tocătoare".
