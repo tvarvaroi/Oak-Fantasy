@@ -5,7 +5,7 @@ const path = require('path');
 // 2026-07-06): violations show up in the browser console / report layer
 // without breaking anything. Promote to enforcing `Content-Security-Policy`
 // only after a verification window with zero unexpected violations
-// (checkout + images + 3D + fonts are the break-prone surfaces).
+// (checkout + images + fonts are the break-prone surfaces).
 //
 // Source inventory this policy is built from:
 // - Next.js hydration: inline <script> bootstrap → script-src 'unsafe-inline'
@@ -18,10 +18,10 @@ const path = require('path');
 // - Supabase JS (auth/db from the browser): connect-src *.supabase.co
 // - Vercel SpeedInsights: script from /_vercel/... (same origin on Vercel),
 //   beacons to vitals.vercel-insights.com → connect-src
-// - Three.js/R3F: canvas textures only — but blob: workers/images allowed
-//   defensively (drei loaders use them)
 // - Stripe: hosted Checkout = full-page redirect, NO Stripe JS on our pages
 //   → no stripe.com sources needed
+// - 2026-10-15: Three.js/R3F removed from the site (hero is a static logo
+//   now) → the defensive `blob:` worker allowance for drei loaders is gone.
 const CSP_REPORT_ONLY = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline'",
@@ -29,7 +29,7 @@ const CSP_REPORT_ONLY = [
   "img-src 'self' data: blob: https://*.supabase.co",
   "font-src 'self' data:",
   "connect-src 'self' https://*.supabase.co https://vitals.vercel-insights.com",
-  "worker-src 'self' blob:",
+  "worker-src 'self'",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -69,13 +69,18 @@ const nextConfig = {
       },
     ],
   },
-  transpilePackages: [
-    'three',
-    '@react-three/fiber',
-    '@react-three/drei',
-    'framer-motion',
-    'gsap',
-  ],
+  transpilePackages: ['framer-motion', 'gsap'],
+  experimental: {
+    // Build warning root cause (2026-10-15): `@react-email/components` is a
+    // barrel that re-exports <Tailwind>, which imports `tailwindcss` at
+    // runtime; tailwindcss/lib/lib/load-config.js has a dynamic require()
+    // that webpack flags as "Critical dependency: the request of a dependency
+    // is an expression" when bundled into the /api/contact route handler.
+    // We never use <Tailwind> in emails/ (inline palette). Keeping the
+    // package external makes Node require() it from node_modules at runtime
+    // instead of bundling it — warning gone, output identical.
+    serverComponentsExternalPackages: ['@react-email/components', '@react-email/tailwind'],
+  },
   webpack: (config) => {
     config.resolve.modules = [
       path.resolve(__dirname, 'node_modules'),

@@ -12,7 +12,13 @@ import CartIcon from '@/components/cart/CartIcon';
 import CartDrawer from '@/components/cart/CartDrawer';
 
 type NavRouteKey = 'despre' | 'atelier' | 'tocatoare' | 'contact';
-type NavLink = { label: string; type: 'route'; routeKey: NavRouteKey };
+// 2026-10-15 (QA & Polish): explicit "Acasă"/"Home" as the FIRST primary link
+// (the logo keeps linking home too). `type: 'home'` resolves to `/${locale}`
+// — there is no PATHNAMES entry for the homepage. No "Cadouri" yet: the
+// /tocatoare-personalizate landing does not exist and would 404.
+type NavLink =
+  | { label: string; type: 'route'; routeKey: NavRouteKey }
+  | { label: string; type: 'home' };
 
 // 2026-06-18 (Task 1.4 — IA Foundation): primary nav reduced to 4 clean
 // route links. The homepage-only anchors "Povestea noastră" (#poveste) and
@@ -25,18 +31,25 @@ type NavLink = { label: string; type: 'route'; routeKey: NavRouteKey };
 //   Earlier: 2026-05-27 #atelier -> /atelier route; 2026-05-23 #tocatoare
 //   -> /tocatoare route.
 const NAV_LINKS_RO: NavLink[] = [
-  { label: 'Atelier', type: 'route', routeKey: 'atelier' },
+  { label: 'Acasă', type: 'home' },
   { label: 'Tocătoare', type: 'route', routeKey: 'tocatoare' },
+  { label: 'Atelier', type: 'route', routeKey: 'atelier' },
   { label: 'Despre', type: 'route', routeKey: 'despre' },
   { label: 'Contact', type: 'route', routeKey: 'contact' },
 ];
 
 const NAV_LINKS_EN: NavLink[] = [
-  { label: 'Workshop', type: 'route', routeKey: 'atelier' },
+  { label: 'Home', type: 'home' },
   { label: 'Cutting Boards', type: 'route', routeKey: 'tocatoare' },
+  { label: 'Workshop', type: 'route', routeKey: 'atelier' },
   { label: 'About', type: 'route', routeKey: 'despre' },
   { label: 'Contact', type: 'route', routeKey: 'contact' },
 ];
+
+/** Public href for a primary nav link (home has no PATHNAMES key). */
+function navHref(link: NavLink, language: Locale): string {
+  return link.type === 'home' ? `/${language}` : localizedPath(link.routeKey, language);
+}
 
 interface NavbarProps {
   language: Locale;
@@ -209,10 +222,10 @@ export default function Navbar({
         {/* Desktop Nav — from lg up. 2026-07-03: breakpoint raised md -> lg;
             at 768-1023 the full nav was physically cramped (design-qa audit),
             so tablets get the same drawer pattern as phones. */}
-        <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
+        <nav className="hidden lg:flex items-center gap-5 xl:gap-8">
           {links.map((link) => {
-            const href = localizedPath(link.routeKey, language);
-            const isActive = pathname === href;
+            const href = navHref(link, language);
+            const isActive = pathname === href || (link.type === 'home' && onHomepage);
             return (
               <Link
                 key={link.label}
@@ -400,8 +413,8 @@ export default function Navbar({
       {/* Drawer nav links */}
       <nav className="flex flex-col" style={{ padding: '10px 22px', flex: 1, overflowY: 'auto' }}>
         {links.map((link) => {
-          const href = localizedPath(link.routeKey, language);
-          const isActive = pathname === href;
+          const href = navHref(link, language);
+          const isActive = pathname === href || (link.type === 'home' && onHomepage);
           return (
             <Link
               key={link.label}

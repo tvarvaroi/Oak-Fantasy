@@ -2,17 +2,23 @@
 
 import { useRef, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { localizedPath } from '@/lib/i18n-routes';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
+const MotionLink = motion(Link);
+
 /* ─── Product data ───────────────────────────────────────────────── */
 
 interface Product {
+  /** `products.slug` in Supabase — the card links to the real PDP. */
+  slug: string;
   image: string;
   labelRo: string;
   labelEn: string;
@@ -32,6 +38,7 @@ interface Product {
 // descriptions mirror the live `products` rows.
 const products: Product[] = [
   {
+    slug: 'tocator-taur-alb',
     image: '/products/tease-taur-alb.webp',
     labelRo: 'Tocător · Frezat CNC',
     labelEn: 'Cutting Board · CNC-carved',
@@ -45,6 +52,7 @@ const products: Product[] = [
     tagEn: 'Oak & ash',
   },
   {
+    slug: 'tocator-platou-model-peste',
     image: '/products/tease-platou-peste.webp',
     labelRo: 'Platou · Servire',
     labelEn: 'Board · Serving',
@@ -58,6 +66,7 @@ const products: Product[] = [
     tagEn: 'Solid oak',
   },
   {
+    slug: 'tava-servire-premium',
     image: '/products/tease-tava-valuri.webp',
     labelRo: 'Tavă · Servire',
     labelEn: 'Tray · Serving',
@@ -71,6 +80,7 @@ const products: Product[] = [
     tagEn: 'One of a kind',
   },
   {
+    slug: 'platou-lung-servire',
     image: '/products/tease-live-edge.webp',
     labelRo: 'Platou · Margine naturală',
     labelEn: 'Board · Live edge',
@@ -97,10 +107,12 @@ function ProductCard({
   index: number;
 }) {
   const prefersReduced = useReducedMotion();
+  const href = `${localizedPath('tocatoare', language)}/${product.slug}`;
+  const name = language === 'ro' ? product.nameRo : product.nameEn;
 
   return (
     <motion.article
-      className="product-card group relative flex-shrink-0 flex flex-col cursor-pointer"
+      className="product-card group relative flex-shrink-0 flex flex-col"
       style={{
         width: 'clamp(280px, 30vw, 360px)',
         borderRadius: 12,
@@ -127,10 +139,17 @@ function ProductCard({
             }
       }
     >
-      {/* image */}
+      {/* Stretched link: the whole card routes to the real product page. */}
+      <Link
+        href={href}
+        aria-label={name}
+        className="absolute inset-0 z-10 rounded-[12px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--copper)]"
+      />
+
+      {/* image — 4:3 to match the product photos (1448×1086), no side crop */}
       <div
         className="relative overflow-hidden"
-        style={{ aspectRatio: '3/2.2' }}
+        style={{ aspectRatio: '4/3' }}
       >
         <motion.div
           className="absolute inset-0"
@@ -310,18 +329,22 @@ export default function ProductTease({ language }: { language: 'ro' | 'en' }) {
     return () => mm.revert();
   }, [prefersReduced]);
 
+  const catalogHref = localizedPath('tocatoare', language);
+
   const copy = {
     ro: {
       eyebrow: 'Produsele noastre',
       title: ['Fiecare bucată,', 'unică.'],
       sub: 'Tocătoarele noastre nu sunt produse în serie. Fiecare iese din atelier cu propria față a lemnului.',
-      cta: 'Înscrie-te pentru acces timpuriu',
+      // Live shop (2026-10-15): the early-access / waitlist CTA is gone —
+      // the gallery ends on the real catalog.
+      cta: 'Vezi toate tocătoarele noastre',
     },
     en: {
       eyebrow: 'Our products',
       title: ['Every piece,', 'unique.'],
       sub: "Our boards aren't mass-produced. Each leaves the workshop with its own face of wood.",
-      cta: 'Sign up for early access',
+      cta: 'See all our cutting boards',
     },
   }[language];
 
@@ -450,35 +473,24 @@ export default function ProductTease({ language }: { language: 'ro' | 'en' }) {
                   opacity: 0.4,
                 }}
               />
-              <p
-                className="font-caveat"
-                style={{
-                  fontSize: '1.6rem',
-                  color: 'rgba(245,235,216,0.5)',
-                  lineHeight: 1.3,
-                  transform: 'rotate(-1deg)',
-                  transformOrigin: 'left center',
-                }}
-              >
-                {language === 'ro' ? 'mai multe\nîn curând...' : 'more\ncoming soon...'}
-              </p>
-              <motion.a
-                href="#waitlist"
-                className="label-caps inline-flex items-center gap-2 group/cta"
+              <MotionLink
+                href={catalogHref}
+                className="font-caudex inline-flex items-start gap-3 group/cta"
                 style={{
                   color: 'var(--cream-warm)',
-                  fontSize: '0.68rem',
-                  letterSpacing: '0.18em',
+                  fontSize: '1.35rem',
+                  lineHeight: 1.25,
                   textDecoration: 'none',
+                  maxWidth: 220,
                 }}
-                whileHover={{ x: 4 }}
+                whileHover={prefersReduced ? undefined : { x: 4 }}
                 transition={{ duration: 0.2 }}
               >
-                {copy.cta}
-                <svg width="16" height="10" viewBox="0 0 16 10" fill="none" aria-hidden>
+                <span>{copy.cta}</span>
+                <svg width="22" height="14" viewBox="0 0 16 10" fill="none" aria-hidden style={{ marginTop: 6, flexShrink: 0 }}>
                   <path d="M1 5h14M10 1l4 4-4 4" stroke="var(--copper)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-              </motion.a>
+              </MotionLink>
             </div>
           </motion.div>
         </div>
@@ -504,8 +516,15 @@ export default function ProductTease({ language }: { language: 'ro' | 'en' }) {
               viewport={{ once: true, margin: '-30px' }}
               transition={{ duration: 0.6, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
             >
-              {/* image */}
-              <div className="relative" style={{ aspectRatio: '16/9' }}>
+              {/* Stretched link to the real PDP */}
+              <Link
+                href={`${catalogHref}/${p.slug}`}
+                aria-label={language === 'ro' ? p.nameRo : p.nameEn}
+                className="absolute inset-0 z-10 rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--copper)]"
+              />
+
+              {/* image — 4:3 like the source photos (was 16:9, cropped ~25%) */}
+              <div className="relative" style={{ aspectRatio: '4/3' }}>
                 <Image
                   src={p.image}
                   alt={language === 'ro' ? p.nameRo : p.nameEn}
@@ -546,21 +565,21 @@ export default function ProductTease({ language }: { language: 'ro' | 'en' }) {
             </motion.article>
           ))}
 
-          {/* mobile CTA */}
-          <motion.a
-            href="#waitlist"
-            className="label-caps inline-flex items-center justify-center gap-2 mt-2 py-4"
-            style={{ color: 'var(--cream-warm)', fontSize: '0.68rem', letterSpacing: '0.18em', textDecoration: 'none', borderTop: '1px solid rgba(184,115,51,0.2)' }}
+          {/* mobile CTA → catalog */}
+          <MotionLink
+            href={catalogHref}
+            className="font-caudex inline-flex items-center justify-center gap-3 mt-2 py-4 min-h-[48px]"
+            style={{ color: 'var(--cream-warm)', fontSize: '1.1rem', textDecoration: 'none', borderTop: '1px solid rgba(184,115,51,0.2)' }}
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
             {copy.cta}
-            <svg width="16" height="10" viewBox="0 0 16 10" fill="none" aria-hidden>
+            <svg width="20" height="12" viewBox="0 0 16 10" fill="none" aria-hidden>
               <path d="M1 5h14M10 1l4 4-4 4" stroke="var(--copper)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-          </motion.a>
+          </MotionLink>
         </div>
       </div>
 

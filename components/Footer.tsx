@@ -205,8 +205,9 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
       colCompany: 'Companie',
       // Mirror Navbar primary (Tier 2 — see _brain/notes/gotchas.md IA tiers).
       navLinks: [
-        { label: 'Atelier', href: localizedPath('atelier', 'ro') },
+        { label: 'Acasă', href: '/ro' },
         { label: 'Tocătoare', href: localizedPath('tocatoare', 'ro') },
+        { label: 'Atelier', href: localizedPath('atelier', 'ro') },
         { label: 'Despre', href: localizedPath('despre', 'ro') },
         { label: 'Contact', href: localizedPath('contact', 'ro') },
       ],
@@ -215,9 +216,13 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
       contactAddressLabel: 'Atelier',
       contactHoursLabel: 'Program',
       contactRegion: 'Arad, România',
-      // COL3 — Sprint 2 slot. Artisan voice, not enterprise "Coming Soon".
-      contEyebrow: 'În curând',
-      contBody: 'Cont personal, istoric comenzi și liste de dorințe — pe drum.',
+      // COL3 — account links (Sprint 2 shipped auth; the "În curând" copy
+      // was a pre-launch relic, replaced 2026-10-15).
+      contLinks: [
+        { label: 'Autentificare', href: localizedPath('login', 'ro') },
+        { label: 'Creează cont', href: localizedPath('register', 'ro') },
+      ],
+      contBody: 'Comenzile și datele de livrare, într-un singur loc.',
       tagline: 'Făcut cu drag în România.',
       copy: `© ${new Date().getFullYear()} Oak Fantasy. Toate drepturile rezervate.`,
       brandDesc: 'Tocătoare din stejar românesc, lucrate manual în atelierul nostru din vestul țării.',
@@ -240,8 +245,9 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
       colCont: 'Account',
       colCompany: 'Company',
       navLinks: [
-        { label: 'Workshop', href: localizedPath('atelier', 'en') },
+        { label: 'Home', href: '/en' },
         { label: 'Cutting Boards', href: localizedPath('tocatoare', 'en') },
+        { label: 'Workshop', href: localizedPath('atelier', 'en') },
         { label: 'About', href: localizedPath('despre', 'en') },
         { label: 'Contact', href: localizedPath('contact', 'en') },
       ],
@@ -250,8 +256,11 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
       contactAddressLabel: 'Workshop',
       contactHoursLabel: 'Hours',
       contactRegion: 'Arad, Romania',
-      contEyebrow: 'Coming soon',
-      contBody: 'Personal account, order history and wishlists — on the way.',
+      contLinks: [
+        { label: 'Log in', href: localizedPath('login', 'en') },
+        { label: 'Create account', href: localizedPath('register', 'en') },
+      ],
+      contBody: 'Your orders and delivery details, in one place.',
       tagline: 'Made with love in Romania.',
       copy: `© ${new Date().getFullYear()} Oak Fantasy. All rights reserved.`,
       brandDesc: 'Romanian oak cutting boards, handcrafted in our workshop in western Romania.',
@@ -409,7 +418,7 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
             </div>
           </motion.div>
 
-          {/* col 3 — Cont (Sprint 2 slot, artisan "În curând" voice) */}
+          {/* col 3 — Cont: real auth links (login / register) */}
           <motion.div
             className="flex flex-col gap-6"
             initial={prefersReduced ? false : { opacity: 0, y: 16 }}
@@ -420,27 +429,26 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
             <p className="label-caps" style={{ color: 'var(--copper)', fontSize: '0.6rem' }}>
               {nav.colCont}
             </p>
-            <div className="flex flex-col gap-3">
-              <p
-                className="label-caps"
-                style={{ color: 'rgba(245,235,216,0.5)', fontSize: '0.6rem' }}
-              >
-                {nav.contEyebrow}
-              </p>
-              <p
-                className="font-caveat"
-                style={{
-                  fontSize: '1.3rem',
-                  color: 'rgba(245,235,216,0.4)',
-                  transform: 'rotate(-1deg)',
-                  transformOrigin: 'left center',
-                  lineHeight: 1.4,
-                  maxWidth: 220,
-                }}
-              >
-                {nav.contBody}
-              </p>
-            </div>
+            <nav className="flex flex-col gap-3" aria-label={nav.colCont}>
+              {nav.contLinks.map((link) => (
+                <FooterLink key={link.href} href={link.href}>
+                  {link.label}
+                </FooterLink>
+              ))}
+            </nav>
+            <p
+              className="font-caveat"
+              style={{
+                fontSize: '1.25rem',
+                color: 'rgba(245,235,216,0.4)',
+                transform: 'rotate(-1deg)',
+                transformOrigin: 'left center',
+                lineHeight: 1.4,
+                maxWidth: 220,
+              }}
+            >
+              {nav.contBody}
+            </p>
           </motion.div>
 
           {/* col 4 — Companie (brand + operator + signature) */}

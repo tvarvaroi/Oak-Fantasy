@@ -3,18 +3,15 @@
 import { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
 import { motion, useReducedMotion } from 'framer-motion';
 import { localizedPath } from '@/lib/i18n-routes';
 
-const CuttingBoard3D = dynamic(() => import('./CuttingBoard3D'), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-full flex items-center justify-center">
-      <div style={{ width: 160, height: 230, backgroundColor: 'var(--oak-warm)', borderRadius: 12, opacity: 0.35 }} />
-    </div>
-  ),
-});
+// 2026-10-15 (QA & Polish #2): the Three.js cutting board (CuttingBoard3D,
+// R3F + drei, ~hundreds of KB async chunk) was replaced by the brand logo.
+// three / @react-three/* were uninstalled — this was their only consumer.
+// The logo is the raster brand file (1254×1254 JPEG, light background),
+// masked circular like the Footer coin, and is the hero's LCP candidate.
+const HERO_LOGO = '/WhatsApp_Image_2026-05-14_at_20.59.06.jpeg';
 
 // ── SVG Decoratives ──────────────────────────────────────────────────────────
 function TwigSVG() {
@@ -371,7 +368,7 @@ export default function Hero({ language }: HeroProps) {
             </motion.div>
           </div>
 
-          {/* ── RIGHT: 3D Board ──────────────────────────────────────── */}
+          {/* ── RIGHT: Brand logo coin ───────────────────────────────── */}
           <motion.div
             initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -383,7 +380,7 @@ export default function Hero({ language }: HeroProps) {
             className="relative flex flex-col items-center"
             style={{ height: 'clamp(400px, 55vw, 600px)' }}
           >
-            {/* Subtle green leaf blur behind board */}
+            {/* Subtle green leaf blur behind the coin */}
             <div
               className="absolute inset-0 rounded-2xl opacity-[0.06] pointer-events-none"
               style={{
@@ -391,12 +388,45 @@ export default function Hero({ language }: HeroProps) {
               }}
             />
 
-            {/* 3D Canvas */}
-            <div className="w-full h-full">
-              <CuttingBoard3D />
+            {/* Logo coin — same geometry as the Footer coin, hero scale.
+                Hover: gentle 1.04 scale (disabled for reduced motion). */}
+            <div
+              className="w-full h-full flex items-center justify-center"
+              style={{ paddingBottom: 'clamp(72px, 10vw, 96px)' }}
+            >
+              <motion.div
+                className="relative rounded-full"
+                style={{
+                  width: 'clamp(240px, 30vw, 400px)',
+                  height: 'clamp(240px, 30vw, 400px)',
+                  padding: 10,
+                  border: '1px solid rgba(184, 115, 51, 0.38)',
+                }}
+                whileHover={prefersReducedMotion ? undefined : { scale: 1.04 }}
+                transition={{ type: 'spring', stiffness: 220, damping: 24, mass: 0.8 }}
+              >
+                <div
+                  className="relative w-full h-full rounded-full overflow-hidden"
+                  style={{
+                    background: 'var(--cream-warm)',
+                    boxShadow:
+                      '0 30px 80px rgba(31, 24, 16, 0.18), 0 6px 18px rgba(31, 24, 16, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
+                  }}
+                >
+                  <Image
+                    src={HERO_LOGO}
+                    alt="Oak Fantasy"
+                    fill
+                    priority
+                    sizes="(max-width: 640px) 240px, (max-width: 1024px) 30vw, 400px"
+                    quality={85}
+                    style={{ objectFit: 'cover' }}
+                  />
+                </div>
+              </motion.div>
             </div>
 
-            {/* Tagline below board */}
+            {/* Tagline below the coin */}
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
               <OakLeafSVG />
               <motion.p

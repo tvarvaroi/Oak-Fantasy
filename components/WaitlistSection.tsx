@@ -152,6 +152,13 @@ function OakBranch({ drawn }: BranchProps) {
 
 /* ─── Section ────────────────────────────────────────────────────── */
 
+// 2026-10-15 (QA & Polish #7): the newsletter section is hidden pre-launch.
+// The store sells now and every "#waitlist" CTA across the site was
+// re-pointed to /tocatoare, so the section had no inbound links left. Code
+// is kept intact (EmailForm + Supabase email_subscribers still work) — flip
+// to `true` to bring it back.
+const SHOW_WAITLIST = false;
+
 export default function WaitlistSection({ language }: { language: 'ro' | 'en' }) {
   const sectionRef = useRef<HTMLElement>(null);
   const [drawn, setDrawn] = useState(false);
@@ -172,6 +179,9 @@ export default function WaitlistSection({ language }: { language: 'ro' | 'en' })
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
+
+  // Hooks above run unconditionally; the early return keeps React happy.
+  if (!SHOW_WAITLIST) return null;
 
   const copy = {
     ro: {

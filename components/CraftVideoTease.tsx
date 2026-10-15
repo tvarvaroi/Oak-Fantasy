@@ -1,7 +1,51 @@
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
+import Image from 'next/image';
 import { motion, useReducedMotion } from 'framer-motion';
+
+/* ─── Ambient slideshow (2026-10-15, QA & Polish #6) ─────────────────
+   Replaces the Pexels video loop: 5 stock stills from /public/stock/
+   (same Pexels License, see docs/stock-credits.md) crossfading every
+   SLIDE_MS with a FADE_S opacity transition. Reduced motion = the first
+   photo, static. All frames are stacked in the DOM so the markup is
+   identical on server and client; only the timer is client-side.
+   `navigator.webdriver` (set by Playwright) also freezes the first frame
+   so design-qa captures and visual-regression baselines are deterministic.
+──────────────────────────────────────────────────────────────── */
+
+type Slide = { src: string; altRo: string; altEn: string };
+
+const SLIDES: Slide[] = [
+  {
+    src: '/stock/atelier-tool-planer.webp',
+    altRo: 'Placă de lemn trecută printr-un rindeluitor electric, cu așchii',
+    altEn: 'Wooden board passing through an electric planer, with shavings',
+  },
+  {
+    src: '/stock/atelier-tool-clamps.webp',
+    altRo: 'Prese cu șuruburi strângând plăci de lemn la lipire',
+    altEn: 'Screw clamps holding glued wooden boards',
+  },
+  {
+    src: '/stock/atelier-place-sawdust.webp',
+    altRo: 'Rumeguș și unelte pe un banc de lucru din lemn',
+    altEn: 'Sawdust and tools on a wooden workbench',
+  },
+  {
+    src: '/stock/atelier-tool-hand-tools.webp',
+    altRo: 'Dălți cu mânere de lemn pe un suport de perete',
+    altEn: 'Wooden-handled chisels on a wall rack',
+  },
+  {
+    src: '/stock/atelier-tool-sander.webp',
+    altRo: 'Șlefuitor orbital pe o placă de stejar',
+    altEn: 'Orbital sander on an oak board',
+  },
+];
+
+const SLIDE_MS = 5000;
+const FADE_S = 1;
 
 /* ─── Corner oak-leaf ornaments ──────────────────────────────────
    Each corner gets a rotated version of the same leaf path.
@@ -118,34 +162,37 @@ function TwigDivider({ drawn }: { drawn: boolean }) {
 
 export default function CraftVideoTease({ language }: { language: 'ro' | 'en' }) {
   const sectionRef = useRef<HTMLElement>(null);
-  const videoRef = useRef<HTMLDivElement>(null);
-  const videoElRef = useRef<HTMLVideoElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
   const [drawn, setDrawn] = useState(false);
+  const [inView, setInView] = useState(false);
+  const [active, setActive] = useState(0);
   const prefersReduced = useReducedMotion();
 
+  // Ornaments draw once on first intersect; the slideshow only advances
+  // while the frame is actually on screen (and the tab is visible).
   useEffect(() => {
-    const el = videoRef.current;
+    const el = frameRef.current;
     if (!el) return;
     const obs = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setDrawn(true);
-          // Lazy playback: the video has preload="none" + poster, so nothing
-          // is fetched until the section scrolls into view. Reduced-motion
-          // users keep the static poster (no autoplay).
-          if (!prefersReduced) {
-            videoElRef.current?.play().catch(() => {
-              /* autoplay can be blocked — poster stays, which is fine */
-            });
-          }
-          obs.disconnect();
-        }
+        setInView(entry.isIntersecting);
+        if (entry.isIntersecting) setDrawn(true);
       },
       { threshold: 0.2 }
     );
     obs.observe(el);
     return () => obs.disconnect();
-  }, [prefersReduced]);
+  }, []);
+
+  useEffect(() => {
+    if (!inView || prefersReduced) return;
+    if (typeof navigator !== 'undefined' && navigator.webdriver) return; // deterministic captures
+    const id = window.setInterval(() => {
+      if (document.hidden) return;
+      setActive((i) => (i + 1) % SLIDES.length);
+    }, SLIDE_MS);
+    return () => window.clearInterval(id);
+  }, [inView, prefersReduced]);
 
   const copy = {
     ro: {
@@ -229,9 +276,9 @@ export default function CraftVideoTease({ language }: { language: 'ro' | 'en' })
           </motion.p>
         </div>
 
-        {/* video container */}
+        {/* slideshow container */}
         <motion.div
-          ref={videoRef}
+          ref={frameRef}
           className="relative mx-auto"
           style={{
             borderRadius: 14,
@@ -248,11 +295,9 @@ export default function CraftVideoTease({ language }: { language: 'ro' | 'en' })
             <CornerOrnament key={corner} corner={corner} drawn={drawn} delay={0.1 + i * 0.08} />
           ))}
 
-          {/* 16:9 ambient loop — stock footage (Pexels, free commercial
-              license — docs/stock-credits.md). Neutral content on purpose:
-              tools + shavings on a workbench, no people. Muted background
-              loop, lazy (preload="none" + play on intersect), poster as
-              reduced-motion / fallback state. */}
+          {/* 16:9 ambient slideshow — stock stills (Pexels License, see
+              docs/stock-credits.md). Neutral content on purpose: tools,
+              shavings and a workbench, no people, no faces. */}
           <div
             className="relative overflow-hidden"
             style={{
@@ -260,21 +305,39 @@ export default function CraftVideoTease({ language }: { language: 'ro' | 'en' })
               borderRadius: 14,
               border: '1px solid rgba(139,94,60,0.2)',
               boxShadow: '0 20px 70px rgba(31,24,16,0.15), 0 4px 20px rgba(31,24,16,0.08)',
-              // Warm dark backdrop until the poster/first frame paints.
-              background: 'linear-gradient(135deg, #2D3A1F 0%, #1F1810 45%, #2A2218 100%)',
+              // Warm dark backdrop until the first frame paints.
+              background: 'linear-gradient(135deg, var(--forest-deep) 0%, var(--bark) 45%, var(--ink) 100%)',
             }}
+            role="group"
+            aria-roledescription={language === 'ro' ? 'galerie foto' : 'photo slideshow'}
+            aria-label={language === 'ro' ? 'Imagini din atelier' : 'Workshop photos'}
           >
-            <video
-              ref={videoElRef}
-              className="absolute inset-0 h-full w-full object-cover"
-              src="/stock/craft-loop.mp4"
-              poster="/stock/craft-loop-poster.webp"
-              muted
-              loop
-              playsInline
-              preload="none"
-              aria-hidden="true"
-              tabIndex={-1}
+            {SLIDES.map((slide, i) => (
+              <div
+                key={slide.src}
+                className="absolute inset-0"
+                style={{
+                  opacity: i === active ? 1 : 0,
+                  transition: prefersReduced ? 'none' : `opacity ${FADE_S}s ease-in-out`,
+                }}
+                aria-hidden={i !== active}
+              >
+                <Image
+                  src={slide.src}
+                  alt={language === 'ro' ? slide.altRo : slide.altEn}
+                  fill
+                  sizes="(max-width: 1000px) 100vw, 960px"
+                  quality={80}
+                  style={{ objectFit: 'cover' }}
+                />
+              </div>
+            ))}
+
+            {/* warm scrim so the caption stays legible on light frames */}
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{ background: 'linear-gradient(180deg, rgba(31,24,16,0.12) 0%, rgba(31,24,16,0.05) 40%, rgba(31,24,16,0.35) 100%)' }}
+              aria-hidden
             />
 
             {/* bottom caption bar */}
