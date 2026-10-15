@@ -4,6 +4,7 @@
 // admin-read migration is applied on the live DB).
 
 import { getServerSupabase } from '@/lib/supabase-server';
+import { NEW_ORDER_STATUS } from '@/lib/orders/status';
 
 export interface MonthlyPoint {
   label: string;
@@ -13,7 +14,7 @@ export interface MonthlyPoint {
 export interface DashboardStats {
   products: { total: number; active: number; draft: number; archived: number; withoutImage: number };
   subscribers: { total: number; active: number };
-  orders: { total: number };
+  orders: { total: number; toConfirm: number };
   subscribersByMonth: MonthlyPoint[];
 }
 
@@ -42,11 +43,14 @@ function buildLast6Months(dates: (string | null)[]): MonthlyPoint[] {
 export async function fetchDashboardStats(): Promise<DashboardStats> {
   const sb = getServerSupabase();
 
-  const [{ data: products }, { data: subs }, { count: ordersCount }] = await Promise.all([
-    sb.from('products').select('status, hero_image_url'),
-    sb.from('email_subscribers').select('created_at, unsubscribed_at'),
-    sb.from('orders').select('*', { count: 'exact', head: true }),
-  ]);
+  const [{ data: products }, { data: subs }, { count: ordersCount }, { count: toConfirmCount }] =
+    await Promise.all([
+      sb.from('products').select('status, hero_image_url'),
+      sb.from('email_subscribers').select('created_at, unsubscribed_at'),
+      sb.from('orders').select('*', { count: 'exact', head: true }),
+      // Orders waiting for the founder's confirmation (2026-10-15 badge).
+      sb.from('orders').select('*', { count: 'exact', head: true }).eq('status', NEW_ORDER_STATUS),
+    ]);
 
   const p = products ?? [];
   const s = subs ?? [];
@@ -63,7 +67,7 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
       total: s.length,
       active: s.filter((x) => !x.unsubscribed_at).length,
     },
-    orders: { total: ordersCount ?? 0 },
+    orders: { total: ordersCount ?? 0, toConfirm: toConfirmCount ?? 0 },
     subscribersByMonth: buildLast6Months(s.map((x) => x.created_at)),
   };
 }

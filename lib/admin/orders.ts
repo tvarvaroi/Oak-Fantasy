@@ -4,7 +4,7 @@
 
 import { getServerSupabase } from '@/lib/supabase-server';
 import type { Database } from '@/types/supabase';
-import { isOrderStatus } from '@/lib/orders/status';
+import { isOrderStatus, NEW_ORDER_STATUS } from '@/lib/orders/status';
 
 export type AdminOrder = Database['public']['Tables']['orders']['Row'];
 export type AdminOrderItem = Database['public']['Tables']['order_items']['Row'];
@@ -21,6 +21,19 @@ export async function fetchOrders(statusFilter?: string): Promise<AdminOrder[]> 
   const { data, error } = await query;
   if (error) return [];
   return data ?? [];
+}
+
+// Number of orders waiting for the founder's confirmation (status pending_cod).
+// Feeds the sidebar badge + dashboard card (2026-10-15 founder request). HEAD
+// count only — no rows transferred. 0 on any error (badge simply hides).
+export async function countOrdersToConfirm(): Promise<number> {
+  const sb = getServerSupabase();
+  const { count, error } = await sb
+    .from('orders')
+    .select('*', { count: 'exact', head: true })
+    .eq('status', NEW_ORDER_STATUS);
+  if (error) return 0;
+  return count ?? 0;
 }
 
 export interface OrderDetail {

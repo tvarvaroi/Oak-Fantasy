@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { requireAdminOrNotFound } from '@/lib/auth/require-admin';
 import { fetchOrders, formatOrderDate } from '@/lib/admin/orders';
 import { baniToRon } from '@/lib/schemas/product';
-import { ORDER_STATUSES, ORDER_STATUS_LABELS, isOrderStatus } from '@/lib/orders/status';
+import { ADMIN_ORDER_STATUSES, ORDER_STATUS_LABELS, isOrderStatus } from '@/lib/orders/status';
 import OrderStatusBadge from '@/components/admin/OrderStatusBadge';
 
 // /admin/comenzi — real orders list (Task 3.6). Status filter via ?status= (D3).
@@ -73,7 +73,7 @@ export default async function OrdersPage({
         >
           Toate
         </Link>
-        {ORDER_STATUSES.map((s) => {
+        {ADMIN_ORDER_STATUSES.map((s) => {
           const on = activeFilter === s;
           return (
             <Link

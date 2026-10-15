@@ -1,4 +1,5 @@
 import { requireAdminOrNotFound } from '@/lib/auth/require-admin';
+import { countOrdersToConfirm } from '@/lib/admin/orders';
 
 import AdminShell from '@/components/admin/AdminShell';
 
@@ -21,6 +22,13 @@ export default async function ProtectedAdminLayout({
 }) {
   const user = await requireAdminOrNotFound();
   const name = user.profile?.full_name || user.email || 'admin';
+  // Sidebar badge: orders waiting for confirmation (runs after the gate, so it
+  // only ever executes for a verified admin; the layout is force-dynamic).
+  const ordersToConfirm = await countOrdersToConfirm();
 
-  return <AdminShell userName={name}>{children}</AdminShell>;
+  return (
+    <AdminShell userName={name} ordersToConfirm={ordersToConfirm}>
+      {children}
+    </AdminShell>
+  );
 }

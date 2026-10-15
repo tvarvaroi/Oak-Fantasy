@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { ORDER_STATUSES, ORDER_STATUS_LABELS } from '@/lib/orders/status';
+import { ADMIN_ORDER_STATUSES, ORDER_STATUS_LABELS } from '@/lib/orders/status';
 import { updateOrderStatus, markOrderPaid } from '@/lib/admin/order-actions';
 
 // Client island on the order detail page (Task 3.6). Status dropdown +
@@ -92,7 +92,7 @@ export default function OrderStatusControl({
           style={selectStyle}
           aria-label="Status comandă"
         >
-          {ORDER_STATUSES.map((s) => (
+          {ADMIN_ORDER_STATUSES.map((s) => (
             <option key={s} value={s}>
               {ORDER_STATUS_LABELS[s]}
             </option>

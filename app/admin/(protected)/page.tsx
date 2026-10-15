@@ -40,7 +40,11 @@ export default async function AdminDashboardPage() {
           value={stats.subscribers.total}
           sub={subDezabonati > 0 ? `${stats.subscribers.active} activi · ${subDezabonati} dezabonați` : `${stats.subscribers.active} activi`}
         />
-        <StatCard label="Comenzi" value={stats.orders.total} sub="După lansare" />
+        <StatCard
+          label="Comenzi de confirmat"
+          value={stats.orders.toConfirm}
+          sub={`${stats.orders.total} ${stats.orders.total === 1 ? 'comandă în total' : 'comenzi în total'}`}
+        />
         <StatCard
           label="Produse fără poză"
           value={stats.products.withoutImage}

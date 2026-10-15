@@ -29,7 +29,7 @@ function isActive(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export default function AdminSidebar() {
+export default function AdminSidebar({ ordersToConfirm = 0 }: { ordersToConfirm?: number }) {
   const pathname = usePathname();
 
   return (
@@ -37,6 +37,8 @@ export default function AdminSidebar() {
       {NAV.map((item) => {
         const Icon = item.icon;
         const active = item.enabled && isActive(pathname, item.href);
+        // "Comenzi" badge (2026-10-15): orders waiting for confirmation.
+        const badge = item.href === '/admin/comenzi' && ordersToConfirm > 0 ? ordersToConfirm : 0;
 
         const inner = (
           <>
@@ -44,6 +46,28 @@ export default function AdminSidebar() {
             <span className="font-caudex" style={{ letterSpacing: '0.03em' }}>
               {item.label}
             </span>
+            {badge ? (
+              <span
+                className="font-caudex ml-auto"
+                aria-label={`${badge} ${badge === 1 ? 'comandă nouă de confirmat' : 'comenzi noi de confirmat'}`}
+                data-testid="orders-to-confirm-badge"
+                style={{
+                  minWidth: 22,
+                  height: 22,
+                  padding: '0 7px',
+                  borderRadius: 999,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  backgroundColor: active ? 'var(--cream-warm)' : 'var(--copper)',
+                  color: active ? 'var(--oak-deep)' : 'var(--cream-warm)',
+                }}
+              >
+                {badge}
+              </span>
+            ) : null}
           </>
         );
 
