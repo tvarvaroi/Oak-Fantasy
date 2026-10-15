@@ -59,10 +59,16 @@
 .workshopBanner::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(31, 24, 16, .68) 0%, rgba(31, 24, 16, .44) 45%, rgba(31, 24, 16, 0) 80%); }
 .workshopOverlay { position: relative; width: 100%; padding: clamp(180px, 26vw, 240px) 48px 60px; color: var(--cream-warm); z-index: 2; max-width: 1200px; margin: 0 auto; display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; flex-wrap: wrap; }
 @media (max-width: 640px) { .workshopOverlay { padding-left: 24px; padding-right: 24px; } }
-.workshopOverlay .eyebrow { color: var(--copper); margin-bottom: 14px; }
-.workshopOverlay h2 { font-family: var(--font-caudex); font-size: clamp(1.8rem, 3.4vw, 2.6rem); line-height: 1.18; max-width: 520px; }
+/* 2026-10-15 (QA & Polish #13) — size hierarchy inside the overlay:
+   h2 (largest) > eyebrow "Atelierul" (medium) > cross-ref link (smallest).
+   The eyebrow was .7rem and the link .72rem (inverted). */
+.workshopOverlay .eyebrow { color: var(--copper); font-size: .86rem; letter-spacing: .24em; margin-bottom: 14px; }
+/* Root cause of the "invisible" heading: globals.css sets `h2 { color: var(--ink) }`
+   directly on the element, which beats the cream colour inherited from
+   .workshopOverlay. The colour has to be explicit here. */
+.workshopOverlay h2 { font-family: var(--font-caudex); font-size: clamp(1.8rem, 3.4vw, 2.6rem); line-height: 1.18; max-width: 520px; color: var(--cream-warm); }
 .workshopOverlay p { font-family: var(--font-lora); font-size: 1rem; line-height: 1.78; color: rgba(245, 235, 216, .85); max-width: 480px; }
-.workshopCrossRef { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-caudex); text-transform: uppercase; letter-spacing: .16em; font-size: .72rem; color: var(--copper); padding: 8px 0; border-bottom: 1px solid var(--copper); text-decoration: none; transition: gap .2s; align-self: flex-start; }
+.workshopCrossRef { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-caudex); text-transform: uppercase; letter-spacing: .16em; font-size: .66rem; color: var(--copper); padding: 8px 0; border-bottom: 1px solid var(--copper); text-decoration: none; transition: gap .2s; align-self: flex-start; }
 .workshopCrossRef:hover { gap: 14px; }
 .workshopCrossRef svg { transition: transform .2s; }
 .workshopCrossRef:hover svg { transform: translateX(2px); }

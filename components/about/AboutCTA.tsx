@@ -1,14 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import type { Locale } from '@/lib/i18n-routes';
+import { localizedPath, type Locale } from '@/lib/i18n-routes';
 import type { AboutContent } from './content';
 import Reveal from './Reveal';
 import styles from './about.module.css';
 
-// Final CTA — v2-timeline.html:231-242. Anchors point at the locale
-// homepage sections (#waitlist / #products) per founder decision C
-// (the /tocatoare route does not exist yet — Etapa 1 future task).
+// Final CTA — v2-timeline.html:231-242. 2026-10-15 (QA & Polish #14): the
+// pre-launch "Lansăm în octombrie" + waitlist anchors are gone; primary →
+// /tocatoare (live catalog), ghost → /atelier.
 
 export default function AboutCTA({
   content,
@@ -18,7 +18,6 @@ export default function AboutCTA({
   locale: Locale;
 }) {
   const { cta } = content;
-  const home = `/${locale}`;
 
   return (
     <section className={`${styles.cta} paper-texture`}>
@@ -26,7 +25,7 @@ export default function AboutCTA({
         <h2>{cta.h2}</h2>
         <p>{cta.p}</p>
         <div className={styles.ctaActions}>
-          <Link href={`${home}${cta.primaryAnchor}`} className={styles.btnPrimary}>
+          <Link href={localizedPath(cta.primaryRoute, locale)} className={styles.btnPrimary}>
             {cta.primaryLabel}
             <svg width="18" height="12" viewBox="0 0 18 12" fill="none" aria-hidden="true">
               <path
@@ -38,7 +37,7 @@ export default function AboutCTA({
               />
             </svg>
           </Link>
-          <Link href={`${home}${cta.ghostAnchor}`} className={styles.btnGhost}>
+          <Link href={localizedPath(cta.ghostRoute, locale)} className={styles.btnGhost}>
             {cta.ghostLabel}
           </Link>
         </div>

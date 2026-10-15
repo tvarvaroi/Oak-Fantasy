@@ -74,11 +74,11 @@ export interface AboutContent {
   cta: {
     h2: string;
     p: string;
-    /** href anchors resolved against the locale homepage in <AboutCTA> */
+    /** 2026-10-15: real routes (localizedPath) instead of homepage anchors. */
     primaryLabel: string;
-    primaryAnchor: '#waitlist';
+    primaryRoute: 'tocatoare';
     ghostLabel: string;
-    ghostAnchor: '#products';
+    ghostRoute: 'atelier';
   };
 }
 
@@ -189,12 +189,12 @@ const ro: AboutContent = {
     ],
   },
   cta: {
-    h2: 'Lansăm în octombrie.',
-    p: 'Primii pe listă primesc 15% reducere și ghidul nostru de îngrijire a lemnului — gratuit.',
-    primaryLabel: 'Înscrie-te pe lista de lansare',
-    primaryAnchor: '#waitlist',
-    ghostLabel: 'Vezi tocătoarele noastre',
-    ghostAnchor: '#products',
+    h2: 'Lucrate manual, în stoc limitat.',
+    p: 'Fiecare piesă iese din atelier una câte una. Ce vezi în catalog e gata de trimis.',
+    primaryLabel: 'Vezi tocătoarele noastre',
+    primaryRoute: 'tocatoare',
+    ghostLabel: 'Vezi atelierul',
+    ghostRoute: 'atelier',
   },
 };
 
@@ -305,12 +305,12 @@ const en: AboutContent = {
     ],
   },
   cta: {
-    h2: 'We launch in October.',
-    p: 'The first on the list get 15% off and our free wood care guide.',
-    primaryLabel: 'Join the launch list',
-    primaryAnchor: '#waitlist',
-    ghostLabel: 'See our cutting boards',
-    ghostAnchor: '#products',
+    h2: 'Handmade, in limited stock.',
+    p: 'Every piece leaves the workshop one at a time. What you see in the catalog is ready to ship.',
+    primaryLabel: 'See our cutting boards',
+    primaryRoute: 'tocatoare',
+    ghostLabel: 'See the workshop',
+    ghostRoute: 'atelier',
   },
 };
 
