@@ -19,6 +19,7 @@ const PUBLIC_ROUTE_KEYS: RouteKey[] = [
   'atelier',
   'contact',
   'tocatoare',
+  'laComanda',
   'terms',
   'privacy',
   'returns',

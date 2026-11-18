@@ -21,6 +21,8 @@ export const PATHNAMES = {
   despre: { ro: 'despre', en: 'about' },
   atelier: { ro: 'atelier', en: 'workshop' },
   tocatoare: { ro: 'tocatoare', en: 'cutting-boards' },
+  // Custom work requests (2026-11-18). RO /la-comanda, EN /custom-orders.
+  laComanda: { ro: 'la-comanda', en: 'custom-orders' },
   // `contact` slug intentionally identical across locales — same word
   // in RO and EN. Codified explicitly so the route is registered with
   // the middleware audit and shows up in localizedPath().

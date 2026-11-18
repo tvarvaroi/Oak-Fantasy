@@ -67,9 +67,15 @@ export function rateLimit(
 // other proxies set `x-real-ip`. Falls back to 'unknown' so the limiter
 // still applies a global ceiling to anonymous traffic.
 export function getClientIp(req: Request): string {
-  const forwarded = req.headers.get('x-forwarded-for');
+  return getClientIpFromHeaders(req.headers);
+}
+
+// Same extraction for server actions, which get `headers()` from next/headers
+// instead of a Request (custom-order form, 2026-11-18).
+export function getClientIpFromHeaders(headers: Pick<Headers, 'get'>): string {
+  const forwarded = headers.get('x-forwarded-for');
   if (forwarded) return forwarded.split(',')[0].trim();
-  const realIp = req.headers.get('x-real-ip');
+  const realIp = headers.get('x-real-ip');
   if (realIp) return realIp;
   return 'unknown';
 }
