@@ -191,22 +191,50 @@ test.describe('NumbersStrip (Faza B refactor)', () => {
   // NumbersStrip is below the fold — counter starts on IntersectionObserver trigger.
   // Scroll into view + reduced-motion (set in fixtures) makes Counter jump to final value.
 
-  test('RO shows "20+ ani" and "1.200+"', async ({ page }) => {
+  // 2026-11-19: only true, checkable figures (see numbers-strip-content.ts).
+  // '1.200+ pe listă', '8h per tocător' and '20+ ani' were removed.
+  test('RO shows the four true figures, none of the removed claims', async ({ page }) => {
     await page.goto('/ro');
     const numbers = page.locator('section[aria-label="Cifre"]');
     await numbers.scrollIntoViewIfNeeded();
-    await expect(numbers).toContainText('+ ani');
-    await expect(numbers).toContainText('1.200', { timeout: 5000 });
+    await expect(numbers).toContainText('modele', { timeout: 5000 });
+    await expect(numbers).toContainText('100%');
+    await expect(numbers).toContainText('5–10');
+    await expect(numbers).toContainText('zile lucrătoare');
+    await expect(numbers).toContainText('320');
+    await expect(numbers).not.toContainText('1.200');
+    await expect(numbers).not.toContainText('pe listă');
+    await expect(numbers).not.toContainText('+ ani');
+    await expect(numbers).not.toContainText('per tocător');
   });
 
-  test('EN shows "20+ years" and "1,200+", not "ani"', async ({ page }) => {
+  test('EN shows the four true figures, none of the removed claims', async ({ page }) => {
     await page.goto('/en');
     const numbers = page.locator('section[aria-label="Numbers"]');
     await numbers.scrollIntoViewIfNeeded();
-    await expect(numbers).toContainText('+ years');
-    await expect(numbers).toContainText('1,200', { timeout: 5000 });
-    // Use precise suffix match — " ani" alone matches "Romanian" (Rom-ani-an)
-    await expect(numbers).not.toContainText('+ ani');
+    await expect(numbers).toContainText('models', { timeout: 5000 });
+    await expect(numbers).toContainText('Romanian oak');
+    await expect(numbers).toContainText('business days');
+    await expect(numbers).toContainText('final grit');
+    await expect(numbers).not.toContainText('1,200');
+    await expect(numbers).not.toContainText('years');
+  });
+
+  test('from lg the four figures sit on one row (dividers no longer eat grid cells)', async ({ page }) => {
+    const vp = page.viewportSize();
+    test.skip(!vp || vp.width < 1024, 'single-row layout is lg+ only');
+    await page.goto('/ro');
+    const numbers = page.locator('section[aria-label="Cifre"]');
+    await numbers.scrollIntoViewIfNeeded();
+    // Poll: the entry animation translates each stat with a stagger.
+    await expect
+      .poll(async () => {
+        const tops = await numbers.locator('.font-caudex.tabular-nums').evaluateAll((els) =>
+          els.map((e) => Math.round(e.getBoundingClientRect().top)),
+        );
+        return tops.length === 4 ? new Set(tops).size : -1;
+      })
+      .toBe(1);
   });
 
   test('RO captions use modern Romanian diacritics (no cedilla)', async ({ page }) => {
