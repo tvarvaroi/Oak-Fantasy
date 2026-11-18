@@ -207,6 +207,7 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
       navLinks: [
         { label: 'Acasă', href: '/ro' },
         { label: 'Tocătoare', href: localizedPath('tocatoare', 'ro') },
+        { label: 'La comandă', href: localizedPath('laComanda', 'ro') },
         { label: 'Atelier', href: localizedPath('atelier', 'ro') },
         { label: 'Despre', href: localizedPath('despre', 'ro') },
         { label: 'Contact', href: localizedPath('contact', 'ro') },
@@ -247,6 +248,7 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
       navLinks: [
         { label: 'Home', href: '/en' },
         { label: 'Cutting Boards', href: localizedPath('tocatoare', 'en') },
+        { label: 'Custom orders', href: localizedPath('laComanda', 'en') },
         { label: 'Workshop', href: localizedPath('atelier', 'en') },
         { label: 'About', href: localizedPath('despre', 'en') },
         { label: 'Contact', href: localizedPath('contact', 'en') },

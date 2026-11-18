@@ -6,6 +6,7 @@ import Hero from '@/components/Hero';
 import StoryStrip from '@/components/StoryStrip';
 import WorkshopSection from '@/components/WorkshopSection';
 import ProductTease from '@/components/ProductTease';
+import CustomOrderTease from '@/components/CustomOrderTease';
 import NumbersStrip from '@/components/NumbersStrip';
 import CraftVideoTease from '@/components/CraftVideoTease';
 import WaitlistSection from '@/components/WaitlistSection';
@@ -31,6 +32,7 @@ export default function LocalePage() {
       <StoryStrip language={language} />
       <WorkshopSection language={language} />
       <ProductTease language={language} />
+      <CustomOrderTease language={language} />
       <NumbersStrip language={language} />
       <CraftVideoTease language={language} />
       <WaitlistSection language={language} />

@@ -5,13 +5,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useReducedMotion } from 'framer-motion';
-import { X } from 'lucide-react';
+import { LogOut, X } from 'lucide-react';
 import { localizedPath, type Locale } from '@/lib/i18n-routes';
 import { createClient } from '@/lib/supabase-client';
 import CartIcon from '@/components/cart/CartIcon';
 import CartDrawer from '@/components/cart/CartDrawer';
 
-type NavRouteKey = 'despre' | 'atelier' | 'tocatoare' | 'contact';
+type NavRouteKey = 'despre' | 'atelier' | 'tocatoare' | 'laComanda' | 'contact';
 // 2026-10-15 (QA & Polish): explicit "Acasă"/"Home" as the FIRST primary link
 // (the logo keeps linking home too). `type: 'home'` resolves to `/${locale}`
 // — there is no PATHNAMES entry for the homepage. No "Cadouri" yet: the
@@ -30,9 +30,11 @@ type NavLink =
 // the post-Sprint-1 smoke test).
 //   Earlier: 2026-05-27 #atelier -> /atelier route; 2026-05-23 #tocatoare
 //   -> /tocatoare route.
+// 2026-11-18: "La comandă" (/la-comanda) added in third place -> 6 links.
 const NAV_LINKS_RO: NavLink[] = [
   { label: 'Acasă', type: 'home' },
   { label: 'Tocătoare', type: 'route', routeKey: 'tocatoare' },
+  { label: 'La comandă', type: 'route', routeKey: 'laComanda' },
   { label: 'Atelier', type: 'route', routeKey: 'atelier' },
   { label: 'Despre', type: 'route', routeKey: 'despre' },
   { label: 'Contact', type: 'route', routeKey: 'contact' },
@@ -41,6 +43,7 @@ const NAV_LINKS_RO: NavLink[] = [
 const NAV_LINKS_EN: NavLink[] = [
   { label: 'Home', type: 'home' },
   { label: 'Cutting Boards', type: 'route', routeKey: 'tocatoare' },
+  { label: 'Custom orders', type: 'route', routeKey: 'laComanda' },
   { label: 'Workshop', type: 'route', routeKey: 'atelier' },
   { label: 'About', type: 'route', routeKey: 'despre' },
   { label: 'Contact', type: 'route', routeKey: 'contact' },
@@ -178,17 +181,19 @@ export default function Navbar({
             className={`transition-all duration-500 ${
               scrolled
                 ? 'w-12 h-12 lg:w-16 lg:h-16'
-                : 'w-14 h-14 lg:w-[100px] lg:h-[100px]'
+                : 'w-14 h-14 lg:w-16 lg:h-16 xl:w-[100px] xl:h-[100px]'
             }`}
             priority
           />
           <div className="flex flex-col leading-none transition-all duration-400">
+            {/* Unscrolled size via a CSS var so the lg–xl band (6 nav links,
+                2026-11-18) can use a smaller wordmark; other widths unchanged. */}
             <span
-              className="font-caudex"
+              className="font-caudex [--wordmark-size:clamp(1.5rem,4.5vw,2.4rem)] lg:max-xl:[--wordmark-size:1.875rem]"
               style={{
                 fontSize: scrolled
                   ? 'clamp(1.25rem, 3.5vw, 1.6rem)'
-                  : 'clamp(1.5rem, 4.5vw, 2.4rem)',
+                  : 'var(--wordmark-size)',
                 fontWeight: 700,
                 color: navInk,
                 letterSpacing: '0.02em',
@@ -222,7 +227,12 @@ export default function Navbar({
         {/* Desktop Nav — from lg up. 2026-07-03: breakpoint raised md -> lg;
             at 768-1023 the full nav was physically cramped (design-qa audit),
             so tablets get the same drawer pattern as phones. */}
-        <nav className="hidden lg:flex items-center gap-5 xl:gap-8">
+        {/* 2026-11-18: 6 links since "La comandă" — the lg–xl band (1024–1279)
+            is tightened (gap 16, logo 64px, wordmark 1.875rem, smaller
+            right-cluster gaps and CTA padding, icon-only sign-out, no
+            wrapping) so it also fits for a signed-in customer at 1024px EN;
+            from xl up the bar is unchanged. */}
+        <nav className="hidden lg:flex items-center gap-4 xl:gap-8">
           {links.map((link) => {
             const href = navHref(link, language);
             const isActive = pathname === href || (link.type === 'home' && onHomepage);
@@ -230,7 +240,7 @@ export default function Navbar({
               <Link
                 key={link.label}
                 href={href}
-                className="font-lora text-sm transition-colors duration-200 hover:text-oak-warm relative group"
+                className="font-lora text-sm whitespace-nowrap transition-colors duration-200 hover:text-oak-warm relative group"
                 style={{
                   color: isActive ? navAccent : navInk,
                   fontFamily: 'var(--font-lora)',
@@ -252,11 +262,11 @@ export default function Navbar({
         {/* Right cluster. Below lg only cart + hamburger stay on the bar
             (max 3 visible elements incl. logo — founder decision); language,
             auth and the CTA live in the drawer. */}
-        <div className="flex items-center gap-1.5 sm:gap-3 lg:gap-4">
+        <div className="flex items-center gap-1.5 sm:gap-3 xl:gap-4">
           {/* Language toggle — desktop only; in the drawer below lg */}
           <button
             onClick={onToggleLanguage}
-            className="hidden lg:block label-caps text-xs font-caudex transition-colors duration-200 hover:text-oak-warm"
+            className="hidden lg:block label-caps text-xs font-caudex whitespace-nowrap transition-colors duration-200 hover:text-oak-warm"
             style={{
               color: navInkSoft,
               fontFamily: 'var(--font-caudex)',
@@ -294,9 +304,12 @@ export default function Navbar({
           {authed && (
             <form action="/auth/signout" method="post" className="hidden lg:block">
               <input type="hidden" name="locale" value={language} />
+              {/* 2026-11-18: icon-only in the lg–xl band (6 nav links leave no
+                  room for the "Sign out" label at 1024px EN); label from xl. */}
               <button
                 type="submit"
-                className="label-caps text-xs font-caudex transition-colors duration-200 hover:text-oak-warm"
+                aria-label={language === 'ro' ? 'Ieși din cont' : 'Sign out'}
+                className="label-caps text-xs font-caudex whitespace-nowrap flex items-center justify-center min-w-[44px] min-h-[44px] xl:min-w-0 transition-colors duration-200 hover:text-oak-warm"
                 style={{
                   color: navInkSoft,
                   fontFamily: 'var(--font-caudex)',
@@ -304,7 +317,10 @@ export default function Navbar({
                   transition: colorTransition,
                 }}
               >
-                {language === 'ro' ? 'Ieși' : 'Sign out'}
+                <LogOut size={18} strokeWidth={1.75} aria-hidden className="xl:hidden" />
+                <span className="hidden xl:inline" aria-hidden>
+                  {language === 'ro' ? 'Ieși' : 'Sign out'}
+                </span>
               </button>
             </form>
           )}
@@ -313,7 +329,7 @@ export default function Navbar({
               Pre-comandă → #waitlist anchor predated checkout). */}
           <Link
             href={localizedPath('tocatoare', language)}
-            className="hidden lg:inline-flex items-center px-5 py-2.5 text-sm font-caudex transition-all duration-200 hover:opacity-90 active:scale-95"
+            className="hidden lg:inline-flex items-center px-3 xl:px-5 py-2.5 text-sm whitespace-nowrap font-caudex transition-all duration-200 hover:opacity-90 active:scale-95"
             style={{
               backgroundColor: 'var(--oak-warm)',
               color: 'var(--cream-warm)',
