@@ -4,12 +4,7 @@ import { OG_IMAGE_DEFAULT as OG_IMAGE } from '@/lib/seo';
 
 import LegalLayout from '@/components/legal/LegalLayout';
 import LegalShell from '@/components/legal/LegalShell';
-import LegalPlaceholder from '@/components/legal/LegalPlaceholder';
-import LegalStatutoryNote from '@/components/legal/LegalStatutoryNote';
-import {
-  RETURNS_CONTENT,
-  RETURNS_STATUTORY,
-} from '@/components/legal/returns/content';
+import { RETURNS_CONTENT } from '@/components/legal/returns/content';
 import { LEGAL_INFO } from '@/lib/legal-info';
 import { isLocale, localizedPath, type Locale } from '@/lib/i18n-routes';
 
@@ -89,25 +84,6 @@ function buildJsonLd(locale: Locale) {
 export default function Page({ params }: { params: { locale: string } }) {
   if (!isLocale(params.locale)) notFound();
   const locale: Locale = params.locale;
-
-  // Statutory note for OUG 34/2014 art. 16 lit. c — injected as a
-  // sectionOverride for the `exceptions` section. Section ids are
-  // locale-agnostic; only titles localise.
-  const note = RETURNS_STATUTORY[locale].exceptions;
-
-  const overrides = {
-    exceptions: (
-      <>
-        <LegalPlaceholder locale={locale} />
-        <LegalStatutoryNote
-          eyebrow={note.eyebrow}
-          citation={note.citation}
-          body={note.body}
-        />
-      </>
-    ),
-  };
-
   return (
     <>
       <script
@@ -118,7 +94,6 @@ export default function Page({ params }: { params: { locale: string } }) {
         <LegalLayout
           content={RETURNS_CONTENT[locale]}
           locale={locale}
-          sectionOverrides={overrides}
         />
       </LegalShell>
     </>

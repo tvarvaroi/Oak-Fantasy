@@ -15,10 +15,12 @@ interface LegalCompanyInfoProps {
 // Rows with placeholder values render nothing (design-qa Batch A) — the row
 // appears automatically once the real value lands in env. The dashed banner
 // below the list explains the gap while isPlaceholderMode is on.
+// Label above value below sm (2026-11-19): at 375px the two-column grid left
+// ~160px for values — the email overflowed the card.
 function Row({ label, value }: { label: string; value: string }) {
   if (hasPlaceholder(value)) return null;
   return (
-    <div className="grid grid-cols-[minmax(120px,180px)_1fr] gap-3 items-baseline">
+    <div className="grid grid-cols-1 gap-1 sm:grid-cols-[minmax(120px,180px)_minmax(0,1fr)] sm:gap-3 items-baseline">
       <span
         className="label-caps"
         style={{ color: 'var(--ink-soft)', fontSize: '0.62rem' }}
@@ -31,6 +33,7 @@ function Row({ label, value }: { label: string; value: string }) {
           color: 'var(--ink)',
           fontSize: '0.95rem',
           lineHeight: 1.55,
+          overflowWrap: 'anywhere',
         }}
       >
         {value}
