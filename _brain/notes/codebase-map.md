@@ -272,3 +272,23 @@ components/tocatoare/
 - Code + tests committed (post founder-review pe 18 baselines regenerate).
 - Live render local: empty state (prod nu are tabela products).
 - Founder activation pe staging → eu regen baselines /tocatoare → review → commit baselines + adăugare la PAGES.
+
+## /la-comanda · /custom-orders + admin „Comenzi custom" (2026-11-18)
+
+**Public:**
+- `app/[locale]/la-comanda/page.tsx` — server: metadata, hreflang, JSON-LD (WebPage + BreadcrumbList + Service).
+- `components/la-comanda/` — `content.ts` (copy RO/EN + teaser homepage), `CustomOrderContent.tsx` (wrapper client: Navbar + secțiuni + Footer; **slot galerie** comentat între WhatWeMake și HowItWorks), `CustomOrderHero.tsx`, `CustomOrderForm.tsx` (fișa = formularul, `#formular`), `WhatWeMake.tsx`, `HowItWorks.tsx`, `CustomOrderCTA.tsx`, `la-comanda.module.css` (inclusiv stilurile teaser-ului).
+- `components/CustomOrderTease.tsx` — banda de pe homepage (între ProductTease și NumbersStrip).
+- `lib/custom-orders/submit.ts` — server action public (rate limit → Zod → honeypot → timing → insert service role → email).
+- `lib/custom-orders/notify-admin.ts` + `emails/CustomOrderAdmin.tsx` — email admin best-effort.
+- `lib/schemas/custom-order.ts` — statusuri + etichete, limite, schema câmpurilor (coduri de eroare), payload, update admin.
+- `lib/whatsapp.ts` — `normalizeRoPhone`, `formatRoPhone`, `waLink`; `lib/custom-orders/whatsapp-greeting.ts` — salut RO/EN.
+
+**Admin:**
+- `app/admin/(protected)/comenzi-custom/page.tsx` (listă + filtre `?status=`) și `[id]/page.tsx` (detaliu).
+- `lib/admin/custom-orders.ts` (citiri + `countNewCustomOrders`), `lib/admin/custom-order-actions.ts` (update/delete prin RLS).
+- `components/admin/CustomOrderControls.tsx` (status + note + dialog ștergere), `CustomOrderStatusBadge.tsx`.
+
+**DB:** `custom_orders` (migrația `20261118090000`), RLS doar admin, fără politică anon.
+
+**Teste:** `tests/e2e/la-comanda.spec.ts` (pagină, validare, linkuri, ancoră, JSON-LD, sitemap, nav 1024/1280 delogat + logat, footer, teaser) · `scripts/smoke-custom-orders.mjs` (flux complet pe DB live, curăță după el).

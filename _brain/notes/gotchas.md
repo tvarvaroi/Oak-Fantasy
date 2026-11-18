@@ -1109,3 +1109,47 @@ de `textContent`, `innerText` reflectă CSS-ul → „COMENZI DE CONFIRMAT".
 (aceeași rețetă ca webhook-ul `expired`). Comenzile de test rămân în DB ca `cancelled`,
 cu `admin_notes` SMOKE.
 **Fișiere:** scripts/smoke-ramburs-order.mjs, .env.example.
+
+## 2026-11-18 — Migrații aplicate manual din SQL editor NU apar în istoricul remote → `db push` le-ar re-rula
+
+**Simptom:** `npx supabase migration list` arăta cele 4 migrații din 2026-06-23 cu
+coloana Remote GOALĂ, deși obiectele lor rulau în producție (RPC `create_order` cu
+`p_locale`, `adjust_stock`, `orders.locale`). Un `db push` simplu le-ar fi aplicat din nou.
+**Cauză:** hand-off-urile din iunie au fost aplicate de founder din SQL editor —
+Supabase înregistrează în `supabase_migrations.schema_migrations` doar ce trece prin CLI.
+**Fix folosit:** (1) verificat obiectele pe live prin OpenAPI-ul PostgREST
+(`GET /rest/v1/` cu service role → `paths['/rpc/…']`, `definitions.<tabel>.properties`);
+(2) `npx supabase migration repair --status applied <versiuni>` (doar evidență, zero SQL);
+(3) `npx supabase db push --dry-run` → confirmat că pleacă DOAR migrația nouă; (4) push.
+**Lecție:** înainte de ORICE `db push`, rulează `migration list` și `--dry-run`. Coloana
+Remote goală ≠ migrație neaplicată.
+
+## 2026-11-18 — Drawer-ul mobil (`<aside>`) are `display:flex` INLINE → `lg:hidden` nu are efect
+
+**Simptom:** pe desktop, `header nav a:visible, aside nav a:visible` întorcea 12 linkuri
+(6 dublate). **Cauză:** stilul inline `display: 'flex'` bate clasa `lg:hidden`; drawer-ul
+rămâne în layout, translatat în afara ecranului (Playwright îl consideră vizibil).
+**Fix în teste:** alege UN container — `header nav` dacă e vizibil, altfel `aside nav`
+(`primaryNavLinks()` în tests/e2e/la-comanda.spec.ts). **Neremediat (pre-existent, flag
+founder):** linkurile din drawer-ul închis pot primi focus cu Tab pe desktop.
+
+## 2026-11-18 — Honeypot poziționat off-screen = `:visible` pentru Playwright
+
+**Simptom:** `input:visible` număra 4 câmpuri în loc de 3. **Cauză:** honeypot-ul e la
+`left:-10000px` cu 1×1px — are box, deci e „visible". **Fix:** `:not(#co-website)`.
+(Notă: honeypot-ul din `lib/schemas/contact.ts` are `max(0)` → un bot care îl completează
+primește 400 cu `fieldErrors.website`, adică AFLĂ de capcană înainte de ramura de
+„succes fals". Pre-existent, flagat; schema nouă `custom-order` lasă honeypot-ul neconstrâns
+și îl verifică DUPĂ parse.)
+
+## 2026-11-18 — PostgREST bulk insert cu chei diferite pe rânduri → coloanele lipsă devin NULL, nu DEFAULT
+
+**Simptom:** `insert([{…fără status}, {…status:'contacted'}])` → eroare NOT NULL pe
+`status`. **Cauză:** PostgREST face uniunea coloanelor din toate obiectele; unde lipsesc,
+trimite NULL (nu folosește DEFAULT-ul). **Fix:** aceleași chei pe toate rândurile.
+
+## 2026-11-18 — Scripturi Node din scratchpad: pachetele proiectului nu se rezolvă din ESM
+
+**Simptom:** `ERR_MODULE_NOT_FOUND '@playwright/test'` pentru un `.mjs` în afara repo-ului.
+**Fix:** script `.cjs` + `NODE_PATH=<repo>/node_modules` (CommonJS respectă NODE_PATH, ESM
+nu) + `MSYS_NO_PATHCONV=1` pentru argumente care încep cu `/` (gotcha 2026-10-15).

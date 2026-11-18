@@ -377,3 +377,30 @@ trebuie să vadă același răspuns; e boolean, nu secret.
 confirmare automată (pierde filtrul pe gravare), rezervare stoc la confirmare în loc de
 plasare (ar permite oversell între plasare și confirmare), auto-paid la `delivered`
 (remiterea ramburs vine mai târziu decât livrarea).
+
+## 2026-11-18 — „La comandă": formular → admin, contactul pe WhatsApp îl inițiem NOI
+
+**Decizie:** (1) Pagina publică `/ro/la-comanda` · `/en/custom-orders` are o „fișă de
+comandă" cu 3 câmpuri (nume, telefon RO, idee), NU buton WhatsApp direct. (2) Cererea
+intră în tabelul nou `custom_orders` (minim: nume, telefon normalizat `+40…`, descriere,
+status, `locale`, note interne, timestamps) și apare în `/admin/comenzi-custom`; founder-ul
+deschide chatul wa.me din admin, cu salut precompletat în limba paginii. (3) Insert DOAR
+prin server action cu service role; tabelul NU are nicio politică anon (RLS: admin full
+access prin `is_admin()`). (4) DELETE real permis aici (abatere conștientă de la
+soft-delete): anularea = status „Anulată", ștergerea = spam/dubluri/cereri GDPR.
+(5) Fără preț, avans, adresă, email, termen — se adaugă printr-o migrație nouă la nevoie.
+(6) Separat de checkout și de stoc; dashboard: un StatCard propriu „Cereri custom noi".
+(7) Email admin best-effort prin Resend (nu blochează nimic); semnalul principal = badge.
+(8) Navbar cu 6 linkuri: strângere DOAR pe 1024–1279 (gap 16, logo 80, wordmark 2rem,
+`whitespace-nowrap`); ≥1280 neschimbat.
+
+**Motiv:** founder-ul vrea să controleze primul contact (filtru pe idei nerealiste, ton,
+timp), nu să primească mesaje WhatsApp la orice oră; formularul lasă o evidență fără
+introducere manuală. Service role în server action = singura cale de insert fără sesiune,
+iar lipsa politicii anon face tabelul imposibil de atins direct din browser. `locale` nu
+e câmp de formular — e dedus din pagină, ca să știi în ce limbă răspunzi.
+
+**Alternative respinse:** buton WhatsApp direct + introducere manuală în admin (prima
+iterație, respinsă de founder), policy anon INSERT (ar expune tabelul direct prin
+PostgREST, fără honeypot/rate limit), poze atașate acum (bucket privat + URL-uri semnate,
+amânat), cifrele custom amestecate în „Comenzi" (ar distorsiona statisticile de magazin).

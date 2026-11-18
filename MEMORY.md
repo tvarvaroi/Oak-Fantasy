@@ -470,3 +470,30 @@ order.mjs, tests/e2e/checkout.spec.ts, _brain/notes/payments-dormant-stripe.md.
 **De ce contează:** Lansarea nu mai depinde de KYC Stripe live + webhook în prod. Founder-ul
 are inbox-ul „Nouă, de confirmat" cu badge și filtrează gravările înainte de producție.
 Reactivarea cardului = 3 env + endpoint webhook, documentat.
+
+---
+
+## 2026-11-18 — „La comandă": formular → admin, migrații fantomă, review multi-lens
+
+**Pattern descoperit:** (1) **`migration list` înainte de ORICE `db push`**: 4 migrații din iunie
+aplicate din SQL editor nu erau în istoricul remote — un push orb le-ar fi re-rulat. Verificare
+obiecte prin OpenAPI-ul PostgREST (`GET /rest/v1/` cu service role) → `migration repair --status
+applied` (doar evidență) → `db push --dry-run` → push. (2) **Formular public fără politică anon**:
+server action `'use server'` + service role DOAR după Zod + honeypot + timing + rate limit;
+tabelul rămâne de neatins din browser (verificat: anon SELECT `[]`, INSERT 42501). Honeypot-ul
+NU se constrânge în schemă (altfel botul primește eroare de validare și află de capcană).
+(3) **Zod vs Postgres la lungimi**: `.length` numără unități UTF-16, `char_length()` code
+points → `Array.from(v).length` în refine (target-ul TS e ES5, `[...v]` nu compilează).
+(4) **Testul de „încape în nav" trebuie să acopere starea logată**: review-ul multi-lens
+(4 dimensiuni + verificator adversarial per dimensiune, 7 agenți) a prins că EN la 1024px cu
+client logat avea 0px între blocuri — testul meu rula doar delogat. Fix: strângere doar pe
+1024–1279 + sign-out icon-only acolo + variantă „signed in" în test (element injectat).
+(5) **Python heredoc + escape-uri**: `'\\u0000'` a ajuns ca octet NUL REAL în fișier
+(`'\\u00a0'` ca NBSP real) — scanează fișierele modificate după octeți NUL înainte de commit.
+**Aplicat la:** supabase/migrations/20261118090000_create_custom_orders.sql, lib/custom-orders/*,
+lib/schemas/custom-order.ts, lib/whatsapp.ts, components/la-comanda/*, app/[locale]/la-comanda,
+app/admin/(protected)/comenzi-custom/*, AdminSidebar (badge generic per item), Navbar (lg–xl),
+tests/e2e/la-comanda.spec.ts, scripts/smoke-custom-orders.mjs.
+**De ce contează:** primul formular public care scrie direct în DB fără policy anon — tiparul
+(server action + service role + apărări în ordine + insert fără `.select()` de la anon) e
+reutilizabil pentru orice formular viitor (cerere ofertă B2B, recenzii).

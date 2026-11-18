@@ -1415,3 +1415,60 @@ SMOKE scripts/smoke-ramburs-order.mjs pe prod build + DB live: 25/25 — plasare
   Primul run s-a oprit la un check (innerText uppercase, vezi gotcha) și a lăsat OF-2026-
   0007 în pending_cod → curățat cu release_stock + cancelled + history. Comenzile de test
   rămân cancelled (OF-2026-0007, -0008).
+
+═══════════════════════════════════════════════════════════════════
+2026-11-18 — „LA COMANDĂ": PAGINĂ CU FORMULAR + TAB ADMIN „COMENZI CUSTOM" [LIVRAT]
+═══════════════════════════════════════════════════════════════════
+GATE: prima iterație (buton WhatsApp direct + introducere manuală în admin) RESPINSĂ de
+  founder → flux nou: formular pe pagină → cerere în admin → NOI contactăm pe WhatsApp.
+  Decizii founder: locale DA; dashboard separat (StatCard propriu); poze MAI TÂRZIU; DELETE
+  real cu confirmare; retenție 12 luni doar ca propunere în brief (fără ștergere automată);
+  db push + gen types pe live DA.
+BASELINE pe HEAD (înainte de cod): e2e 292 passed / 2 skipped; vizual 72/72.
+DB: migrația 20261118090000_create_custom_orders.sql — custom_orders (nume 2–80, telefon
+  CHECK ^\+40[0-9]{9}$, descriere 10–2000, status new|contacted|in_progress|completed|
+  cancelled, locale ro|en, note ≤5000, timestamps + set_updated_at). RLS: o singură policy
+  „Admin full access custom_orders" (is_admin()); ZERO policy anon. Verificat pe live: anon
+  SELECT → [], anon INSERT → 42501.
+  ⚠ Istoric remote: 4 migrații din 2026-06-23 (aplicate din SQL editor) lipseau → verificate
+  prin OpenAPI PostgREST → migration repair --status applied → db push --dry-run (doar a
+  mea) → push. types/supabase.ts regenerat (+custom_orders, +adjust_stock care lipsea).
+PUBLIC: /ro/la-comanda · /en/custom-orders (PATHNAMES laComanda, sitemap, hreflang + x-default,
+  redirect 308 pe slug-ul greșit al limbii). Hero cu „fișă de comandă" paper-aged = formularul
+  (nume, telefon RO permisiv ca în checkout, idee cu rânduri liniate + contor), notă de acord
+  → confidențialitate, notă retur OUG 34/2014 art. 16 lit. c → retur. Ce putem face (5, fără
+  numerotare — nu e secvență), slot galerie NERANDAT (comentariu în CustomOrderContent), Cum
+  lucrăm (i./ii./iii.), CTA bark → #formular + focus pe Nume. JSON-LD WebPage + BreadcrumbList +
+  Service → #organization, fără Offer. Singura animație: fișa se îndreaptă la focus (≥lg).
+SERVER ACTION lib/custom-orders/submit.ts: rate limit 5/oră/IP (in-memory) → Zod (lungimi în
+  code points) → honeypot → timing <2s (ambele: succes fals, nimic salvat) → insert service
+  role → email admin best-effort (emails/CustomOrderAdmin.tsx). Telefon normalizat +40….
+ADMIN: sidebar „Comenzi custom" sub „Comenzi" + badge cereri „new" (badge generic per item);
+  /admin/comenzi-custom (filtre pill, telefon = wa.me) + /[id] (ideea primă, buton „Scrie pe
+  WhatsApp" cu salut RO/EN după locale, status + note, „Șterge cererea" cu dialog Radix — overlay
+  cald, wrapper-ul shadcn are bg-black/80). Dashboard: StatCard „Cereri custom noi" → ?status=new
+  (grid sm2/lg3/xl5).
+NAV: „La comandă" pe poziția 3 (Navbar desktop + drawer) + Footer „Navigare" + teaser homepage
+  între ProductTease și NumbersStrip. Măsurat real: la 1024 „La comandă"/„Cutting Boards" treceau
+  pe 2 rânduri, gap 0 → strângere DOAR 1024–1279 (gap 16, logo 64, wordmark 1.875rem, CTA px-3,
+  sign-out doar icon, whitespace-nowrap). Rezultat 1024 EN: 44px delogat / 16px logat; ≥1280
+  identic cu înainte.
+CODE REVIEW (workflow, 4 lentile + verificator adversarial, 7 agenți): 5 confirmate, 0 respinse,
+  toate reparate — (1) client logat EN 1024 = 0px (testul rula doar delogat → variantă „signed in"
+  adăugată), (2) textarea invalidă fără focus vizibil (specificitate), (3) Zod .length vs
+  char_length (emoji), (4) note cu spații → „Salvează" rămânea activ, (5) hover:opacity-85 nu
+  există în Tailwind 3.3.3.
+VERIFICARE: typecheck ✓ · lint ✓ · check:i18n ✓ (4 warnings pre-existente admin) · build ✓
+  „Compiled successfully", zero warnings · e2e 379 passed / 20 skipped / 0 failed (87 teste noi:
+  la-comanda.spec.ts + seo) · smoke scripts/smoke-custom-orders.mjs 29/29 pe prod build (submit RO
+  + EN → DB new/+40/locale, anon RLS, honeypot + timing resping, admin: salut EN → delete, badge 1,
+  listă, salut RO, status contacted + notă în DB, delete → badge 0) · hidratare 0 erori (7 pagini ×
+  2 viewporturi, prod) · design-qa 160 capturi matrice + capturi pe element (pagină RO/EN/RM,
+  teaser, admin listă/detaliu/dialog/dashboard 4 vp, navbar 1024 pe /atelier dark + legal, email
+  randat) · baselines 78 (72 regenerate — Footer global, 6 noi).
+EMAIL: local fără RESEND_API_KEY → sărit (log). Pe Vercel: from RESEND_FROM_EMAIL (fallback
+  onboarding@resend.dev, sandbox) → to RESEND_ADMIN_EMAIL (fallback tvarvaroi@gmail.com).
+FLAG-uri pre-existente (neatinse): (a) umbră verticală pe marginea dreaptă pe mobil pe toate
+  paginile (probabil CartDrawer); (b) drawer-ul mobil închis e focusabil cu Tab pe desktop
+  (display:flex inline bate lg:hidden); (c) honeypot-ul /api/contact (max(0)) dezvăluie capcana
+  botului prin eroarea de validare.
