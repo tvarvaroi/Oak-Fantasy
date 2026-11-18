@@ -353,6 +353,8 @@ TXT     _dmarc            v=DMARC1; p=quarantine; rua=mailto:dmarc@...  3600
 
 ```
 /api/contact            → max 5 requests/oră/IP (anti-spam form)
+submitCustomOrder       → max 5 requests/oră/IP (server action /la-comanda, 2026-11-18;
+                          același limiter in-memory + honeypot + timing ca /api/contact)
 /api/subscribe          → max 3 requests/oră/IP (anti-spam newsletter)
 /api/auth/login         → max 10 requests/oră/IP (anti-brute-force)
 /api/auth/register      → max 5 requests/oră/IP
@@ -710,6 +712,43 @@ Verifică că ai DPA semnat (sau ai acceptat ToS-uri care includ DPA) cu:
 - [ ] `/api/user/data-export` — descarcă toate datele user-ului (GDPR Article 15)
 - [ ] `/api/user/delete-account` — șterge cont + anonymizează comenzi (GDPR Article 17)
 - [ ] Test ambele endpoint-uri pre-launch
+
+### 10.3.b Brief pentru avocat — formularul „La comandă" (added 2026-11-18)
+
+Politica de confidențialitate e încă schelet (toate secțiunile „în pregătire").
+Textul final trebuie să acopere și prelucrarea de mai jos, introdusă de
+formularul de pe `/ro/la-comanda` · `/en/custom-orders`.
+
+- **Ce colectăm:** nume, telefon (WhatsApp), descrierea liberă a ideii. Textul
+  liber poate conține date ale unor terți (ex. numele de gravat, „pentru nunta
+  Ioanei"). Plus, automat: limba paginii (`locale`) și data cererii. IP-ul e
+  folosit doar pentru rate limiting, ținut în memoria procesului, NU e stocat.
+- **Scop:** să-l contactăm pe client în legătură cu ideea lui și să stabilim
+  detaliile și prețul unei lucrări la comandă. Nimic altceva — fără marketing,
+  fără newsletter.
+- **Temei:** art. 6(1)(b) GDPR — demersuri precontractuale la cererea persoanei.
+  Pentru cererile care devin comenzi facturate: și art. 6(1)(c) (obligații
+  fiscale/contabile). Pagina afișează sub formular o frază de informare cu link
+  spre politică (nu checkbox de consimțământ — temeiul nu e consimțământul).
+  Avocatul confirmă formularea.
+- **Canal de comunicare:** WhatsApp (Meta Platforms Ireland; transfer posibil în
+  afara SEE). Clientul ne lasă numărul ca să fie contactat acolo — de menționat
+  explicit, inclusiv transferul.
+- **Destinatari / procesatori:** Supabase (stocarea cererii, tabelul
+  `custom_orders`; verifică regiunea proiectului), Resend (emailul de notificare
+  către admin conține numele, telefonul și ideea), Vercel (hosting, loguri de
+  aplicație — server action-ul loghează doar IP-ul la respingeri anti-spam).
+  DPA-urile din §10.2 acoperă Supabase/Resend/Vercel.
+- **Retenție (PROPUNERE founder, de validat de avocat):** cererile care nu se
+  concretizează se șterg după **12 luni** de la ultima actualizare; cele
+  concretizate urmează termenul legal pentru documentele contabile. NU e
+  automatizat în cod — ștergerea se face manual din admin (buton „Șterge
+  cererea", DELETE real).
+- **Drepturi:** acces/rectificare/ștergere la cerere — ștergerea e acoperită
+  de butonul din `/admin/comenzi-custom/[id]`.
+- **Securitate:** tabel cu RLS (doar admin prin `is_admin()`), fără nicio
+  politică pentru anon; insert doar prin server action cu service role după
+  validare Zod + honeypot + timing + rate limit.
 
 ### 10.4 ANPC requirements
 
