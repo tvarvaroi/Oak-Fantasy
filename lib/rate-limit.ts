@@ -36,14 +36,13 @@ export function rateLimit(
   const now = Date.now();
   const entry = buckets.get(key);
 
-  // Poor man's TTL — sweep expired buckets only when the map grows. Using
-  // forEach to stay compatible with tsconfig target=es5 without downlevel
-  // iteration flag.
-  if (buckets.size > 1000) {
-    buckets.forEach((v, k) => {
-      if (v.resetAt < now) buckets.delete(k);
-    });
-  }
+  // Poor man's TTL — sweep expired buckets on every call (2026-11-19: the
+  // privacy policy says the IP is only used for a one-hour window; the map
+  // only holds form submissions, so the O(n) sweep is cheap). Using forEach
+  // to stay compatible with tsconfig target=es5 without downlevel iteration.
+  buckets.forEach((v, k) => {
+    if (v.resetAt < now) buckets.delete(k);
+  });
 
   if (!entry || entry.resetAt < now) {
     const resetAt = now + windowMs;
