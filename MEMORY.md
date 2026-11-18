@@ -497,3 +497,27 @@ tests/e2e/la-comanda.spec.ts, scripts/smoke-custom-orders.mjs.
 **De ce contează:** primul formular public care scrie direct în DB fără policy anon — tiparul
 (server action + service role + apărări în ordine + insert fără `.select()` de la anon) e
 reutilizabil pentru orice formular viitor (cerere ofertă B2B, recenzii).
+
+---
+
+## 2026-11-19 — Texte legale finale + „nu inventa fapte” verificat în cod
+
+**Pattern descoperit:** (1) **Textul legal se scrie DIN audit, nu din șablon**: un agent de
+audit (citire, cu file:line) + verificări directe (regiunea Supabase prin `supabase projects
+list`, numărul de rânduri prin `Prefer: count=exact`) au dat baza pentru fiecare fișă de
+prelucrare; gate-ul a pus founder-ului doar întrebările pe care codul nu le putea lămuri.
+(2) **Model de conținut cu tokeni** (`{companyName}`, `{shippingFee}`, `[x](route:returns)`):
+datele de registru și prețurile au o singură sursă, iar un token necunoscut aruncă eroare la
+build. Renderer-ul trebuie să fie RECURSIV în `**bold**` — testul e2e „niciun `{token}` în
+pagină” a prins asta. (3) **Review-ul text ↔ cod găsește nepotriviri pe care testele nu le
+văd**: emailul automat se numea „Confirmare comandă”, deși Termenii spun că emailul confirmă
+doar primirea → subiect/corp/pagina de mulțumire aliniate. Rulează un review „fiecare
+afirmație din text vs codul care o face adevărată” după orice text legal. (4) **Cifrele de
+marketing sunt și ele afirmații**: „1.200+ pe listă” cu 2 rânduri de test în DB = practică
+înșelătoare; fiecare cifră are acum sursa notată lângă ea.
+**Aplicat la:** components/legal/* (LegalText, LegalBlocks, LegalToc, content.ts × 3),
+components/checkout/ReviewStep.tsx (nota de gravură), ContactForm/RegisterForm, Footer,
+NumbersStrip, emails/OrderConfirmationClient.tsx, lib/orders/send-order-emails.ts,
+lib/rate-limit.ts (sweep la fiecare apel, ca să fie adevărat „o fereastră de o oră”).
+**De ce contează:** când politica spune ceva, codul trebuie să facă exact acel lucru —
+ținem textul și codul legate prin teste (tokeni rezolvați, linkuri, faptele de la gate).

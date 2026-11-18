@@ -1472,3 +1472,51 @@ FLAG-uri pre-existente (neatinse): (a) umbră verticală pe marginea dreaptă pe
   paginile (probabil CartDrawer); (b) drawer-ul mobil închis e focusabil cu Tab pe desktop
   (display:flex inline bate lg:hidden); (c) honeypot-ul /api/contact (max(0)) dezvăluie capcana
   botului prin eroarea de validare.
+
+═══════════════════════════════════════════════════════════════════
+2026-11-19 — HOMEPAGE FĂRĂ „VEDERE DIN ATELIER” + TEXTE LEGALE FINALE (RO + EN) [LIVRAT]
+═══════════════════════════════════════════════════════════════════
+PARTEA A (commit separat b53c7d7): CraftVideoTease ascuns (SHOW_CRAFT_VIEW = false + return
+  null, tiparul WaitlistSection; cod + /public/stock rămân). Ritm: NumbersStrip (forest)
+  ajungea lipit de Footer (bark) → teaser-ul „La comandă” mutat după cifre (dark → forest →
+  paper → bark). e2e 385 passed / 0 failed, vizual 78/78 (6 home regenerate).
+GATE B: audit de date (agent + verificări directe: Supabase Frankfurt, 2 abonați de test,
+  Stripe dormant confirmat, contact = doar email cu IP în el, Speed Insights fără cookie-uri,
+  cookie sb-…-auth-token + localStorage oak-cart) → cuprins → 14 întrebări → lista avocat.
+  Răspunsuri founder: curier nenumit, 1–3 zile; document fiscal general (de confirmat cu
+  contabilul); adresa de retur pe email; rambursare transfer în IBAN-ul din cerere (= acord);
+  confirmare prin telefon/WhatsApp; domeniul Resend tratat NEVERIFICAT (blocant nou);
+  colet refuzat = anulare fără cost; avans prin transfer la lucrări mari; retenții 3 ani /
+  12 luni / 2 ani / termen contabil, manual; 2 abonați de test ȘTERȘI; contabil = destinatar;
+  18+; gravură anulabilă până începe gravarea; „ROOBO PELLETS S.R.L.” cu punct.
+TEXTE: components/legal/{terms,privacy,returns}/content.ts — model de blocuri (p, list,
+  callout, record, form) + tokeni din LEGAL_INFO / lib/config/shipping (LegalText.tsx; token
+  necunoscut = eroare la build). Termeni 15 secțiuni, Confidențialitate 12 (fișe de
+  prelucrare cu ce/de ce/temei/cât timp), Retur 10 + anexa formular de retragere. Cuprins
+  <details> pe fiecare pagină. Șterse LegalBanner / LegalPlaceholder / LegalStatutoryNote.
+COD: nota de gravură la checkout (doar cu gravură în coș, link /retur#exceptions) + rând
+  confidențialitate; rânduri de informare la contact și înregistrare; termen de livrare la
+  checkout aliniat cu Termenii (5–10 + 1–3) și „gratuit de la 500 RON” (config e >=);
+  footer fără SOL/ODR; llms.txt (plată ramburs, retur, linkuri; „gravură pe unele modele”).
+SECȚIUNEA 6 (commituri separate): cifrele false din bandă scoase (1.200+, 8h, 20+ ani) →
+  10 modele (DB) / 100% stejar românesc / 5–10 zile lucrătoare / granulație 320 + grila
+  reparată (separatoarele mâncau celule) + centrare mobil; „Cont” (footer + subtitluri
+  login/înregistrare) rescris pe ce face contul de fapt; IP scos din emailul de contact
+  (și numele din logul honeypot); Netlify șters (netlify.toml + plugin, nimic nu-l folosea).
+DOCS: SECURITY_CHECKLIST — blocante #12 (domeniu Resend), #13 (revizuire avocat), #14 (env
+  COMPANY_NAME), §10.3.c (condiții reactivare newsletter, inclusiv dezabonare), §10.4 (SOL
+  scos), §10.5 (lista pentru avocat).
+REVIEW (agent, text ↔ cod): 1 bug (test flaky: intrarea cifrelor nu respecta reduced motion →
+  useReducedMotion + expect.poll), 4 nepotriviri reparate (emailul „Confirmare comandă” vs
+  Termeni §5 → „Am primit comanda” + /multumim; „transportul apare în coș” → în rezumat;
+  răspunsul automat de contact lipsea din Resend; emailul expeditorului în logul de test),
+  finisaje (hash, numele cookie-ului, fereastra IP + sweep la fiecare apel, TOC 44px, Link la
+  înregistrare, produs gravabil căutat dinamic în test). Design-qa a mai prins: cardul cu
+  datele comerciantului — emailul ieșea din card la 375 → stivuit pe mobil.
+VERIFICARE: typecheck ✓ · lint ✓ · check:i18n ✓ (4 warnings admin pre-existente) · build ✓
+  „Compiled successfully”, zero warnings · e2e 443 passed / 22 skipped / 0 failed · vizual
+  78/78 (32 regenerate) + 78/78 confirmare · hidratare 0 (14 pagini × 2 viewporturi, prod) ·
+  design-qa 124 capturi (6 pagini legale + checkout cu gravură RO/EN + home + footer +
+  contact + înregistrare, 4 viewporturi, EN, reduced-motion pe /retur) — revizuite.
+COMMITURI: rebase local (nepushat) ca ștergerile deja din index (Legal* + netlify.toml) să
+  intre în commiturile lor, nu în cel cu legal-info — vezi gotcha.

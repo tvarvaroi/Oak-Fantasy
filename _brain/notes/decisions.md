@@ -404,3 +404,37 @@ e câmp de formular — e dedus din pagină, ca să știi în ce limbă răspunz
 iterație, respinsă de founder), policy anon INSERT (ar expune tabelul direct prin
 PostgREST, fără honeypot/rate limit), poze atașate acum (bucket privat + URL-uri semnate,
 amânat), cifrele custom amestecate în „Comenzi" (ar distorsiona statisticile de magazin).
+
+---
+
+## 2026-11-19 — Texte legale finale (Termeni, Confidențialitate, Retur) + model de conținut cu tokeni
+
+**Decizie:** (1) Lansăm cu textele scrise acum (RO = versiunea de referință, EN completă);
+avocatul le revizuiește DUPĂ lansare (lista în SECURITY_CHECKLIST §10.5). Nicio mențiune
+„draft/în pregătire” pe paginile publice. (2) Conținutul e un model de blocuri
+(`p`, `list`, `callout`, `record`, `form`) în `components/legal/*/content.ts`; datele
+firmei, contactul și prețurile de livrare sunt TOKENI (`{companyName}`, `{email}`,
+`{shippingFee}`…) rezolvați din `LEGAL_INFO` / `lib/config/shipping` — un token necunoscut
+aruncă eroare la build. (3) Faptele stabilite la gate: ramburs exclusiv; curier nenumit,
+1–3 zile după expediere; confirmare manuală prin telefon/WhatsApp = încheierea
+contractului; colet refuzat = anulare fără cost; gravură anulabilă gratuit până începe
+gravarea; rambursare prin transfer în IBAN-ul din cererea de retragere (= acordul
+clientului); adresa de retur se trimite pe email; retenții 3 ani / 12 luni / 2 ani /
+termen contabil, ștergere manuală; 18+. (4) Nota „Produsele personalizate (gravate) nu
+beneficiază de dreptul de retragere de 14 zile.” apare la checkout lângă bifa de termeni
+DOAR când coșul are gravură — condiție ca excepția art. 16 lit. c să fie opozabilă.
+(5) Footer fără SOL/ODR (platforma UE închisă în iulie 2025). (6) Banda de cifre de pe
+homepage are doar cifre adevărate și verificabile (10 modele / 100% stejar românesc /
+5–10 zile lucrătoare / granulație 320); au ieșit „1.200+ pe listă”, „8h”, „20+ ani”. „10 modele” e
+scris de mână în `components/numbers-strip-content.ts` — se actualizează când se schimbă
+catalogul. (7) Emailul automat către client și /multumim spun „Am primit comanda” + „te
+sunăm / îți scriem pe WhatsApp ca s-o confirmăm” — aliniate cu Termeni §5 (emailul nu e
+acceptarea comenzii).
+
+**Motiv:** site-ul colectează deja date (comenzi, contact, la-comandă, conturi); a lansa
+fără texte reale e mai riscant decât a lansa cu texte clare, verificate în cod, pe care
+avocatul le rafinează. Tokenii elimină a doua sursă de adevăr pentru datele de registru.
+
+**Alternative respinse:** texte „schiță” cu banner (founder: nu), HTML/Markdown liber în
+content (ar pierde paritatea RO/EN verificată de check:i18n și tokenii), nota de gravură
+mereu vizibilă (zgomot pentru 8 din 10 modele care nu au gravură).

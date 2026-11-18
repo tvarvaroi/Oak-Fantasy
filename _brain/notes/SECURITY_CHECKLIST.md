@@ -3,7 +3,7 @@
 > **Document scop:** Audit complet de securitate înainte de lansare publică  
 > **Status:** Living document, actualizat la fiecare sprint  
 > **Owner:** Theodor + Claude Code (auto-update după task-uri sensibile)  
-> **Ultima actualizare:** 2026-06-23 (Task 4.1 — stock management + out-of-stock visibility, SPRINT 4 start. Zero secret nou. ATENȚIE NOUĂ: `SUPABASE_SERVICE_ROLE_KEY` folosit acum și în `lib/db/products.ts` (fetchStockMap) pentru a citi `inventory` (RLS admin-only) — STRICT server-side (fișier importat doar de Server Components; cheia NU e NEXT_PUBLIC → nu intră în bundle client). Clientul primește DOAR boolean inStock, niciodată numărul exact. adjust_stock = funcție PL/pgSQL SECURITY DEFINER apelată din action care re-aserează admin. PRE-LAUNCH BLOCKERS rămase: Stripe LIVE keys, domeniu oakfantasy.ro în Resend, poze produs 1:1, date firmă LEGAL_INFO env, Supabase Pro no-auto-pause.)
+> **Ultima actualizare:** 2026-11-19 (texte legale finale: blocante noi #12–14 în TL;DR — domeniu Resend, revizuire avocat, env COMPANY_NAME; §10.3.c condiții newsletter; §10.4 SOL scos; §10.5 lista pentru avocat.)
 
 ---
 
@@ -27,6 +27,15 @@
     tranzacționale (cos/cart, checkout, multumim/thank-you, auth) + adaugă
     `sitemap: 'https://oakfantasy.ro/sitemap.xml'`. Fără flip, site-ul lansat
     rămâne INVIZIBIL pentru Google. Sitemap-ul (app/sitemap.ts) e deja construit.
+12. 🚨 **Verificare domeniu în Resend + `RESEND_FROM_EMAIL`** (added 2026-11-19),
+    altfel clientul nu primește emailul promis în Termeni (§5 pas 3: „Primești un
+    email automat că am primit comanda”). În modul sandbox (`onboarding@resend.dev`),
+    `lib/orders/send-order-emails.ts` trimite confirmarea clientului la ADMIN, nu la
+    client. Tratat ca NEVERIFICAT până la confirmarea founder-ului.
+13. 🚨 **Avocatul revizuiește textele legale** (decizie founder 2026-11-19: lansăm cu
+    textele scrise acum, revizuirea vine după lansare) — lista de puncte în §10.5.
+14. ⚠ `NEXT_PUBLIC_COMPANY_NAME` pe Vercel: dacă e setat, suprascrie denumirea din
+    `LEGAL_INFO` — trebuie să fie exact „ROOBO PELLETS S.R.L.” (cu punct final) sau șters.
 
 ---
 
@@ -750,11 +759,92 @@ formularul de pe `/ro/la-comanda` · `/en/custom-orders`.
   politică pentru anon; insert doar prin server action cu service role după
   validare Zod + honeypot + timing + rate limit.
 
+### 10.3.c Newsletter — condiție de reactivare (added 2026-11-19)
+
+Formularul de newsletter e ascuns (`SHOW_WAITLIST = false`); cei 2 abonați din
+`email_subscribers` erau de test (`dev-test-…@example.com`) și au fost ȘTERȘI.
+Politica de confidențialitate spune că nu colectăm adrese pentru newsletter.
+
+**Înainte de a reactiva formularul (toate obligatorii):**
+- [ ] Link de dezabonare funcțional în fiecare email + pagină/endpoint care setează
+      `unsubscribed_at` (coloana există, nimic nu o scrie azi).
+- [ ] Decizie dublă confirmare (double opt-in) + textul de consimțământ lângă câmp.
+- [ ] Inserția trece pe server action (azi e insert direct din browser cu cheia anon).
+- [ ] Secțiune nouă în politica de confidențialitate (date, temei = consimțământ,
+      retenție până la dezabonare) — ACTUALIZATĂ ÎNAINTE de reactivare.
+
 ### 10.4 ANPC requirements
 
 - [ ] Link ANPC pe footer / pagini legale
-- [ ] Logo "SAL" și "SOL" (Soluționare Alternativă a Litigiilor / Soluționare Online) — link European Commission ODR platform
-- [ ] Politică retur conform OUG 34/2014
+- [x] Link SAL în footer (anpc.ro/ce-este-sal/). SOL/ODR SCOS 2026-11-19: platforma UE ODR a fost închisă
+      în iulie 2025 (Reg. (UE) 2024/3228) — linkul ducea spre o pagină moartă.
+- [ ] Pictogramele SAL în formatul cerut de ANPC (acum doar link text) — întrebare pentru avocat, §10.5
+- [x] Politică retur conform OUG 34/2014 — text final 2026-11-19 (+ formular de retragere ca anexă,
+      notă la checkout pentru produsele gravate). Revizuire avocat: §10.5.
+
+---
+
+### 10.5 Lista finală pentru avocat — texte legale (added 2026-11-19)
+
+Decizia founder-ului: site-ul se lansează cu textele din 2026-11-19
+(`components/legal/{terms,privacy,returns}/content.ts`), avocatul le revizuiește
+DUPĂ lansare. Puncte de verificat, cu ce am scris și de ce:
+
+**Retur / consum**
+- [ ] **Rambursare prin transfer la o comandă plătită ramburs.** Art. 13 OUG 34/2014 cere
+      același mijloc de plată, altfel acordul expres al consumatorului. Am scris: clientul
+      indică IBAN-ul în cererea de retragere și „scriind IBAN-ul, ești de acord” (și în
+      formularul-anexă). E suficient ca acord expres?
+- [ ] **Gravura pe un produs din catalog** — intră sigur sub art. 16 lit. c („personalizat
+      clar”)? Nota apare la checkout lângă bifa de termeni doar când coșul are gravură.
+- [ ] **Calculul termenului de 14 zile** (ziua următoare primirii, ultima zi nelucrătoare →
+      următoarea zi lucrătoare, livrări separate → ultimul produs) — formulare corectă?
+- [ ] **Rambursarea livrării la retur parțial**: am scris „costul livrării, dacă returnezi
+      toate produsele din comandă”.
+- [ ] **Diminuarea valorii** (produs folosit la tăiat/spălat) — reținere din rambursare.
+- [ ] **Garanția de conformitate**: trimitere la „garanția legală de conformitate”, 2 ani de
+      la livrare (OUG 140/2021?) — fără număr de act în text; confirmă temeiul și termenul.
+- [ ] **Anulare gratuită** a comenzii gravate „până începem gravura” și a produselor standard
+      „oricând înainte de livrare” — formulare OK?
+- [ ] **Avans la lucrările la comandă**: am scris doar restituirea integrală dacă NOI nu mai
+      putem face lucrarea. Ce se întâmplă cu avansul dacă clientul renunță după începerea
+      lucrului — nescris, de decis.
+
+**Termeni**
+- [ ] **Momentul încheierii contractului** = confirmarea noastră prin telefon/WhatsApp (emailul
+      automat = doar confirmare de primire). Conform Legii 365/2002 + OUG 34/2014 (confirmarea
+      pe suport durabil)?
+- [ ] **Eroarea vădită de preț**: anunțăm la confirmare, clientul alege prețul corect sau
+      renunță.
+- [ ] **Limitarea răspunderii** (§11) — ce e permis față de consumator.
+- [ ] **Forța majoră** — formulare + „dacă situația se prelungește, oricare parte renunță”.
+- [ ] **Instanța competentă**: „instanțele competente din România”, fără a exclude domiciliul
+      consumatorului.
+- [ ] **Termenul maxim de livrare** (30 de zile, dacă nu s-a convenit altfel) — textul spune
+      5–10 zile lucrătoare + 1–3 zile curier și „te anunțăm dacă apare o întârziere”.
+- [ ] **Arhivarea contractului**: „păstrăm comanda și ți-o putem trimite la cerere”.
+- [ ] **Document fiscal**: „primești documentul fiscal aferent comenzii” — de confirmat cu
+      CONTABILUL ce document (factură / bon) și cum ajunge (hârtie / email).
+
+**Confidențialitate**
+- [ ] **Termene de retenție**: comenzi = „termenul contabil legal” (5 sau 10 ani? Legea
+      82/1991); conturi inactive 3 ani; cereri neconcretizate 12 luni; mesaje de contact 2 ani.
+      Toate cu ștergere MANUALĂ (nimic automat în cod).
+- [ ] **Temeiuri**: comandă b+c, cont b, contact f (+b), La comandă b (+c), anti-abuz f,
+      Speed Insights f.
+- [ ] **Fără DPO** — confirmă că nu suntem obligați (art. 37 GDPR).
+- [ ] **Transferuri în afara SEE**: Vercel (funcțiile rulează probabil în SUA — regiunea nu e
+      configurată în repo), Resend (SUA), Google/Gmail, Meta/WhatsApp — DPF / SCC.
+- [ ] **Vercel Speed Insights fără consimțământ** (fără cookie-uri; Legea 506/2004 art. 4).
+- [ ] **localStorage „oak-cart”** tratat ca stocare strict necesară (fără banner).
+- [ ] **Jurnalele Vercel**: IP-ul apare la respingerile anti-spam; retenția e a furnizorului.
+- [ ] **Pagina de mulțumire** `/multumim/<uuid>` arată numele, adresa și telefonul oricui are
+      linkul (UUID = singurul control de acces). Risc acceptabil?
+- [ ] **Minori**: site doar pentru 18+.
+- [ ] **ANSPDCP**: am pus doar site-ul (www.dataprotection.ro), fără adresă poștală.
+
+**ANPC**
+- [ ] Pictogramele SAL (format, dimensiuni) cerute de ANPC — azi e doar un link text în footer.
 
 ---
 

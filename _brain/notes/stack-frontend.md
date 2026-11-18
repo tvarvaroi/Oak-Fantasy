@@ -58,4 +58,4 @@ npm install X --legacy-peer-deps   # obligatoriu flag-ul (R3F)
 
 ## Hosting
 
-Vercel — auto-deploy din `main`. Env: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` în `.env.local` (gitignored) ȘI pe Vercel. (Notă: există și `netlify.toml` + `@netlify/plugin-nextjs` în deps — config Netlify rezidual; sursă de adevăr = Vercel per CLAUDE.md.)
+Vercel — auto-deploy din `main`. Env: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` în `.env.local` (gitignored) ȘI pe Vercel. (Config-ul Netlify rezidual — `netlify.toml` + `@netlify/plugin-nextjs` — a fost șters pe 2026-11-19.)

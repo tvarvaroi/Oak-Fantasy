@@ -292,3 +292,17 @@ components/tocatoare/
 **DB:** `custom_orders` (migrația `20261118090000`), RLS doar admin, fără politică anon.
 
 **Teste:** `tests/e2e/la-comanda.spec.ts` (pagină, validare, linkuri, ancoră, JSON-LD, sitemap, nav 1024/1280 delogat + logat, footer, teaser) · `scripts/smoke-custom-orders.mjs` (flux complet pe DB live, curăță după el).
+
+## Pagini legale — texte finale (2026-11-19)
+
+**Rute:** `app/[locale]/{termeni,confidentialitate,retur}/page.tsx` (EN `/terms`, `/privacy`, `/returns`) — metadata + JSON-LD WebPage + `LegalShell` (Navbar/Footer) + `LegalLayout`.
+
+**Conținut:** `components/legal/{terms,privacy,returns}/content.ts` — `Record<Locale, LegalContent>`; fiecare secțiune = `{ id, title, blocks[] }`. Tipurile + `LEGAL_LAST_UPDATED` în `components/legal/content.ts`.
+- Blocuri: `p`, `list` (ordered), `callout`, `record` (fișă de prelucrare în confidențialitate), `form` (anexa formular de retragere).
+- Tokeni rezolvați în `components/legal/LegalText.tsx`: `{companyName} {cui} {regCom} {hqAddress} {capital} {email} {phone} {hours} {shippingFee} {freeShippingFrom}`, linkuri `[x](route:<RouteKey>)` / `[x](#id)` / `[x](https://…)`, `**bold**`. Token necunoscut = eroare la build.
+
+**Componente:** `LegalLayout` (hero → intro → `LegalToc` → secțiuni → `LegalCompanyInfo`), `LegalSection` (număr + h2 + ancoră), `LegalBlocks`, `LegalToc` (`<details>` fără JS), `LegalHero`, `LegalCompanyInfo`. Șterse: `LegalBanner`, `LegalPlaceholder`, `LegalStatutoryNote`.
+
+**Puncte de legătură:** nota de gravură din checkout (`components/checkout/ReviewStep.tsx`, `data-testid="engraving-withdrawal-notice"` → `/retur#exceptions`), notele de confidențialitate din `ContactForm` și `RegisterForm`, footer (Termeni/Confidențialitate/Retur + ANPC + SAL).
+
+**Teste:** `tests/e2e/legal.spec.ts` (structură, fără „în pregătire”/tokeni nerezolvați, cuprins = secțiuni, faptele de la gate, linkuri footer/contact/înregistrare) + `checkout.spec.ts` (nota de gravură RO/EN, absentă fără gravură).

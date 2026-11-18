@@ -1153,3 +1153,52 @@ trimite NULL (nu folosește DEFAULT-ul). **Fix:** aceleași chei pe toate rându
 **Simptom:** `ERR_MODULE_NOT_FOUND '@playwright/test'` pentru un `.mjs` în afara repo-ului.
 **Fix:** script `.cjs` + `NODE_PATH=<repo>/node_modules` (CommonJS respectă NODE_PATH, ESM
 nu) + `MSYS_NO_PATHCONV=1` pentru argumente care încep cu `/` (gotcha 2026-10-15).
+
+## 2026-11-19 — Markup inline: `**{companyName}**` rămânea literal
+
+**Simptom:** pe /termeni și /confidentialitate apărea textul „{companyName}” îngroșat.
+**Cauză:** în `renderLegalInline` (components/legal/LegalText.tsx) regex-ul de split prinde
+întâi `**…**` ca un singur fragment, iar ramura bold afișa conținutul ca text simplu.
+**Fix:** ramura bold apelează recursiv `renderLegalInline` pe conținut. Prins de testul
+e2e care caută `\{[a-zA-Z]+\}` în textul paginii — păstrează-l pentru orice renderer de tokeni.
+
+## 2026-11-19 — NumbersStrip: `lg:contents` face din separatoare celule de grid
+
+**Simptom:** pe desktop, banda de cifre avea 2 cifre pe rând și jumătatea dreaptă goală.
+**Cauză:** fiecare cifră e într-un wrapper `flex lg:contents` împreună cu separatorul
+vertical; de la lg wrapper-ul dispare, deci separatoarele devin elemente de grid:
+4 cifre + 3 separatoare = 7 elemente într-un `grid-cols-4`. Sub lg, cifrele (copii ai unui
+flex) nu se întindeau → aliniate la stânga pe mobil.
+**Fix:** `lg:grid-cols-[minmax(0,1fr)_1px_…]` (7 piste) + `flex-1` pe cifră. Dacă schimbi
+numărul de cifre, schimbi și șablonul.
+
+## 2026-11-19 — `node -e "…"` în Bash: backtick-urile din text devin command substitution
+
+**Simptom:** în SECURITY_CHECKLIST au apărut paranteze goale „()” și erori
+`command not found` — tot ce era între backtick-uri a dispărut. **Cauză:** scriptul era în
+ghilimele duble bash, iar `\\`` a ajuns ca backtick neescapat → bash l-a executat.
+**Fix:** text cu backtick-uri (markdown) se scrie cu Write/Edit sau cu heredoc cu delimitator
+între ghilimele simple (`<<'EOF'`), niciodată prin `node -e "…"`.
+
+## 2026-11-19 — `next start` local: Speed Insights dă 404 + eroare de MIME în consolă
+
+**Simptom:** testul „GET /ro … no console errors” pica pe mobil/tabletă doar pe build-ul de
+producție local. **Cauză:** `/_vercel/speed-insights/script.js` există doar pe Vercel.
+**Fix:** suita e2e rulează pe serverul de dev (config Playwright); pe `next start` local
+filtrează mesajele `speed-insights`/404 când numeri erorile de consolă.
+
+## 2026-11-19 — Captură imediat după `scrollIntoViewIfNeeded` = navbar transparent (fals)
+
+**Simptom:** în capturile design-qa navbar-ul apărea fără fundal peste text. **Cauză:**
+starea „scrolled” se setează pe evenimentul de scroll; captura fără așteptare prinde
+tranziția. Verificat cu `mouse.wheel` + 1,5 s: fundal `rgb(245,235,216)`. Nu e bug.
+
+## 2026-11-19 — `git rm` devreme + commituri pe fișiere = ștergerile intră în PRIMUL commit
+
+**Simptom:** commitul „fix(legal-info)” conținea și ștergerea a 3 componente legale și a
+`netlify.toml`. **Cauză:** `git rm` pune ștergerea direct în index; `git add <fișiere>` +
+`git commit` trimite TOT indexul, nu doar fișierele adăugate. **Fix:** rebase neinteractiv
+(`GIT_SEQUENCE_EDITOR="sed -i 's/^pick X/edit X/'" git rebase -i <bază>`), la oprire
+`git restore --source=HEAD^ --staged --worktree <căi>` + `commit --amend`, apoi `git rm` în
+commitul corect. Prevenție: șterge cu `rm` simplu și pune ștergerea în index abia la commitul
+ei — sau verifică `git diff --cached --stat` înainte de fiecare commit.
