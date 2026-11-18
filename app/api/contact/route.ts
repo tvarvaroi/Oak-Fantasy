@@ -85,7 +85,7 @@ export async function POST(request: Request) {
   // simulate success so the bot doesn't learn it was rejected, but skip
   // all real work.
   if (data.website && data.website.length > 0) {
-    console.warn(`[contact] honeypot triggered ip=${ip} name=${data.name}`);
+    console.warn(`[contact] honeypot triggered ip=${ip}`);
     return json({ success: true });
   }
 
@@ -133,7 +133,6 @@ export async function POST(request: Request) {
         message: data.message,
         locale: data.locale,
         submittedAt,
-        ip,
         testMode: isTestMode,
       }),
     });
@@ -183,7 +182,7 @@ export async function POST(request: Request) {
     }
   } else {
     console.warn(
-      `[contact] TEST MODE: auto-reply to ${data.email} skipped. Pre-launch: setup ${LEGAL_INFO.brandDomain} domain in Resend.`,
+      `[contact] TEST MODE: auto-reply skipped. Pre-launch: setup ${LEGAL_INFO.brandDomain} domain in Resend.`,
     );
   }
 

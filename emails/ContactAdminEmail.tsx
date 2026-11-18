@@ -25,7 +25,6 @@ export interface ContactAdminEmailProps {
   message: string;
   locale: 'ro' | 'en';
   submittedAt: string;
-  ip: string;
   // When true (Resend in test-mode i.e. no verified domain), the API route
   // could not send the auto-reply to the user. The admin email surfaces a
   // warning banner so the founder knows to reply manually.
@@ -62,7 +61,6 @@ export default function ContactAdminEmail({
   message,
   locale,
   submittedAt,
-  ip,
   testMode = false,
 }: ContactAdminEmailProps) {
   const subjectLabel = SUBJECT_LABELS[locale][subject];
@@ -159,7 +157,6 @@ export default function ContactAdminEmail({
             {phone ? <FieldRow label="Telefon" value={phone} /> : null}
             <FieldRow label="Subiect" value={subjectLabel} />
             <FieldRow label="Locale" value={locale.toUpperCase()} />
-            <FieldRow label="IP" value={ip} />
             <FieldRow label="Trimis" value={submittedAt} />
           </Section>
 
