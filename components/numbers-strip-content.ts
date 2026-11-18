@@ -15,25 +15,33 @@ export interface NumbersStripContent {
   stats: Stat[];
 }
 
+// Every figure here must be TRUE and checkable (founder rule 2026-11-19):
+//   10      → active products in the catalogue (DB: products.status='active')
+//   100%    → Romanian oak — founder-stated origin, same claim as Hero/About
+//   5–10    → working days to make an order (founder fact; Terms §4/§7)
+//   320     → final sanding grit, 80 → 320 (the /atelier process copy)
+// Removed 2026-11-19: '1.200+ pe listă' (2 test rows in the DB, false),
+// '8h per tocător' (catalogue range is 1–15 h) and '20+ ani' (no source).
+// A stat with from === to renders static (no count-up), e.g. the 5–10 range.
 export const numbersStripContent: Record<Locale, NumbersStripContent> = {
   ro: {
     ariaLabel: 'Cifre',
     numberLocale: 'ro-RO',
     stats: [
-      { from: 0, to: 1200, prefix: '', suffix: '+',     label: 'pe listă',         caption: 'Persoane care așteaptă' },
-      { from: 0, to: 100,  prefix: '', suffix: '%',     label: 'stejar românesc',  caption: 'Material provenit local' },
-      { from: 0, to: 8,    prefix: '', suffix: 'h',     label: 'per tocător',      caption: 'Ore de lucru manual' },
-      { from: 0, to: 20,   prefix: '', suffix: '+ ani', label: 'de meșteșug',      caption: 'Experiență în atelier' },
+      { from: 0,  to: 10,  prefix: '',   suffix: '',  label: 'modele',            caption: 'În catalogul nostru' },
+      { from: 0,  to: 100, prefix: '',   suffix: '%', label: 'stejar românesc',   caption: 'Material provenit local' },
+      { from: 10, to: 10,  prefix: '5–', suffix: '',  label: 'zile lucrătoare',   caption: 'Cât lucrăm o comandă' },
+      { from: 0,  to: 320, prefix: '',   suffix: '',  label: 'granulație finală', caption: 'Șlefuit de la 80 la 320' },
     ],
   },
   en: {
     ariaLabel: 'Numbers',
     numberLocale: 'en-US',
     stats: [
-      { from: 0, to: 1200, prefix: '', suffix: '+',       label: 'on the list',  caption: 'People waiting' },
-      { from: 0, to: 100,  prefix: '', suffix: '%',       label: 'Romanian oak', caption: 'Locally sourced material' },
-      { from: 0, to: 8,    prefix: '', suffix: 'h',       label: 'per board',    caption: 'Hours of handwork' },
-      { from: 0, to: 20,   prefix: '', suffix: '+ years', label: 'of craft',     caption: 'Workshop experience' },
+      { from: 0,  to: 10,  prefix: '',   suffix: '',  label: 'models',          caption: 'In our catalogue' },
+      { from: 0,  to: 100, prefix: '',   suffix: '%', label: 'Romanian oak',    caption: 'Locally sourced material' },
+      { from: 10, to: 10,  prefix: '5–', suffix: '',  label: 'business days',   caption: 'To make an order' },
+      { from: 0,  to: 320, prefix: '',   suffix: '',  label: 'final grit',      caption: 'Sanded from 80 to 320' },
     ],
   },
 };

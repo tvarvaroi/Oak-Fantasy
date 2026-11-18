@@ -87,6 +87,7 @@ function VerticalDivider() {
 export default function NumbersStrip({ language }: { language: Locale }) {
   const ref = useRef<HTMLElement>(null);
   const [play, setPlay] = useState(false);
+  const prefersReduced = useReducedMotion();
   const { ariaLabel, numberLocale, stats } = numbersStripContent[language];
 
   useEffect(() => {
@@ -129,15 +130,19 @@ export default function NumbersStrip({ language }: { language: Locale }) {
         className="mx-auto"
         style={{ maxWidth: 1200, padding: '80px 32px' }}
       >
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0 lg:gap-0">
+        {/* From lg each item wrapper is display:contents, so the dividers are
+            grid items too: 4 stats + 3 dividers = 7 tracks. A plain
+            grid-cols-4 put two stats per row with the right half empty
+            (fixed 2026-11-19). Keep in step with the stat count. */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_1px_minmax(0,1fr)_1px_minmax(0,1fr)_1px_minmax(0,1fr)] gap-0">
           {stats.map((stat, i) => (
             <div key={stat.label} className="flex lg:contents">
               {/* vertical divider before each item except first */}
               {i > 0 && <VerticalDivider />}
 
               <motion.div
-                className="flex flex-col items-center text-center px-6 py-10 lg:py-8 gap-3 relative"
-                initial={{ opacity: 0, y: 20 }}
+                className="flex-1 flex flex-col items-center text-center px-6 py-10 lg:py-8 gap-3 relative"
+                initial={prefersReduced ? false : { opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-40px' }}
                 transition={{
@@ -146,10 +151,10 @@ export default function NumbersStrip({ language }: { language: Locale }) {
                   ease: [0.16, 1, 0.3, 1],
                 }}
               >
-                {/* mobile divider between rows */}
+                {/* divider between rows: 1 column below sm (above items 2–4), 2 columns sm–lg (above the second row only) */}
                 {i > 0 && (
                   <div
-                    className="block lg:hidden absolute top-0 left-1/2 -translate-x-1/2"
+                    className={`${i === 1 ? 'block sm:hidden' : 'block lg:hidden'} absolute top-0 left-1/2 -translate-x-1/2`}
                     style={{
                       width: 40,
                       height: 1,
