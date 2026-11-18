@@ -13,7 +13,7 @@ export const LEGAL_INFO = {
   // ca default (decizie founder 2026-07-15: fără dependență de env). Env vars
   // rămân ca override OPȚIONAL — mecanismul hasPlaceholder() rămâne sănătos:
   // un env setat greșit pe un „[TOKEN]" tot ascunde rândul, nu afișează junk.
-  companyName: process.env.NEXT_PUBLIC_COMPANY_NAME ?? 'ROOBO PELLETS S.R.L',
+  companyName: process.env.NEXT_PUBLIC_COMPANY_NAME ?? 'ROOBO PELLETS S.R.L.',
   cui: process.env.NEXT_PUBLIC_COMPANY_CUI ?? '39549528',
   regCom: process.env.NEXT_PUBLIC_COMPANY_REG_COM ?? 'J2018001030021',
   capitalSocial: process.env.NEXT_PUBLIC_COMPANY_CAPITAL ?? '200 RON',
@@ -58,7 +58,6 @@ export const LEGAL_INFO = {
 
   // External regulatory links (no placeholder needed — public URLs).
   anpcUrl: 'https://anpc.ro',
-  odrEuUrl: 'https://ec.europa.eu/consumers/odr',
 } as const;
 
 // True before launch — used to render a discreet placeholder banner in
