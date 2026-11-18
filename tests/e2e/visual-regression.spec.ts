@@ -41,7 +41,9 @@ test.describe('Visual regression', () => {
     test(`${name} screenshot matches baseline`, async ({ page }) => {
       // 2026-10-15: the CraftVideoTease slideshow freezes on its first frame
       // when `navigator.webdriver` is true (Playwright sets it), so captures
-      // are deterministic without any stub here.
+      // are deterministic without any stub here. (Hidden on the homepage
+      // since 2026-11-18 — SHOW_CRAFT_VIEW; the freeze matters again if it
+      // comes back.)
       await page.goto(path);
       await page.waitForLoadState('networkidle');
       // Atelier has 10 Reveal sections — fullPage screenshot scrolls during

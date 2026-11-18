@@ -269,7 +269,9 @@ test.describe('"La comandă" in navigation (2026-11-18)', () => {
 });
 
 test.describe('Homepage teaser (2026-11-18)', () => {
-  test('sits between the product tease and the numbers strip, links to the page', async ({ page }) => {
+  // 2026-11-18: last band before the Footer (moved after NumbersStrip when
+  // CraftVideoTease was hidden — keeps a light band between the two darks).
+  test('sits between the numbers strip and the footer, links to the page', async ({ page }) => {
     await page.goto('/ro');
     const tease = page.getByTestId('custom-order-tease');
     await expect(tease).toBeVisible();
@@ -282,8 +284,8 @@ test.describe('Homepage teaser (2026-11-18)', () => {
         next: t?.nextElementSibling?.getAttribute('aria-label'),
       };
     });
-    expect(order.prev).toBe('Produsele noastre');
-    expect(order.next).toBeTruthy();
+    expect(order.prev).toBe('Cifre');
+    expect(order.next).toBe('Footer');
   });
 
   test('EN teaser links to /en/custom-orders', async ({ page }) => {

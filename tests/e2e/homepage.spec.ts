@@ -40,6 +40,21 @@ test.describe('Homepage — /ro + /en', () => {
     expect(text).not.toMatch(/[ăâîșțĂÂÎȘȚ]/);
   });
 
+  // 2026-11-18: CraftVideoTease is hidden (SHOW_CRAFT_VIEW = false) until we
+  // have our own workshop photos — neither the section nor its stock stills
+  // may reach the homepage in either locale.
+  for (const { path, label } of [
+    { path: '/ro', label: 'Vedere din atelier' },
+    { path: '/en', label: 'Workshop view' },
+  ]) {
+    test(`${path}: the workshop-view slideshow is hidden`, async ({ page }) => {
+      await page.goto(path);
+      await expect(page.locator('footer')).toBeVisible();
+      await expect(page.locator(`section[aria-label="${label}"]`)).toHaveCount(0);
+      await expect(page.locator('img[src*="atelier-tool-planer"]')).toHaveCount(0);
+    });
+  }
+
   test('Language toggle from /ro navigates to /en', async ({ page }) => {
     await page.goto('/ro');
     // Below lg the toggle lives inside the hamburger drawer (2026-07-03).

@@ -32,8 +32,8 @@ export default function LocalePage() {
       <StoryStrip language={language} />
       <WorkshopSection language={language} />
       <ProductTease language={language} />
-      <CustomOrderTease language={language} />
       <NumbersStrip language={language} />
+      <CustomOrderTease language={language} />
       <CraftVideoTease language={language} />
       <WaitlistSection language={language} />
       <Footer language={language} />

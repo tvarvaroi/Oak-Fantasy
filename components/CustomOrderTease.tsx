@@ -6,10 +6,11 @@ import { localizedPath, type Locale } from '@/lib/i18n-routes';
 import { CUSTOM_ORDER_CONTENT } from '@/components/la-comanda/content';
 import styles from '@/components/la-comanda/la-comanda.module.css';
 
-// Homepage teaser for /la-comanda (2026-11-18). Sits between ProductTease
-// (bark) and NumbersStrip (forest): "you've seen the shop; if it isn't there,
-// we make it" — and a light paper band breaks the two dark sections. Links to
-// the page (which explains the flow), not straight to the form.
+// Homepage teaser for /la-comanda (2026-11-18). Last band before the Footer,
+// after NumbersStrip (forest): "you've seen the shop; if it isn't there, we
+// make it". Moved here when CraftVideoTease was hidden, so a light paper band
+// still separates the dark NumbersStrip from the bark Footer. Links to the
+// page (which explains the flow), not straight to the form.
 
 export default function CustomOrderTease({ language }: { language: Locale }) {
   const copy = CUSTOM_ORDER_CONTENT[language].teaser;

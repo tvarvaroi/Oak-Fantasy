@@ -160,6 +160,12 @@ function TwigDivider({ drawn }: { drawn: boolean }) {
 
 /* ─── Section ────────────────────────────────────────────────────── */
 
+// 2026-11-18: hidden on the homepage until we have our own workshop photos /
+// video — the slideshow runs on Pexels stock stills. Same pattern as
+// WaitlistSection: code and /public/stock images stay in the repo; flip to
+// `true` to bring the section back.
+const SHOW_CRAFT_VIEW = false;
+
 export default function CraftVideoTease({ language }: { language: 'ro' | 'en' }) {
   const sectionRef = useRef<HTMLElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
@@ -193,6 +199,9 @@ export default function CraftVideoTease({ language }: { language: 'ro' | 'en' })
     }, SLIDE_MS);
     return () => window.clearInterval(id);
   }, [inView, prefersReduced]);
+
+  // Hooks above run unconditionally; the early return keeps React happy.
+  if (!SHOW_CRAFT_VIEW) return null;
 
   const copy = {
     ro: {
