@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -152,6 +153,18 @@ export default function RegisterForm({
       </div>
 
       <ServerError message={serverError} />
+
+      <p className="font-lora" style={{ fontSize: '0.82rem', lineHeight: 1.6, color: 'var(--ink-soft)' }} data-testid="register-legal-note">
+        {copy.legal.prefix}{' '}
+        <Link href={localizedPath('terms', locale)} style={{ color: 'var(--oak-warm)', textDecoration: 'underline' }}>
+          {copy.legal.terms}
+        </Link>
+        {copy.legal.middle}{' '}
+        <Link href={localizedPath('privacy', locale)} style={{ color: 'var(--oak-warm)', textDecoration: 'underline' }}>
+          {copy.legal.privacy}
+        </Link>
+        .
+      </p>
 
       <SubmitButton loading={isSubmitting} label={copy.submit} loadingLabel={copy.submitting} />
 

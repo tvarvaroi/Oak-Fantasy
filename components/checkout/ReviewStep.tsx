@@ -34,6 +34,7 @@ export default function ReviewStep({
   const total = subtotalBani + ship;
   const d = watch();
   const paymentLabel = d.paymentMethod === 'stripe_card' ? c.cardLabel : c.codLabel;
+  const hasEngraving = items.some((item) => Boolean(item.engraving?.text));
 
   const rowStyle: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', alignItems: 'center' };
 
@@ -155,6 +156,54 @@ export default function ReviewStep({
           </span>
         </label>
         <FieldError message={errors.termsAccepted?.message} />
+
+        {/* OUG 34/2014 art. 16 lit. c: engraved goods have no right of
+            withdrawal, but only if the customer is told before ordering —
+            so the notice sits right next to the checkbox, and only when the
+            cart actually holds an engraved line. */}
+        {hasEngraving ? (
+          <p
+            className="font-lora"
+            role="note"
+            data-testid="engraving-withdrawal-notice"
+            style={{
+              marginTop: 12,
+              padding: '10px 14px',
+              borderLeft: '3px solid var(--copper)',
+              backgroundColor: 'rgba(184,115,51,0.08)',
+              borderRadius: '0 6px 6px 0',
+              color: 'var(--ink)',
+              fontSize: '0.86rem',
+              lineHeight: 1.55,
+            }}
+          >
+            {c.engravingNotice}{' '}
+            <Link
+              href={`${localizedPath('returns', locale)}#exceptions`}
+              target="_blank"
+              style={{ color: 'var(--oak-warm)', textDecoration: 'underline', textUnderlineOffset: 3 }}
+            >
+              {c.engravingNoticeLink}
+            </Link>
+            .
+          </p>
+        ) : null}
+
+        <p
+          className="font-lora"
+          data-testid="checkout-privacy-note"
+          style={{ marginTop: 10, color: 'var(--ink-soft)', fontSize: '0.8rem', lineHeight: 1.55 }}
+        >
+          {c.privacyPrefix}{' '}
+          <Link
+            href={localizedPath('privacy', locale)}
+            target="_blank"
+            style={{ color: 'var(--oak-warm)', textDecoration: 'underline', textUnderlineOffset: 3 }}
+          >
+            {c.privacyLink}
+          </Link>
+          .
+        </p>
       </div>
     </div>
   );

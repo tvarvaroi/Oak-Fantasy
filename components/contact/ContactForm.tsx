@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion, useReducedMotion } from 'framer-motion';
@@ -12,7 +13,7 @@ import {
   type ContactSubject,
   contactFormSchema,
 } from '@/lib/schemas/contact';
-import type { Locale } from '@/lib/i18n-routes';
+import { localizedPath, type Locale } from '@/lib/i18n-routes';
 
 import type { ContactCopy } from './content';
 
@@ -399,6 +400,14 @@ export default function ContactForm({ copy, locale }: ContactFormProps) {
             {serverError}
           </p>
         ) : null}
+
+        <p className="font-lora" style={{ margin: 0, fontSize: '0.84rem', lineHeight: 1.6, color: 'var(--ink-soft)' }} data-testid="contact-privacy-note">
+          {copy.privacy.text}{' '}
+          <Link href={localizedPath('privacy', locale)} style={{ color: 'var(--oak-warm)', textDecoration: 'underline', textUnderlineOffset: 3 }}>
+            {copy.privacy.link}
+          </Link>
+          .
+        </p>
 
         <div className="flex justify-end pt-1">
           <button

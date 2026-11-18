@@ -50,6 +50,13 @@ export interface CheckoutContent {
   total: string;
   termsPrefix: string;
   termsLink: string;
+  /** Shown next to the terms checkbox only when the cart holds an engraved item
+   *  (OUG 34/2014 art. 16 lit. c — the exception is valid only if announced). */
+  engravingNotice: string;
+  engravingNoticeLink: string;
+  /** Information notice (GDPR art. 13) under the terms checkbox. */
+  privacyPrefix: string;
+  privacyLink: string;
   placeOrder: string;
   placeOrderComingSoon: string;
   placing: string;
@@ -92,8 +99,8 @@ export const CHECKOUT_CONTENT: Record<Locale, CheckoutContent> = {
     codNote: 'Plătești curierului la primire.',
     shippingCostLabel: 'Transport',
     freeShipping: 'Gratuit',
-    freeShippingHint: 'Transport gratuit peste 500 RON.',
-    leadTime: 'Livrare estimată în 5–10 zile lucrătoare.',
+    freeShippingHint: 'Transport gratuit de la 500 RON.',
+    leadTime: 'Lucrăm comanda în 5–10 zile lucrătoare, apoi curierul o livrează de regulă în 1–3 zile lucrătoare.',
 
     reviewHeading: 'Rezumat comandă',
     shippingToLabel: 'Livrare către',
@@ -104,6 +111,10 @@ export const CHECKOUT_CONTENT: Record<Locale, CheckoutContent> = {
     total: 'Total',
     termsPrefix: 'Sunt de acord cu',
     termsLink: 'termenii și condițiile',
+    engravingNotice: 'Produsele personalizate (gravate) nu beneficiază de dreptul de retragere de 14 zile.',
+    engravingNoticeLink: 'Detalii în politica de retur',
+    privacyPrefix: 'Folosim datele tale doar pentru comandă și livrare. Detalii în',
+    privacyLink: 'politica de confidențialitate',
     placeOrder: 'Plasează comanda',
     placeOrderComingSoon: 'Plata vine în curând — o activăm în pasul următor.',
     placing: 'Se procesează…',
@@ -149,8 +160,8 @@ export const CHECKOUT_CONTENT: Record<Locale, CheckoutContent> = {
     codNote: 'Pay the courier on arrival.',
     shippingCostLabel: 'Shipping',
     freeShipping: 'Free',
-    freeShippingHint: 'Free shipping over 500 RON.',
-    leadTime: 'Estimated delivery in 5–10 business days.',
+    freeShippingHint: 'Free shipping from 500 RON.',
+    leadTime: 'We make your order in 5–10 business days; the courier then usually delivers it in 1–3 business days.',
 
     reviewHeading: 'Order summary',
     shippingToLabel: 'Shipping to',
@@ -161,6 +172,10 @@ export const CHECKOUT_CONTENT: Record<Locale, CheckoutContent> = {
     total: 'Total',
     termsPrefix: 'I agree to the',
     termsLink: 'terms and conditions',
+    engravingNotice: 'Personalised (engraved) products are not covered by the 14-day right of withdrawal.',
+    engravingNoticeLink: 'Details in our returns policy',
+    privacyPrefix: 'We use your details only for your order and its delivery. More in our',
+    privacyLink: 'privacy policy',
     placeOrder: 'Place order',
     placeOrderComingSoon: 'Payment is coming soon — we enable it in the next step.',
     placing: 'Processing…',

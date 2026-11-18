@@ -32,6 +32,8 @@ export interface ContactCopy {
       // Template with literal `{minutes}` placeholder + plural forms.
       errorRateTemplate: { one: string; many: string };
     };
+    // Information notice under the form (GDPR art. 13), links to /confidentialitate.
+    privacy: { text: string; link: string };
   };
   info: {
     sectionLabel: string;
@@ -90,6 +92,10 @@ export const CONTACT_CONTENT: Record<Locale, ContactCopy> = {
           many: 'Ai trimis mai multe mesaje recent. Încearcă din nou peste {minutes} minute.',
         },
       },
+      privacy: {
+        text: 'Folosim datele tale doar ca să-ți răspundem. Detalii în',
+        link: 'politica de confidențialitate',
+      },
     },
     info: {
       sectionLabel: 'Direct la atelier',
@@ -146,6 +152,10 @@ export const CONTACT_CONTENT: Record<Locale, ContactCopy> = {
           one: "You've sent a few messages recently. Try again in {minutes} minute.",
           many: "You've sent a few messages recently. Try again in {minutes} minutes.",
         },
+      },
+      privacy: {
+        text: 'We use your details only to reply to you. More in our',
+        link: 'privacy policy',
       },
     },
     info: {

@@ -39,6 +39,8 @@ export interface AuthContent {
     submitting: string;
     haveAccount: string;
     loginLink: string;
+    // Notice above the submit button: terms accepted on sign-up + privacy link.
+    legal: { prefix: string; terms: string; middle: string; privacy: string };
   };
   forgot: AuthPageCopy & {
     emailLabel: string;
@@ -107,6 +109,12 @@ export const AUTH_CONTENT: Record<Locale, AuthContent> = {
       submitting: 'Se creează…',
       haveAccount: 'Ai deja cont?',
       loginLink: 'Conectează-te',
+      legal: {
+        prefix: 'Creând contul, ești de acord cu',
+        terms: 'termenii și condițiile',
+        middle: '. Cum folosim datele tale scrie în',
+        privacy: 'politica de confidențialitate',
+      },
     },
     forgot: {
       meta: { title: 'Recuperare parolă — Oak Fantasy', description: 'Resetează-ți parola Oak Fantasy.' },
@@ -180,6 +188,12 @@ export const AUTH_CONTENT: Record<Locale, AuthContent> = {
       submitting: 'Creating…',
       haveAccount: 'Already have an account?',
       loginLink: 'Sign in',
+      legal: {
+        prefix: 'By creating an account you agree to the',
+        terms: 'terms and conditions',
+        middle: '. How we use your data is explained in our',
+        privacy: 'privacy policy',
+      },
     },
     forgot: {
       meta: { title: 'Reset password — Oak Fantasy', description: 'Reset your Oak Fantasy password.' },
