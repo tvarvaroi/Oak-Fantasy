@@ -153,8 +153,8 @@ export async function sendOrderEmails(orderId: string): Promise<void> {
     } else {
       const subject =
         locale === 'ro'
-          ? `Confirmare comandă ${order.order_number} — ${LEGAL_INFO.brandName}`
-          : `Order confirmation ${order.order_number} — ${LEGAL_INFO.brandName}`;
+          ? `Am primit comanda ${order.order_number} — ${LEGAL_INFO.brandName}`
+          : `Order received ${order.order_number} — ${LEGAL_INFO.brandName}`;
       try {
         const clientRes = await resend.emails.send({
           from,
@@ -184,7 +184,7 @@ export async function sendOrderEmails(orderId: string): Promise<void> {
       }
       if (isTestMode) {
         console.warn(
-          `[order-emails] TEST MODE: client confirmation for ${order.order_number} redirected to founder (would be ${intendedRecipient}). Pre-launch: verify ${LEGAL_INFO.brandDomain} in Resend.`,
+          `[order-emails] TEST MODE: client confirmation for ${order.order_number} redirected to founder. Pre-launch: verify ${LEGAL_INFO.brandDomain} in Resend.`,
         );
       }
     }

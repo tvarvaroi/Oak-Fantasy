@@ -18,7 +18,7 @@ export interface OrderConfirmContent {
 export const ORDER_CONFIRM_CONTENT: Record<Locale, OrderConfirmContent> = {
   ro: {
     title: 'Mulțumim pentru comandă!',
-    intro: 'Am primit comanda ta și o pregătim cu drag.',
+    intro: 'Am primit comanda ta. Te sunăm sau îți scriem pe WhatsApp, la numărul din comandă, ca s-o confirmăm.',
     orderNumberLabel: 'Număr comandă',
     statusPaid: 'Plata a fost confirmată.',
     statusPendingPayment: 'Confirmăm plata — vei primi un email când e gata.',
@@ -32,7 +32,7 @@ export const ORDER_CONFIRM_CONTENT: Record<Locale, OrderConfirmContent> = {
   },
   en: {
     title: 'Thank you for your order!',
-    intro: 'We have received your order and are preparing it with care.',
+    intro: 'We have received your order. We will call you or message you on WhatsApp, at the number in the order, to confirm it.',
     orderNumberLabel: 'Order number',
     statusPaid: 'Your payment is confirmed.',
     statusPendingPayment: "We're confirming your payment — you'll get an email shortly.",
