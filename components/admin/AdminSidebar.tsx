@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Package, Users, UserCog, ShoppingBag } from 'lucide-react';
+import { LayoutDashboard, Package, Users, UserCog, ShoppingBag, Hammer } from 'lucide-react';
 
 // Left navigation for the admin shell. Client component because the active
 // state depends on the current pathname. Items whose tools don't exist yet
@@ -22,23 +22,49 @@ const NAV: NavItem[] = [
   { label: 'Abonați', href: '/admin/subscribers', icon: Users, enabled: true },
   { label: 'Profil', href: '/admin/profile', icon: UserCog, enabled: true },
   { label: 'Comenzi', href: '/admin/comenzi', icon: ShoppingBag, enabled: true },
+  // 2026-11-18: requests from the /la-comanda form — separate from checkout orders.
+  { label: 'Comenzi custom', href: '/admin/comenzi-custom', icon: Hammer, enabled: true },
 ];
+
+// Badge per nav item: count + accessible label + test id. Both badges count
+// work waiting on the founder (Comenzi: pending_cod; Comenzi custom: "new").
+type BadgeSpec = { count: number; label: (n: number) => string; testId: string };
 
 function isActive(pathname: string, href: string): boolean {
   if (href === '/admin') return pathname === '/admin';
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export default function AdminSidebar({ ordersToConfirm = 0 }: { ordersToConfirm?: number }) {
+export default function AdminSidebar({
+  ordersToConfirm = 0,
+  customOrdersNew = 0,
+}: {
+  ordersToConfirm?: number;
+  customOrdersNew?: number;
+}) {
   const pathname = usePathname();
+
+  const badges: Record<string, BadgeSpec> = {
+    '/admin/comenzi': {
+      count: ordersToConfirm,
+      label: (n) => `${n} ${n === 1 ? 'comandă nouă de confirmat' : 'comenzi noi de confirmat'}`,
+      testId: 'orders-to-confirm-badge',
+    },
+    '/admin/comenzi-custom': {
+      count: customOrdersNew,
+      label: (n) => `${n} ${n === 1 ? 'cerere custom nouă' : 'cereri custom noi'}`,
+      testId: 'custom-orders-new-badge',
+    },
+  };
 
   return (
     <nav className="flex flex-col gap-1" aria-label="Navigare administrare">
       {NAV.map((item) => {
         const Icon = item.icon;
         const active = item.enabled && isActive(pathname, item.href);
-        // "Comenzi" badge (2026-10-15): orders waiting for confirmation.
-        const badge = item.href === '/admin/comenzi' && ordersToConfirm > 0 ? ordersToConfirm : 0;
+        // Badges: "Comenzi" (2026-10-15) and "Comenzi custom" (2026-11-18).
+        const spec = badges[item.href];
+        const badge = spec && spec.count > 0 ? spec.count : 0;
 
         const inner = (
           <>
@@ -49,8 +75,8 @@ export default function AdminSidebar({ ordersToConfirm = 0 }: { ordersToConfirm?
             {badge ? (
               <span
                 className="font-caudex ml-auto"
-                aria-label={`${badge} ${badge === 1 ? 'comandă nouă de confirmat' : 'comenzi noi de confirmat'}`}
-                data-testid="orders-to-confirm-badge"
+                aria-label={spec.label(badge)}
+                data-testid={spec.testId}
                 style={{
                   minWidth: 22,
                   height: 22,

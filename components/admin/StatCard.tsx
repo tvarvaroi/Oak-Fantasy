@@ -1,15 +1,20 @@
-// Dashboard stat card (Task 2.7). Server component — pure display.
+import Link from 'next/link';
+
+// Dashboard stat card (Task 2.7). Server component — pure display. With
+// `href` (2026-11-18) the whole card links to the matching admin list.
 
 export default function StatCard({
   label,
   value,
   sub,
+  href,
 }: {
   label: string;
   value: string | number;
   sub?: string;
+  href?: string;
 }) {
-  return (
+  const card = (
     <div
       style={{
         backgroundColor: 'var(--paper-aged)',
@@ -37,5 +42,12 @@ export default function StatCard({
         </span>
       ) : null}
     </div>
+  );
+
+  if (!href) return card;
+  return (
+    <Link href={href} className="block rounded-[10px] transition-opacity hover:opacity-80">
+      {card}
+    </Link>
   );
 }

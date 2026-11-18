@@ -5,6 +5,7 @@
 
 import { getServerSupabase } from '@/lib/supabase-server';
 import { NEW_ORDER_STATUS } from '@/lib/orders/status';
+import { NEW_CUSTOM_ORDER_STATUS } from '@/lib/schemas/custom-order';
 
 export interface MonthlyPoint {
   label: string;
@@ -15,6 +16,7 @@ export interface DashboardStats {
   products: { total: number; active: number; draft: number; archived: number; withoutImage: number };
   subscribers: { total: number; active: number };
   orders: { total: number; toConfirm: number };
+  customOrders: { new: number };
   subscribersByMonth: MonthlyPoint[];
 }
 
@@ -43,13 +45,24 @@ function buildLast6Months(dates: (string | null)[]): MonthlyPoint[] {
 export async function fetchDashboardStats(): Promise<DashboardStats> {
   const sb = getServerSupabase();
 
-  const [{ data: products }, { data: subs }, { count: ordersCount }, { count: toConfirmCount }] =
-    await Promise.all([
+  const [
+    { data: products },
+    { data: subs },
+    { count: ordersCount },
+    { count: toConfirmCount },
+    { count: customNewCount },
+  ] = await Promise.all([
       sb.from('products').select('status, hero_image_url'),
       sb.from('email_subscribers').select('created_at, unsubscribed_at'),
       sb.from('orders').select('*', { count: 'exact', head: true }),
       // Orders waiting for the founder's confirmation (2026-10-15 badge).
       sb.from('orders').select('*', { count: 'exact', head: true }).eq('status', NEW_ORDER_STATUS),
+      // Custom-order requests not yet handled (2026-11-18) — kept separate from
+      // shop orders (founder decision: no stock, no checkout, own card).
+      sb
+        .from('custom_orders')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', NEW_CUSTOM_ORDER_STATUS),
     ]);
 
   const p = products ?? [];
@@ -68,6 +81,7 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
       active: s.filter((x) => !x.unsubscribed_at).length,
     },
     orders: { total: ordersCount ?? 0, toConfirm: toConfirmCount ?? 0 },
+    customOrders: { new: customNewCount ?? 0 },
     subscribersByMonth: buildLast6Months(s.map((x) => x.created_at)),
   };
 }

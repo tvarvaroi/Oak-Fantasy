@@ -1,5 +1,6 @@
 import { requireAdminOrNotFound } from '@/lib/auth/require-admin';
 import { countOrdersToConfirm } from '@/lib/admin/orders';
+import { countNewCustomOrders } from '@/lib/admin/custom-orders';
 
 import AdminShell from '@/components/admin/AdminShell';
 
@@ -22,12 +23,16 @@ export default async function ProtectedAdminLayout({
 }) {
   const user = await requireAdminOrNotFound();
   const name = user.profile?.full_name || user.email || 'admin';
-  // Sidebar badge: orders waiting for confirmation (runs after the gate, so it
-  // only ever executes for a verified admin; the layout is force-dynamic).
-  const ordersToConfirm = await countOrdersToConfirm();
+  // Sidebar badges: orders waiting for confirmation + new custom-order requests
+  // (run after the gate, so they only ever execute for a verified admin; the
+  // layout is force-dynamic).
+  const [ordersToConfirm, customOrdersNew] = await Promise.all([
+    countOrdersToConfirm(),
+    countNewCustomOrders(),
+  ]);
 
   return (
-    <AdminShell userName={name} ordersToConfirm={ordersToConfirm}>
+    <AdminShell userName={name} ordersToConfirm={ordersToConfirm} customOrdersNew={customOrdersNew}>
       {children}
     </AdminShell>
   );

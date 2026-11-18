@@ -28,8 +28,8 @@ export default async function AdminDashboardPage() {
         Administrare Oak Fantasy
       </h1>
 
-      {/* Stats (D3, D4: 4-col responsive grid) */}
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Stats (D3, D4: responsive grid; 5th card = custom requests, 2026-11-18) */}
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         <StatCard
           label="Produse"
           value={stats.products.total}
@@ -44,6 +44,12 @@ export default async function AdminDashboardPage() {
           label="Comenzi de confirmat"
           value={stats.orders.toConfirm}
           sub={`${stats.orders.total} ${stats.orders.total === 1 ? 'comandă în total' : 'comenzi în total'}`}
+        />
+        <StatCard
+          label="Cereri custom noi"
+          value={stats.customOrders.new}
+          sub="din formularul „La comandă”"
+          href="/admin/comenzi-custom?status=new"
         />
         <StatCard
           label="Produse fără poză"

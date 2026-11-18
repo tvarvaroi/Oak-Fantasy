@@ -10,11 +10,14 @@ import AdminSidebar from './AdminSidebar';
 export default function AdminShell({
   userName,
   ordersToConfirm = 0,
+  customOrdersNew = 0,
   children,
 }: {
   userName: string;
   /** Orders in status pending_cod — shown as a badge next to "Comenzi". */
   ordersToConfirm?: number;
+  /** Custom-order requests in status "new" — badge next to "Comenzi custom". */
+  customOrdersNew?: number;
   children: React.ReactNode;
 }) {
   return (
@@ -37,7 +40,7 @@ export default function AdminShell({
             Administrare
           </p>
         </div>
-        <AdminSidebar ordersToConfirm={ordersToConfirm} />
+        <AdminSidebar ordersToConfirm={ordersToConfirm} customOrdersNew={customOrdersNew} />
       </aside>
 
       {/* Main column */}
@@ -81,7 +84,7 @@ export default function AdminShell({
           className="md:hidden"
           style={{ padding: '12px clamp(16px, 4vw, 40px)', borderBottom: '1px solid rgba(92,58,32,0.18)' }}
         >
-          <AdminSidebar ordersToConfirm={ordersToConfirm} />
+          <AdminSidebar ordersToConfirm={ordersToConfirm} customOrdersNew={customOrdersNew} />
         </div>
 
         <main style={{ padding: 'clamp(24px, 5vw, 48px)' }}>{children}</main>
