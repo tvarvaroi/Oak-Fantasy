@@ -9,6 +9,8 @@ const PAGES = [
   { path: '/en/workshop',          name: 'atelier-en' },
   { path: '/ro/tocatoare',         name: 'tocatoare-ro' },
   { path: '/en/cutting-boards',    name: 'tocatoare-en' },
+  { path: '/ro/la-comanda',        name: 'la-comanda-ro' },
+  { path: '/en/custom-orders',     name: 'la-comanda-en' },
   { path: '/ro/contact',           name: 'contact-ro' },
   { path: '/en/contact',           name: 'contact-en' },
   { path: '/ro/termeni',           name: 'termeni-ro' },

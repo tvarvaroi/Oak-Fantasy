@@ -18,12 +18,15 @@ const ALL_PAGES = [
   { path: '/en/workshop',         title: /Oak Fantasy Workshop/i },
   { path: '/ro/tocatoare',        title: /Tocătoare din Stejar Românesc/i },
   { path: '/en/cutting-boards',   title: /Romanian Oak Cutting Boards/i },
+  { path: '/ro/la-comanda',       title: /Tocătoare personalizate/i },
+  { path: '/en/custom-orders',    title: /Custom Wooden Pieces/i },
 ];
 
 const PAGES_WITH_FULL_SEO = [
   '/ro/despre', '/en/about',
   '/ro/atelier', '/en/workshop',
   '/ro/tocatoare', '/en/cutting-boards',
+  '/ro/la-comanda', '/en/custom-orders',
 ] as const;
 
 // JSON-LD types per page family — /despre + /atelier emit AboutPage; /tocatoare

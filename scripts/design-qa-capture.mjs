@@ -28,6 +28,7 @@ const STATIC_PAGES = [
   ['atelier', 'atelier', 'workshop'],
   ['contact', 'contact', 'contact'],
   ['tocatoare', 'tocatoare', 'cutting-boards'],
+  ['la-comanda', 'la-comanda', 'custom-orders'],
   ['cos-empty', 'cos', 'cart'],
   ['termeni', 'termeni', 'terms'],
   ['confidentialitate', 'confidentialitate', 'privacy'],
@@ -326,12 +327,32 @@ async function main() {
     });
   }
 
+  // ── 5b. /la-comanda slip — validation errors (2026-11-18). Never submits a
+  // valid slip: that would write a real row to custom_orders.
+  for (const vp of VIEWPORTS) {
+    for (const [locale, slug] of [['ro', 'la-comanda'], ['en', 'custom-orders']]) {
+      await tryStep(`la-comanda-errors-${locale}-${vp.name}`, async () => {
+        const { page, ctx } = await newPage(browser, vp);
+        await page.goto(`${BASE}/${locale}/${slug}`);
+        await settle(page);
+        await page.fill('#co-phone', '12345');
+        await page.locator('[data-testid="custom-order-form"] button[type="submit"]').click();
+        await page.waitForTimeout(500);
+        // Element capture of the slip: a full-page stitch would bury it.
+        mkdirSync(join(OUT, 'forms'), { recursive: true });
+        await page.locator('#formular').screenshot({ path: join(OUT, 'forms', `la-comanda-errors--${locale}--${vp.name}.png`) });
+        captured++;
+        await ctx.close();
+      });
+    }
+  }
+
   // ── 6. reduced-motion runs — WITH scroll priming. RM verifies content is
   // visible without animations; it does not disable lazy loading, so a
   // no-scroll capture would show below-fold images blank (false finding).
   // Animation defects still surface: with RM emulated, anything stuck at
   // opacity 0 after priming is a real bug.
-  for (const [key, slug] of [['home', ''], ['atelier', 'atelier'], ['tocatoare', 'tocatoare'], ['despre', 'despre']]) {
+  for (const [key, slug] of [['home', ''], ['atelier', 'atelier'], ['tocatoare', 'tocatoare'], ['despre', 'despre'], ['la-comanda', 'la-comanda']]) {
     for (const vp of [VIEWPORTS[0], VIEWPORTS[3]]) {
       await tryStep(`reduced-motion-${key}-${vp.name}`, async () => {
         const { page, ctx } = await newPage(browser, vp, { reducedMotion: true });
