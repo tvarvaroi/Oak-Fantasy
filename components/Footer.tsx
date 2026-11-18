@@ -238,7 +238,6 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
       ],
       anpcLabel: 'ANPC',
       salLabel: 'SAL',
-      solLabel: 'SOL',
     },
     en: {
       colNav: 'Navigation',
@@ -277,7 +276,6 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
       ],
       anpcLabel: 'ANPC',
       salLabel: 'ADR',
-      solLabel: 'ODR',
     },
   }[language];
 
@@ -608,8 +606,9 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
             ))}
           </nav>
 
-          {/* ANPC + SAL/SOL row — required by ANPC for RO e-commerce sites.
-              Three small linked labels with copper accent dot separators. */}
+          {/* ANPC + SAL row — required by ANPC for RO e-commerce sites. The
+              EU ODR (SOL) link was removed 2026-11-19: the platform was shut
+              down in July 2025 (Reg. (EU) 2024/3228). */}
           <div
             aria-label={language === 'ro' ? 'Protecția consumatorului' : 'Consumer protection'}
             style={{
@@ -649,21 +648,6 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
               }}
             >
               {nav.salLabel}
-            </a>
-            <span aria-hidden style={{ color: 'var(--copper)', opacity: 0.4 }}>·</span>
-            <a
-              href="https://ec.europa.eu/consumers/odr"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="label-caps"
-              style={{
-                color: 'var(--copper)',
-                fontSize: '0.6rem',
-                opacity: 0.7,
-                textDecoration: 'none',
-              }}
-            >
-              {nav.solLabel}
             </a>
           </div>
 
