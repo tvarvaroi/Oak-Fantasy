@@ -306,3 +306,11 @@ components/tocatoare/
 **Puncte de legătură:** nota de gravură din checkout (`components/checkout/ReviewStep.tsx`, `data-testid="engraving-withdrawal-notice"` → `/retur#exceptions`), notele de confidențialitate din `ContactForm` și `RegisterForm`, footer (Termeni/Confidențialitate/Retur + ANPC + SAL).
 
 **Teste:** `tests/e2e/legal.spec.ts` (structură, fără „în pregătire”/tokeni nerezolvați, cuprins = secțiuni, faptele de la gate, linkuri footer/contact/înregistrare) + `checkout.spec.ts` (nota de gravură RO/EN, absentă fără gravură).
+
+## 2026-11-19 — Homepage server shell
+- `app/[locale]/page.tsx` — Server Component (revalidate 60): `countActiveProducts()` →
+  `<HomeClient productCount={…} />`.
+- `components/HomeClient.tsx` — fostul page client (Navbar, Hero, StoryStrip, …, Footer).
+- `lib/db/products.ts#countActiveProducts` — count head-only, anon + RLS; null la eroare.
+- `NumbersStrip` primește `productCount`; stat-ul cu `live: 'productCount'` dispare când e null
+  (grila lg trece pe 5 track-uri).

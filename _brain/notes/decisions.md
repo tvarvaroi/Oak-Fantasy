@@ -455,3 +455,37 @@ unor branduri / să se lege de modele care se pot schimba. Ce rămâne pe site e
 
 **Gardă:** tests/e2e/despre.spec.ts („Origin claims stay plain”) + atelier.spec.ts (fără
 branduri în HTML-ul randat).
+
+---
+
+## 2026-11-19 — Fact-check complet al afirmațiilor (runda 1 + 2, founder)
+
+**Decizie:** după marcajele founder-ului (artifact „Verificarea afirmațiilor”, colecțiile
+`marks` și `decisions`), site-ul spune doar ce e adevărat sau general valabil:
+- Scoase: Bucegi/Apuseni, „6–12 luni”, „8–10%”, Titebond III (rămâne „adeziv alimentar”),
+  ceara de albine, „ani de zile”, „fără noduri”, „un singur copac”, „același om”,
+  „linie de producție / în serie”, „atelier mic”, ~60 m², „cinci unelte”, 4 prese,
+  programul 7–18, 18–22°C / 45–55%, higrometru/dezumidificator, asamblări iarna,
+  „capacitate maximă de Crăciun”, end-grain/heirloom, 1.200+ abonați, ghidul gratuit,
+  Arad din footer, intervalul de prețuri (urmează actualizare de prețuri — nu se pun prețuri
+  în meta/llms), dălțile din slideshow-ul ascuns.
+- Păstrate (founder „las cum e”): „stejar românesc”, „nealtoit din pădurile României”,
+  „Din rădăcină…” (ascuns), Tava Valuri, rindeaua electrică, 5–10 zile lucrătoare.
+- Rescrise GENERAL (founder: „nu mințim, dar nici nu suntem foarte specifici despre noi”):
+  /atelier „O zi în atelier” (fără ore), „Condițiile” (comportamentul lemnului + pragurile
+  40/60% confirmate), „Vremea schimbă lemnul” (anotimpuri = fizica lemnului + „primăvara
+  primim lemn nou”, confirmat), „Atelierul ca loc” (doar ce e confirmat); uscarea (/despre),
+  straturile de ulei.
+- Adăugate: Freză CNC + Gravare laser pe /atelier (7 unelte), fraza „Desenele le frezăm pe
+  CNC; tăierea, lipirea, șlefuirea și uleiul le facem noi, în atelier.” pe /despre,
+  „Fotografii ilustrative.” sub pozele stock, numărul de modele din banda de cifre citit LIVE
+  din DB (homepage devine server shell + HomeClient), „lemn masiv” unde e descris tot
+  catalogul (stejar + frasin).
+- DB (produse cu desen CNC: OF-01/02/03/06/10): „Lucrat manual” → „Finisat în atelier” /
+  „Frezat CNC și finisat în atelier”; OF-01 redenumit „…de stejar și frasin…”.
+
+**Motiv:** regula „nu inventa fapte”; o parte din copy venea din handoff-ul de design, nu
+de la founder.
+
+**Gardă:** tests/e2e/fact-check.spec.ts (afirmațiile scoase nu revin pe 10 pagini RO/EN +
+llms.txt; mențiunea foto; CNC pe /despre; stoc pe /tocatoare; cifra live).

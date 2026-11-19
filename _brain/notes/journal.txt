@@ -1562,3 +1562,25 @@ VERIFICARE: typecheck ✓ · lint ✓ · check:i18n ✓ · build ✓ · e2e 470 
   failed (prima rulare: 9 eșecuri de mediu — sistemul a intrat în sleep, ERR_NETWORK_IO_SUSPENDED;
   rerun complet curat) · vizual 78/78 (1 regenerată) + 78/78 · hidratare 0 · design-qa 40
   capturi (/atelier + /despre RO/EN × 4 vp + RM).
+
+2026-11-19 (4) — Fact-check: corecturile din runda 2
+Founder-ul a marcat 114 fapte (54 adevărate / 8 false / 52 de corectat, aproape fără note) →
+runda 2 în același artifact: propunere concretă per fapt + 4 grupuri pe secțiuni /atelier,
+răspunsuri în colecția `decisions` (48/48). Aplicat: /despre, /atelier (7 unelte, 4 secțiuni
+rescrise general, „Fotografii ilustrative.”), homepage (StoryStrip, WorkshopSection, banda
+cu număr live din DB), navbar/footer („lemn masiv”, fără Arad), /tocatoare (meta fără
+număr/prețuri, „în stoc” + termen ca la checkout), /la-comanda, newsletter ascuns,
+slideshow ascuns, llms.txt rescris; DB: 5 produse CNC + numele OF-01 (backup local
+products-before.json). Poze noi: Pexels 7480234 (CNC), 38030790 (laser).
+Review (workflow, 5 dimensiuni + verificare adversarială): 11 confirmate, 12 respinse. Reparat: uscarea
+„nu se mai mișcă” (fals despre lemn) → „în echilibru cu aerul din jur”; toamna → „pornesc
+caloriferele… trecere cu ulei”; llms.txt: vopseaua doar pe tocătoare, nu pe ceas; NumbersStrip
+cu 3 celule pe sm; teste: cifra live = nr. carduri /tocatoare, scan și în head (meta/JSON-LD,
+Arad doar în text vizibil — sediul social e în JSON-LD), llms.txt 200, regex 1.200 ancorat.
+NEaplicat (decizie founder F01 „las cum e”): titlul /tocatoare „Tocătoare din Stejar Românesc”.
+Design-qa (workflow, 164 capturi, 6 grupuri): reparat ce a introdus task-ul — WorkshopSection
+(rânduri rupte pe mobil → inline sub xl), eticheta foto pe imagine, „5–10” nowrap, h1 /atelier
+text-wrap: balance. Pre-existente raportate, nereparate: umbra drawer-ului coș pe marginea
+dreaptă, placeholder gri rece în formulare, touch targets (filtre, coș, checkbox termeni),
+404 fără fonturi + RO/EN amestecat, ProductTease în reduced-motion, gradient cream între
+ProductTease și NumbersStrip, navbar sticky peste câmpuri la erori, rând produs în checkout.

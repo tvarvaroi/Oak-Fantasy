@@ -1215,3 +1215,23 @@ sau `${}` se scrie cu Edit/Write sau heredoc `<<'EOF'`, nu prin `node -e "…"`.
 **Cauză:** sistemul a intrat în sleep în timpul rulării: `net::ERR_NETWORK_IO_SUSPENDED`,
 `browserType.launch: Timeout 180000ms`. **Fix:** rerulează suita; un eșec cu aceste erori
 nu e un bug de cod. Atenție: `--last-failed` după o rulare vizuală curată re-rulează TOT.
+
+## 2026-11-19 — `next start` orfan după TaskStop + ISR scris peste un build nou
+
+**Simptom:** după oprirea task-ului `npx next start -p 3001`, noul server pică cu
+EADDRINUSE; capturile design-qa „merg”, dar vin de la procesul VECHI. Apoi, după
+`npm run build`, /ro/tocatoare cerea un chunk inexistent (404 `page-<hash>.js`) și se
+randa fără stiluri.
+**Cauză:** TaskStop omoară `npx`, nu și copilul `node` care ține portul. Serverul vechi,
+încă viu în timpul rebuild-ului, a regenerat paginile ISR (revalidate 60) și le-a scris în
+`.next/` cu referințe la chunk-urile build-ului vechi.
+**Fix:** după oprire: `netstat -ano | grep ":3001 " | grep LISTEN` → `taskkill //PID <pid> //F //T`.
+Nu rula build în timp ce un `next start` e viu pe același `.next/`. Doar local — Vercel face
+build curat.
+
+## 2026-11-19 — Spec Playwright nu poate importa module de conținut (ESM)
+
+`await import('../../components/numbers-strip-content')` dintr-un spec → „Unexpected token
+'export'”. Pentru verificări statice ale conținutului: citește fișierul ca text
+(`fs.readFileSync`) și filtrează liniile relevante (atenție la comentarii care conțin
+același token).

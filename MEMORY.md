@@ -553,3 +553,19 @@ completitudine + agent de grupare pe „fapt” → pagină artifact cu `db` und
 marchează, iar noi citim marcajele cu ArtifactData în loc de o listă lungă în chat.
 **Aplicat la:** public/stock/atelier-tool-hand-planer.webp, docs/stock-credits.md,
 artifact „Verificarea afirmațiilor”.
+
+## 2026-11-19 — Fact-check în două runde + cifre live din DB
+
+**Pattern descoperit:** un marcaj „de corectat” fără valoarea corectă nu se poate aplica
+fără a inventa → a doua rundă în ACELAȘI artifact: propunere concretă per fapt (text tăiat →
+text nou, variante A/B/C + „altă variantă” + „las cum e”), grupată pe secțiuni când mai
+multe fapte stau în aceeași secțiune; răspunsurile vin în colecția `decisions`. Când
+founder-ul cere „general valabil”, rescrierea folosește fizica lemnului + doar faptele
+marcate adevărat. Orice cifră care descrie catalogul (număr de modele) se citește din DB,
+nu se scrie de mână: homepage-ul e acum server shell (`app/[locale]/page.tsx`, revalidate 60)
++ `components/HomeClient.tsx`; `countActiveProducts()` întoarce null la eroare, iar banda
+ascunde celula în loc să afișeze o cifră falsă.
+**Aplicat la:** /despre, /atelier, homepage, navbar/footer, /tocatoare, /la-comanda,
+llms.txt, 5 produse din DB; garda tests/e2e/fact-check.spec.ts.
+**De ce contează:** site-ul nu mai conține afirmații pe care founder-ul nu le-a confirmat;
+testul împiedică revenirea lor.
