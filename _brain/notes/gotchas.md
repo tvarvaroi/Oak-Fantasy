@@ -1262,3 +1262,14 @@ deși tot site-ul (canonical, sitemap, emailuri) folosește apex-ul.
 www→apex în next.config ar face buclă cu setarea Vercel.
 **Fix:** în Vercel → Domains: `oakfantasy.ro` conectat la Production fără redirect,
 `www.oakfantasy.ro` → „Redirect to oakfantasy.ro” (308). Verifică cu `curl -sI`.
+
+## 2026-11-19 — Baseline-uri vizuale capturate fără fontul Lora
+
+**Simptom:** după schimbarea de domeniu (zero modificări vizuale), 66/78 capturi vizuale picau:
+textul body era mai înalt cu ~120 px pe mobil.
+**Cauză:** baseline-urile din fa17cc7 fuseseră capturate cu Lora NEÎNCĂRCAT (fallback sans) —
+probabil serverul orfan/ISR din aceeași sesiune servea chunk-uri/fonturi 404; „confirm”-ul de
+atunci a trecut pe același server stricat. Rulările noi randează corect (Lora).
+**Fix:** baseline-uri regenerate + confirmate 78/78; comparat vizual vechi vs nou (login mobil).
+**Regulă:** după `test:e2e:update`, deschide 1–2 capturi și verifică fonturile brandului
+(Caudex titluri, Lora text) înainte de commit — un update „verde” poate îngheța o randare stricată.
