@@ -2,12 +2,13 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 import { getServerSupabase } from '@/lib/supabase-server';
 import { isLocale } from '@/lib/i18n-routes';
+import { safeRedirectPath } from '@/lib/safe-redirect';
 
 export const dynamic = 'force-dynamic';
 
 // Server-side sign out. POST so it isn't triggerable by a stray GET/prefetch.
 // Redirect target:
-//   - `redirectTo` (relative path only — open-redirect guard) wins; used by
+//   - `redirectTo` (same-origin path only — lib/safe-redirect.ts) wins; used by
 //     the admin area to land on /admin/login after sign out (Task 2.3 D5).
 //   - else `locale` form field -> that locale's homepage.
 //   - else /ro.
@@ -19,9 +20,10 @@ export async function POST(request: NextRequest) {
   try {
     const form = await request.formData();
 
-    const redirectTo = form.get('redirectTo');
-    if (typeof redirectTo === 'string' && redirectTo.startsWith('/') && !redirectTo.startsWith('//')) {
-      target = redirectTo;
+    // Same-origin paths only — see lib/safe-redirect.ts (`/\evil.com` bypass).
+    const safe = safeRedirectPath(form.get('redirectTo'), '', request.url);
+    if (safe) {
+      target = safe;
     } else {
       const l = form.get('locale');
       if (typeof l === 'string' && isLocale(l)) target = `/${l}`;

@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { getServerSupabase } from '@/lib/supabase-server';
+import { safeRedirectPath } from '@/lib/safe-redirect';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,8 +15,8 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get('code');
   const next = searchParams.get('next') ?? '/ro';
 
-  // Only allow same-origin relative redirects (open-redirect guard).
-  const safeNext = next.startsWith('/') ? next : '/ro';
+  // Only allow same-origin paths (open-redirect guard, lib/safe-redirect.ts).
+  const safeNext = safeRedirectPath(next, '/ro', origin);
 
   if (code) {
     const supabase = getServerSupabase();
