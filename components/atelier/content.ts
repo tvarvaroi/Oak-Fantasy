@@ -3,9 +3,9 @@ import type { Locale } from '@/lib/i18n-routes';
 // Bilingual content for /atelier (RO) / /workshop (EN).
 // RO = verbatim from the approved Claude Design handoff `v3-catalog.html`
 //      (Variant C, Tool-Forward Catalog).
-// EN = founder-approved glossary (sign-off 2026-05-27). Tool names use
-//      "translated lead" format (e.g. "Bosch GTS 635-216 table saw").
-//      Brand-model strings are PRESERVED across locales verbatim.
+// EN = founder-approved glossary (sign-off 2026-05-27).
+// Tool names are GENERIC tool types (2026-11-19, founder): no brand, no model
+// code, no spec that only makes sense for one model — in name, desc or alt.
 
 export interface HeroCell {
   /**
@@ -21,7 +21,7 @@ export interface HeroCell {
 export interface Tool {
   /** Pill tag in the top-left corner: "Featured · Tăiere" / "Asamblare" etc. */
   tag: string;
-  /** Tool name. Brand+model is preserved verbatim across locales. */
+  /** Generic tool type — never a brand or model code (2026-11-19). */
   name: string;
   /** One-line italic copper role description below h3. */
   role: string;
@@ -191,9 +191,9 @@ const ro: AtelierContent = {
     items: [
       {
         tag: 'Tăiere',
-        name: 'Planou circular Bosch GTS 635-216',
+        name: 'Ferăstrău circular de masă',
         role: 'Unealta cu care începe orice tocător.',
-        desc: 'Tăie scândurile la dimensiuni precise. Lama subțire, ghidaj fix, masă mare. Pentru tăieri repetate la aceeași dimensiune, nu există ceva mai bun.',
+        desc: 'Taie scândurile la dimensiuni precise. Pentru tăieri repetate la aceeași dimensiune, nu există ceva mai bun.',
         image: '/stock/atelier-tool-circular-saw.webp',
         imageAlt: 'Pânză de fierăstrău circular tăind o scândură de stejar',
       },
@@ -215,7 +215,7 @@ const ro: AtelierContent = {
       },
       {
         tag: 'Aplatizare',
-        name: 'Rindeluitor electric Makita KP0810',
+        name: 'Rindea electrică',
         role: 'Suprafețe perfect plane după lipire.',
         desc: 'Tăieri subțiri, pe direcția fibrei, până când blocul e perfect plan.',
         image: '/stock/atelier-tool-planer.webp',
@@ -223,7 +223,7 @@ const ro: AtelierContent = {
       },
       {
         tag: 'Șlefuit',
-        name: 'Șlefuitor orbital Festool ETS 150/3',
+        name: 'Șlefuitor orbital',
         role: 'De la 80 la 320. Fără apăsare, fără grabă.',
         desc: 'Patru-cinci graduri de hârtie abrazivă. Mișcare circulară, fără apăsare, fără grabă.',
         image: '/stock/atelier-tool-sander.webp',
@@ -237,7 +237,7 @@ const ro: AtelierContent = {
     h2Em: 'treaba.',
     paragraphs: [
       'Atelierul nostru e o încăpere de vreo șaizeci de metri pătrați, în vestul României, unde tâmplăria are rădăcini vechi. Are lumină naturală bună până pe la patru după-amiaza, apoi aprindem lămpile. Iarna intră soarele direct pe geamul de est dimineața — atunci facem treaba care cere ochi bun, șlefuit fin, asamblare. Vara stăm mai mult în partea umbrită, unde temperatura rămâne stabilă.',
-      'Miroase a stejar — un miros dulce, ușor acrișor, care se ține în haine și în păr. Sunetul depinde de ce facem: motoarele de la planoiul circular și freză sunt cele zgomotoase, dar le folosim pe rând și nu toată ziua. Cel mai mult timp lucrăm cu unelte de mână — și atunci e liniște, doar fierăstrău, raspel, șmirghel.',
+      'Miroase a stejar — un miros dulce, ușor acrișor, care se ține în haine și în păr. Sunetul depinde de ce facem: motoarele de la ferăstrăul circular și de la freză sunt cele zgomotoase, dar le folosim pe rând și nu toată ziua. Cel mai mult timp lucrăm cu unelte de mână — și atunci e liniște, doar fierăstrău, raspel, șmirghel.',
     ],
     imageTopAlt: 'Banc de lucru vechi lângă o fereastră, în lumină naturală',
     imageBottomAlt: 'Așchii de lemn și creioane pe un blat de lucru',
@@ -373,9 +373,9 @@ const en: AtelierContent = {
     items: [
       {
         tag: 'Cutting',
-        name: 'Bosch GTS 635-216 table saw',
+        name: 'Table saw',
         role: 'The tool every cutting board starts with.',
-        desc: "Cuts boards to precise dimensions. Thin blade, fixed guide, large table. For repeated cuts at the same size, nothing's better.",
+        desc: "Cuts boards to precise dimensions. For repeated cuts at the same size, nothing's better.",
         image: '/stock/atelier-tool-circular-saw.webp',
         imageAlt: 'Circular saw blade cutting an oak board',
       },
@@ -397,7 +397,7 @@ const en: AtelierContent = {
       },
       {
         tag: 'Flattening',
-        name: 'Makita KP0810 hand planer',
+        name: 'Electric hand planer',
         role: 'Perfectly flat surfaces after glueing.',
         desc: 'Thin cuts, along the grain, until the block is perfectly flat.',
         image: '/stock/atelier-tool-planer.webp',
@@ -405,7 +405,7 @@ const en: AtelierContent = {
       },
       {
         tag: 'Sanding',
-        name: 'Festool ETS 150/3 orbital sander',
+        name: 'Orbital sander',
         role: 'From 80 to 320. No pressure, no rush.',
         desc: 'Four-five grits of sandpaper. Circular motion, no pressure, no rush.',
         image: '/stock/atelier-tool-sander.webp',

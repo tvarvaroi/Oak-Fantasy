@@ -95,7 +95,7 @@ function buildJsonLd(locale: Locale) {
     ],
   };
 
-  // Bonus: ItemList of the 6 tools — rich-result candidate for Google.
+  // Bonus: ItemList of the 5 tools (generic names, no brands) — rich-result candidate for Google.
   const itemList = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
