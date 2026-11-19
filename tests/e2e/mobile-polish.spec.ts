@@ -122,4 +122,29 @@ test.describe('404 — brand fonts, one language per page', () => {
     expect(res?.status()).toBe(404);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Pagina asta nu există.');
   });
+
+  // Dotted junk paths skip the middleware; the afterFiles rewrite in
+  // next.config.js sends them to the branded RO 404 instead of Next's
+  // unstyled error shell.
+  for (const path of ['/.env', '/wp-admin/setup.php', '/x.php']) {
+    test(`${path}: branded 404 with stylesheet and Caudex`, async ({ page }) => {
+      const res = await page.goto(path);
+      expect(res?.status()).toBe(404);
+      const h1 = page.getByRole('heading', { level: 1 });
+      await expect(h1).toHaveText('Pagina asta nu există.');
+      expect(await h1.evaluate((el) => getComputedStyle(el).fontFamily)).toMatch(/Caudex/i);
+      expect(await page.evaluate(() => document.styleSheets.length)).toBeGreaterThan(0);
+    });
+  }
+
+  test('the junk-path rewrite leaves real routes and files alone', async ({ request }) => {
+    for (const path of ['/ro', '/en', '/en/about', '/en/cutting-boards', '/ro/despre', '/admin/login']) {
+      expect((await request.get(path)).status(), path).toBe(200);
+    }
+    for (const path of ['/robots.txt', '/sitemap.xml', '/llms.txt', '/og/oak-fantasy-og.png']) {
+      const r = await request.get(path);
+      expect(r.status(), path).toBe(200);
+      expect(r.headers()['content-type'], path).not.toContain('text/html');
+    }
+  });
 });

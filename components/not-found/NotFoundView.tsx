@@ -31,7 +31,7 @@ export default function NotFoundView() {
           </p>
           <h1
             className="font-caudex"
-            style={{ color: 'var(--oak-deep)', fontSize: 'clamp(1.9rem, 6vw, 2.6rem)', lineHeight: 1.15, marginTop: 14 }}
+            style={{ color: 'var(--oak-deep)', fontSize: 'clamp(1.9rem, 6vw, 2.6rem)', lineHeight: 1.15, marginTop: 14, textWrap: 'balance' }}
           >
             {c.title}
           </h1>
@@ -41,7 +41,7 @@ export default function NotFoundView() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3" style={{ marginTop: 30 }}>
             <Link
               href={`/${locale}`}
-              className="font-caudex inline-flex items-center justify-center transition-opacity hover:opacity-90"
+              className="font-caudex inline-flex items-center justify-center w-full max-w-[280px] sm:w-auto sm:max-w-none transition-opacity hover:opacity-90"
               style={{
                 backgroundColor: 'var(--oak-warm)',
                 color: 'var(--cream-warm)',
@@ -55,7 +55,7 @@ export default function NotFoundView() {
             </Link>
             <Link
               href={localizedPath('tocatoare', locale)}
-              className="font-caudex inline-flex items-center justify-center transition-colors hover:bg-[var(--paper-aged)]"
+              className="font-caudex inline-flex items-center justify-center w-full max-w-[280px] sm:w-auto sm:max-w-none transition-colors hover:bg-[var(--paper-aged)]"
               style={{
                 color: 'var(--oak-warm)',
                 border: '1px solid var(--oak-warm)',

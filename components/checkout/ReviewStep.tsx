@@ -11,6 +11,7 @@ import { localizedPath, type Locale } from '@/lib/i18n-routes';
 import type { CartItem } from '@/lib/store/cart';
 import type { CheckoutData } from '@/lib/schemas/checkout';
 import type { CheckoutContent } from './content';
+import { noBreakRanges } from '@/lib/no-break-ranges';
 
 export default function ReviewStep({
   content,
@@ -140,7 +141,7 @@ export default function ReviewStep({
         </p>
         {!CARD_PAYMENTS_ENABLED ? (
           <p className="font-lora" style={{ fontSize: '0.8rem', color: 'var(--ink-soft)' }}>
-            {ship === 0 ? c.leadTime : `${c.freeShippingHint} ${c.leadTime}`}
+            {noBreakRanges(ship === 0 ? c.leadTime : `${c.freeShippingHint} ${c.leadTime}`)}
           </p>
         ) : null}
       </div>

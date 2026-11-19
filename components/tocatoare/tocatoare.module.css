@@ -131,6 +131,28 @@
 }
 .filterPill .count { margin-left: 8px; opacity: 0.65; font-size: 0.66rem; }
 
+/* Phones + small tablets (design-qa 2026-11-19): the wrapped 44px pills made the STICKY bar
+   ~330px tall (4 rows + sort), covering ~40% of the screen while scrolling the
+   catalog. One horizontally scrollable row instead; the cut-off last pill
+   shows there is more. Sort keeps its own row. Up to 900px: at 768 the
+   pills wrapped too (orphan "Moștenire" row, ~225px sticky bar). */
+@media (max-width: 900px) {
+  .filterbar { padding: 14px 0 12px; }
+  .filterbarWrap { padding: 0 24px; gap: 10px; }
+  .filterRow {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    width: calc(100% + 48px);
+    margin: 0 -24px;
+    padding: 0 24px 2px;
+    scroll-padding: 0 24px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .filterRow::-webkit-scrollbar { display: none; }
+  .filterPill { flex-shrink: 0; white-space: nowrap; }
+}
+
 /* Sort dropdown */
 .sortWrap { position: relative; display: inline-block; }
 .sortToggle {
@@ -375,21 +397,29 @@
   justify-content: flex-end;
 }
 .cardCta {
+  /* 44px touch target; the visible underline lives on the inner label so it
+     stays right under the text instead of at the bottom of the tall box. */
   display: inline-flex;
   align-items: center;
-  gap: 8px;
   font-family: var(--font-caudex);
   text-transform: uppercase;
   letter-spacing: 0.14em;
   font-size: 0.72rem;
   color: var(--oak-warm);
   min-height: 44px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--oak-warm);
-  transition: gap 0.2s, color 0.2s;
+  transition: color 0.2s;
   text-decoration: none;
 }
-.cardCta:hover { gap: 12px; color: var(--oak-deep); }
+.cardCtaLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid currentColor;
+  transition: gap 0.2s;
+}
+.cardCta:hover { color: var(--oak-deep); }
+.cardCta:hover .cardCtaLabel { gap: 12px; }
 .cardCta svg { transition: transform 0.2s; }
 .cardCta:hover svg { transform: translateX(2px); }
 

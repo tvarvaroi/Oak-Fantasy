@@ -112,16 +112,18 @@ export default function ProductCard({ product, content, locale, inStock = true }
           </span>
           <div className={styles.cardCtaRow}>
             <Link href={ctaHref} className={styles.cardCta} data-card-cta>
-              {content.card.seeDetails}
-              <svg width="14" height="10" viewBox="0 0 14 10" fill="none" aria-hidden>
-                <path
-                  d="M1 5h12M9 1l4 4-4 4"
-                  stroke="currentColor"
-                  strokeWidth="1.4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              <span className={styles.cardCtaLabel}>
+                {content.card.seeDetails}
+                <svg width="14" height="10" viewBox="0 0 14 10" fill="none" aria-hidden>
+                  <path
+                    d="M1 5h12M9 1l4 4-4 4"
+                    stroke="currentColor"
+                    strokeWidth="1.4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
             </Link>
             {inStock ? (
               <Link
