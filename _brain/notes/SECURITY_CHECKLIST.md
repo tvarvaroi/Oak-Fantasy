@@ -573,6 +573,8 @@ provider în Supabase Dashboard + redirect URL deja whitelistabil.
       (necesar pentru reset password + Google OAuth Task 2.3).
 - [ ] DUPĂ ce founder face signup (Task 2.2): promovare admin via SQL editor:
       `UPDATE profiles SET role='admin' WHERE email='tvarvaroi@gmail.com';`
+      **2026-11-19:** emailul contului admin schimbat în `oakfantasy2026@gmail.com` (auth + profiles.email,
+      confirmat); parolă nouă setată prin service role. `tvarvaroi@gmail.com` nu mai e cont de login.
       (guard_profile_role exempt când auth.uid() IS NULL în SQL editor)
 - [ ] Pre-launch: branded auth email templates (acum default Supabase OK).
 - [ ] Google OAuth provider — configurat la Task 2.3 (Google Cloud Console nou)
