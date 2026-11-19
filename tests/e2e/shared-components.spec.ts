@@ -26,14 +26,15 @@ function navLink(page: Page, href: string) {
 }
 
 test.describe('Navbar tagline (Faza B fix)', () => {
-  test('RO shows "stejar · manual"', async ({ page }) => {
+  // 2026-11-19 (founder fact-check): the catalogue is oak AND ash → "lemn masiv".
+  test('RO shows "lemn masiv · manual"', async ({ page }) => {
     await page.goto('/ro');
-    await expect(page.locator('header')).toContainText('stejar · manual');
+    await expect(page.locator('header')).toContainText('lemn masiv · manual');
   });
 
-  test('EN shows "oak · handmade", not "stejar"', async ({ page }) => {
+  test('EN shows "solid wood · handmade", not "stejar"', async ({ page }) => {
     await page.goto('/en');
-    await expect(page.locator('header')).toContainText('oak · handmade');
+    await expect(page.locator('header')).toContainText('solid wood · handmade');
     await expect(page.locator('header')).not.toContainText('stejar');
   });
 });
@@ -166,14 +167,14 @@ test.describe('Navbar Tocătoare link (2026-05-23 — /tocatoare route)', () => 
 });
 
 test.describe('Footer microTagline (Faza B fix)', () => {
-  test('RO footer shows "stejar · manual · România"', async ({ page }) => {
+  test('RO footer shows "lemn masiv · manual · România"', async ({ page }) => {
     await page.goto('/ro');
-    await expect(page.locator('footer')).toContainText('stejar · manual · România');
+    await expect(page.locator('footer')).toContainText('lemn masiv · manual · România');
   });
 
-  test('EN footer shows "oak · handmade · Romania", not "stejar"', async ({ page }) => {
+  test('EN footer shows "solid wood · handmade · Romania", not "stejar"', async ({ page }) => {
     await page.goto('/en');
-    await expect(page.locator('footer')).toContainText('oak · handmade · Romania');
+    await expect(page.locator('footer')).toContainText('solid wood · handmade · Romania');
     await expect(page.locator('footer')).not.toContainText('stejar');
   });
 
@@ -193,11 +194,20 @@ test.describe('NumbersStrip (Faza B refactor)', () => {
 
   // 2026-11-19: only true, checkable figures (see numbers-strip-content.ts).
   // '1.200+ pe listă', '8h per tocător' and '20+ ani' were removed.
-  test('RO shows the four true figures, none of the removed claims (incl. 100%)', async ({ page }) => {
+  // 2026-11-19: the "modele" figure is the live active-product count; with no
+  // active products (or no DB) the stat is hidden — branch like tocatoare.spec.
+  async function activeProducts(page: import('@playwright/test').Page) {
+    await page.goto('/ro/tocatoare');
+    return page.locator('[data-product]').count();
+  }
+
+  test('RO shows the true figures, none of the removed claims (incl. 100%)', async ({ page }) => {
+    const n = await activeProducts(page);
     await page.goto('/ro');
     const numbers = page.locator('section[aria-label="Cifre"]');
     await numbers.scrollIntoViewIfNeeded();
-    await expect(numbers).toContainText('modele', { timeout: 5000 });
+    if (n > 0) await expect(numbers).toContainText('modele', { timeout: 5000 });
+    else await expect(numbers).not.toContainText('modele');
     await expect(numbers).toContainText('Lemn masiv');
     await expect(numbers).toContainText('lucrat manual');
     await expect(numbers).not.toContainText('100%');
@@ -210,11 +220,13 @@ test.describe('NumbersStrip (Faza B refactor)', () => {
     await expect(numbers).not.toContainText('per tocător');
   });
 
-  test('EN shows the four true figures, none of the removed claims', async ({ page }) => {
+  test('EN shows the true figures, none of the removed claims', async ({ page }) => {
+    const n = await activeProducts(page);
     await page.goto('/en');
     const numbers = page.locator('section[aria-label="Numbers"]');
     await numbers.scrollIntoViewIfNeeded();
-    await expect(numbers).toContainText('models', { timeout: 5000 });
+    if (n > 0) await expect(numbers).toContainText('models', { timeout: 5000 });
+    else await expect(numbers).not.toContainText('models');
     await expect(numbers).toContainText('Solid wood');
     await expect(numbers).toContainText('handcrafted');
     await expect(numbers).not.toContainText('100%');

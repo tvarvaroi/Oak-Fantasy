@@ -5,13 +5,14 @@ test.describe('/atelier page + path-localized routing', () => {
     const response = await page.goto('/ro/atelier');
     expect(response?.status()).toBe(200);
     // 2026-07-15: narrative moved from "zona Carpaților" to "vestul României".
-    await expect(page.locator('body')).toContainText('Un atelier mic, în vestul României.');
+    // 2026-11-19: "mic" dropped (founder fact-check).
+    await expect(page.locator('body')).toContainText('Un atelier în vestul României.');
   });
 
   test('GET /en/workshop returns 200', async ({ page }) => {
     const response = await page.goto('/en/workshop');
     expect(response?.status()).toBe(200);
-    await expect(page.locator('body')).toContainText('A small workshop in western Romania.');
+    await expect(page.locator('body')).toContainText('A workshop in western Romania.');
   });
 
   test('GET /en/atelier redirects 308 to /en/workshop', async ({ page }) => {
@@ -47,14 +48,14 @@ test.describe('/atelier page + path-localized routing', () => {
   for (const { path, names } of [
     {
       path: '/ro/atelier',
-      names: ['Ferăstrău circular de masă', 'Freză verticală cu ghidaj', 'Presă manuală cu șuruburi (4 buc.)', 'Rindea electrică', 'Șlefuitor orbital'],
+      names: ['Ferăstrău circular de masă', 'Freză verticală cu ghidaj', 'Presă manuală cu șuruburi', 'Rindea electrică', 'Freză CNC', 'Șlefuitor orbital', 'Gravare laser'],
     },
     {
       path: '/en/workshop',
-      names: ['Table saw', 'Plunge router with edge guide', 'Manual screw clamps (4 pcs.)', 'Electric hand planer', 'Orbital sander'],
+      names: ['Table saw', 'Plunge router with edge guide', 'Manual screw clamps', 'Electric hand planer', 'CNC router', 'Orbital sander', 'Laser engraving'],
     },
   ]) {
-    test(`${path}: five generic tool names, no brand or model anywhere`, async ({ page }) => {
+    test(`${path}: seven generic tool names, no brand or model anywhere`, async ({ page }) => {
       await page.goto(path);
       const cards = page.locator('#unelte h3');
       await expect(cards).toHaveText(names);
@@ -70,6 +71,24 @@ test.describe('/atelier page + path-localized routing', () => {
     const card = page.locator('#unelte article').filter({ hasText: 'Rindea electrică' });
     await expect(card.locator('img')).toHaveAttribute('src', /atelier-tool-hand-planer/);
     await expect(card.locator('img')).toHaveAttribute('alt', /Rindea electrică de mână/);
+  });
+
+  // 2026-11-19 (founder fact-check): CNC router + laser engraving cards, and
+  // the stock photos are labelled as illustrative.
+  test('CNC and laser cards use their own photos', async ({ page }) => {
+    await page.goto('/ro/atelier');
+    const cnc = page.locator('#unelte article').filter({ hasText: 'Freză CNC' });
+    await expect(cnc.locator('img')).toHaveAttribute('src', /atelier-tool-cnc/);
+    const laser = page.locator('#unelte article').filter({ hasText: 'Gravare laser' });
+    await expect(laser.locator('img')).toHaveAttribute('src', /atelier-tool-laser/);
+  });
+
+  test('stock photos carry the illustrative-photo note (tools + place)', async ({ page }) => {
+    await page.goto('/ro/atelier');
+    await expect(page.locator('#unelte')).toContainText('Fotografii ilustrative.');
+    await expect(page.locator('#loc')).toContainText('Fotografii ilustrative.');
+    await page.goto('/en/workshop');
+    await expect(page.locator('#unelte')).toContainText('Illustrative photos.');
   });
 
   test('RO seasons section has all 4 seasons', async ({ page }) => {
