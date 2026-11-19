@@ -63,6 +63,32 @@ const CANONICAL_ORIGIN = 'https://oakfantasy.ro';
 
 const nextConfig = {
   reactStrictMode: true,
+  // 404 for dotted junk paths (/.env, /x.php, /wp-login.php …), 2026-11-19.
+  // The middleware matcher skips dotted paths, so they used to reach the
+  // [locale] layout with locale=".env"; its notFound() then rendered the root
+  // app/not-found.tsx through Next's error shell, which loads NO stylesheet
+  // (unstyled page). afterFiles rewrites run after public files and app
+  // metadata routes (llms.txt, images, robots.txt, sitemap.xml are served
+  // first) and before dynamic routes, so only unmatched paths are sent to
+  // /ro/<path> → app/[locale]/[...rest] → the branded, localized 404 (status 404).
+  async rewrites() {
+    return {
+      beforeFiles: [],
+      afterFiles: [
+        {
+          // Non-dotted paths never get here: middleware already redirected them
+          // to /ro/…; this catches dotted ones at any depth (/wp-admin/x.php).
+          // robots.txt/sitemap.xml are app metadata routes: `next dev` matches them
+          // AFTER afterFiles rewrites, so they are excluded explicitly.
+          // The lookahead sees the REST of the path, so each excluded segment
+          // must be followed by "/" or the end (`en$` alone let /en/about through).
+          source: '/:first((?!(?:ro|en|_next|api|auth|admin|robots\.txt|sitemap\.xml)(?:/|$))[^/]+)/:rest*',
+          destination: '/ro/:first/:rest*',
+        },
+      ],
+      fallback: [],
+    };
+  },
   async redirects() {
     return [
       {

@@ -1,10 +1,8 @@
 import { Caudex, Caveat, Lora } from 'next/font/google';
 
-// Brand fonts, declared ONCE (2026-11-19). The [locale] layout, the admin
-// layout and the root 404 all import these instances. Declaring the same
-// Google font in several files made `next build` fail intermittently inside
-// next/font's shared download cache ("Cannot read properties of null
-// (reading '1')" in google/loader.js) — see _brain/notes/gotchas.md.
+// Brand fonts, declared ONCE (2026-11-19): the [locale] layout and the admin
+// layout import these instances instead of each calling Caudex()/Lora()/
+// Caveat() with copy-pasted options, so the two can never drift apart.
 export const caudex = Caudex({
   subsets: ['latin'],
   weight: ['400', '700'],
