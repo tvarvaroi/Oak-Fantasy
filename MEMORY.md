@@ -583,3 +583,17 @@ fără Lora) — deschide capturile înainte de commit.
 tests/e2e/domain.spec.ts, scripts/smoke-domain.mjs, branch local `launch/robots-allow`.
 **De ce contează:** lansarea depinde de 3 setări externe (Vercel primar, Supabase URL, Resend
 domeniu) pe care codul nu le poate repara — sunt în raport ca pași ai founder-ului.
+
+## 2026-11-19 — CSP enforce, open redirect, 404 per limbă, polish mobil
+
+**Pattern descoperit:** (1) Un design-qa pe build de PRODUCȚIE prinde ce dev-ul ascunde: 404-ul
+root se servea fără CSS (shell `__next_error__`), invizibil în `next dev`. (2) Un rewrite cu regex
+pe primul segment poate rupe tot site-ul (`(?!en$)` a dat 404 pe /en/about) — orice rewrite nou
+primește un test „rutele reale rămân 200”. (3) Un eșec de build intermitent (next/font/google) cere
+reproducere în buclă înainte de a „repara” — prima ipoteză (fonturi duplicate) era greșită.
+(4) CSP trecut în enforce doar după dovadă: 0 încălcări Report-Only live, apoi smoke-urile pică la
+orice încălcare, inclusiv în admin.
+**Aplicat la:** next.config.js, lib/safe-redirect.ts, app/[locale]/not-found + [...rest],
+components/cart|checkout|tocatoare, app/globals.css, tests/e2e/{auth-redirect,mobile-polish}.spec.ts.
+**De ce contează:** verificarea trebuie să ruleze pe forma în care rulează și clienții (build de
+producție, domeniul live), nu doar pe serverul de dezvoltare.
