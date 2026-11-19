@@ -41,21 +41,27 @@ test.describe('/atelier page + path-localized routing', () => {
     expect(text).not.toMatch(/[ăâîșțĂÂÎȘȚ]/);
   });
 
-  test('RO has all 6 tool brand names', async ({ page }) => {
-    await page.goto('/ro/atelier');
-    const body = page.locator('body');
-    await expect(body).toContainText('Bosch GTS 635-216');
-    await expect(body).toContainText('Festool ETS 150/3');
-    await expect(body).toContainText('Makita KP0810');
-  });
-
-  test('EN has matching tool brand names', async ({ page }) => {
-    await page.goto('/en/workshop');
-    const body = page.locator('body');
-    await expect(body).toContainText('Bosch GTS 635-216');
-    await expect(body).toContainText('Festool ETS 150/3');
-    await expect(body).toContainText('Makita KP0810');
-  });
+  // 2026-11-19: tool names are generic tool types — no brand or model code
+  // anywhere on the page (cards, alt texts, JSON-LD ItemList).
+  const BRANDS = /Bosch|Makita|Festool|GTS ?635|KP ?0810|ETS ?150/i;
+  for (const { path, names } of [
+    {
+      path: '/ro/atelier',
+      names: ['Ferăstrău circular de masă', 'Freză verticală cu ghidaj', 'Presă manuală cu șuruburi (4 buc.)', 'Rindea electrică', 'Șlefuitor orbital'],
+    },
+    {
+      path: '/en/workshop',
+      names: ['Table saw', 'Plunge router with edge guide', 'Manual screw clamps (4 pcs.)', 'Electric hand planer', 'Orbital sander'],
+    },
+  ]) {
+    test(`${path}: five generic tool names, no brand or model anywhere`, async ({ page }) => {
+      await page.goto(path);
+      const cards = page.locator('#unelte h3');
+      await expect(cards).toHaveText(names);
+      const html = await page.content();
+      expect(html).not.toMatch(BRANDS);
+    });
+  }
 
   test('RO seasons section has all 4 seasons', async ({ page }) => {
     await page.goto('/ro/atelier');

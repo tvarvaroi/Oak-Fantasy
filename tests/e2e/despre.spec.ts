@@ -43,3 +43,32 @@ test.describe('/despre page + path-localized routing', () => {
     expect(text).not.toMatch(/[ăâîșțĂÂÎȘȚ]/);
   });
 });
+
+// 2026-11-19 (founder): no absolute origin claims ("100%", "doar…", "fără
+// import", "din pădurile noastre") and no "certified forests" anywhere.
+test.describe('Origin claims stay plain', () => {
+  const ABSOLUTE_RO = /Lucrăm doar cu|fără import|100% stejar|păduri certificate/i;
+  const ABSOLUTE_EN = /work only with|no imports|100% Romanian|certified forests/i;
+
+  for (const path of ['/ro', '/ro/despre', '/ro/atelier']) {
+    test(`${path}: no absolute origin claim`, async ({ page }) => {
+      await page.goto(path);
+      const text = await page.evaluate(() => document.body.innerText);
+      expect(text).not.toMatch(ABSOLUTE_RO);
+    });
+  }
+  for (const path of ['/en', '/en/about', '/en/workshop']) {
+    test(`${path}: no absolute origin claim`, async ({ page }) => {
+      await page.goto(path);
+      const text = await page.evaluate(() => document.body.innerText);
+      expect(text).not.toMatch(ABSOLUTE_EN);
+    });
+  }
+
+  test('/despre values card: Romanian oak, solid wood, worked by hand', async ({ page }) => {
+    await page.goto('/ro/despre');
+    await expect(page.locator('main')).toContainText('Lucrăm cu stejar românesc: lemn masiv, lucrat manual, fără compromis.');
+    await page.goto('/en/about');
+    await expect(page.locator('main')).toContainText('We work with Romanian oak: solid wood, worked by hand, no compromise.');
+  });
+});

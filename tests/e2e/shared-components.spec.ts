@@ -193,12 +193,14 @@ test.describe('NumbersStrip (Faza B refactor)', () => {
 
   // 2026-11-19: only true, checkable figures (see numbers-strip-content.ts).
   // '1.200+ pe listă', '8h per tocător' and '20+ ani' were removed.
-  test('RO shows the four true figures, none of the removed claims', async ({ page }) => {
+  test('RO shows the four true figures, none of the removed claims (incl. 100%)', async ({ page }) => {
     await page.goto('/ro');
     const numbers = page.locator('section[aria-label="Cifre"]');
     await numbers.scrollIntoViewIfNeeded();
     await expect(numbers).toContainText('modele', { timeout: 5000 });
-    await expect(numbers).toContainText('100%');
+    await expect(numbers).toContainText('Lemn masiv');
+    await expect(numbers).toContainText('lucrat manual');
+    await expect(numbers).not.toContainText('100%');
     await expect(numbers).toContainText('5–10');
     await expect(numbers).toContainText('zile lucrătoare');
     await expect(numbers).toContainText('320');
@@ -213,7 +215,9 @@ test.describe('NumbersStrip (Faza B refactor)', () => {
     const numbers = page.locator('section[aria-label="Numbers"]');
     await numbers.scrollIntoViewIfNeeded();
     await expect(numbers).toContainText('models', { timeout: 5000 });
-    await expect(numbers).toContainText('Romanian oak');
+    await expect(numbers).toContainText('Solid wood');
+    await expect(numbers).toContainText('handcrafted');
+    await expect(numbers).not.toContainText('100%');
     await expect(numbers).toContainText('business days');
     await expect(numbers).toContainText('final grit');
     await expect(numbers).not.toContainText('1,200');
@@ -229,7 +233,8 @@ test.describe('NumbersStrip (Faza B refactor)', () => {
     // Poll: the entry animation translates each stat with a stagger.
     await expect
       .poll(async () => {
-        const tops = await numbers.locator('.font-caudex.tabular-nums').evaluateAll((els) =>
+        // Labels, not values: the text stat has no .tabular-nums counter.
+        const tops = await numbers.locator('p.label-caps').evaluateAll((els) =>
           els.map((e) => Math.round(e.getBoundingClientRect().top)),
         );
         return tops.length === 4 ? new Set(tops).size : -1;
