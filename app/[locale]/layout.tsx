@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { Caudex, Caveat, Lora } from 'next/font/google';
+import { fontVariables } from '@/lib/fonts';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import PageTransition from '@/components/PageTransition';
 import { isLocale, type Locale } from '@/lib/i18n-routes';
@@ -8,27 +8,6 @@ import { LEGAL_INFO, hasPlaceholder } from '@/lib/legal-info';
 import '../globals.css';
 import { OG_IMAGE_DEFAULT, OG_IMAGE_WIDTH, OG_IMAGE_HEIGHT } from '@/lib/seo';
 import { SITE_URL } from '@/lib/site-url';
-
-const caudex = Caudex({
-  subsets: ['latin'],
-  weight: ['400', '700'],
-  variable: '--font-caudex',
-  display: 'swap',
-});
-
-const caveat = Caveat({
-  subsets: ['latin'],
-  weight: ['400', '600'],
-  variable: '--font-caveat',
-  display: 'swap',
-});
-
-const lora = Lora({
-  subsets: ['latin'],
-  weight: ['400', '500'],
-  variable: '--font-lora',
-  display: 'swap',
-});
 
 // Sitewide entity graph (SEO audit fix #4). Organization + WebSite with stable
 // @id anchors — subpages (despre/atelier/contact/termeni) reference these ids
@@ -150,7 +129,7 @@ export default function LocaleLayout({
   return (
     <html
       lang={locale}
-      className={`${caudex.variable} ${caveat.variable} ${lora.variable}`}
+      className={fontVariables}
     >
       <body>
         <script

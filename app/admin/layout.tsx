@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Caudex, Caveat, Lora } from 'next/font/google';
+import { fontVariables } from '@/lib/fonts';
 
 import '../globals.css';
 
@@ -12,9 +12,6 @@ import '../globals.css';
 // This layout does NOT gate — /admin/login must stay reachable. The 404 gate
 // for non-admins lives in app/admin/(protected)/layout.tsx.
 
-const caudex = Caudex({ subsets: ['latin'], weight: ['400', '700'], variable: '--font-caudex', display: 'swap' });
-const caveat = Caveat({ subsets: ['latin'], weight: ['400', '600'], variable: '--font-caveat', display: 'swap' });
-const lora = Lora({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-lora', display: 'swap' });
 
 // SECURITY: neutral title (no "Admin") so the 404 for /admin and any probe
 // is indistinguishable from a normal page — the <title> must not confirm an
@@ -27,7 +24,7 @@ export const metadata: Metadata = {
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ro" className={`${caudex.variable} ${caveat.variable} ${lora.variable}`}>
+    <html lang="ro" className={fontVariables}>
       <body>{children}</body>
     </html>
   );
