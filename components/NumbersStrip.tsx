@@ -106,11 +106,21 @@ function VerticalDivider() {
 
 /* ─── Section ────────────────────────────────────────────────────── */
 
-export default function NumbersStrip({ language }: { language: Locale }) {
+export default function NumbersStrip({
+  language,
+  productCount,
+}: {
+  language: Locale;
+  /** Live active-product count; null hides the "modele" stat. */
+  productCount: number | null;
+}) {
   const ref = useRef<HTMLElement>(null);
   const [play, setPlay] = useState(false);
   const prefersReduced = useReducedMotion();
-  const { ariaLabel, numberLocale, stats } = numbersStripContent[language];
+  const { ariaLabel, numberLocale, stats: baseStats } = numbersStripContent[language];
+  const stats = baseStats
+    .filter((s) => s.live !== 'productCount' || productCount)
+    .map((s) => (s.live === 'productCount' && productCount ? { ...s, to: productCount } : s));
 
   useEffect(() => {
     const el = ref.current;
@@ -155,10 +165,22 @@ export default function NumbersStrip({ language }: { language: Locale }) {
         {/* From lg each item wrapper is display:contents, so the dividers are
             grid items too: 4 stats + 3 dividers = 7 tracks. A plain
             grid-cols-4 put two stats per row with the right half empty
-            (fixed 2026-11-19). Keep in step with the stat count. */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_1px_minmax(0,1fr)_1px_minmax(0,1fr)_1px_minmax(0,1fr)] gap-0">
+            (fixed 2026-11-19). Keep in step with the stat count: 3 stats
+            (product count unavailable) = 5 tracks. */}
+        <div
+          className={`grid grid-cols-1 sm:grid-cols-2 gap-0 ${
+            stats.length === 3
+              ? 'lg:grid-cols-[minmax(0,1fr)_1px_minmax(0,1fr)_1px_minmax(0,1fr)]'
+              : 'lg:grid-cols-[minmax(0,1fr)_1px_minmax(0,1fr)_1px_minmax(0,1fr)_1px_minmax(0,1fr)]'
+          }`}
+        >
           {stats.map((stat, i) => (
-            <div key={stat.label} className="flex lg:contents">
+            <div
+              key={stat.label}
+              // 3 stats (no live product count) on the 2-col sm grid: the
+              // last one takes the full row instead of leaving half empty.
+              className={`flex lg:contents ${stats.length === 3 && i === 2 ? 'sm:col-span-2' : ''}`}
+            >
               {/* vertical divider before each item except first */}
               {i > 0 && <VerticalDivider />}
 

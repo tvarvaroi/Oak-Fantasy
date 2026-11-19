@@ -27,6 +27,25 @@ export async function fetchActiveProducts(): Promise<CatalogProduct[]> {
   }
 }
 
+// Number of active products, for the homepage NumbersStrip. null on any
+// failure (never 0): the caller hides the figure rather than show a wrong one.
+export async function countActiveProducts(): Promise<number | null> {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) return null;
+  try {
+    const sb = createClient<Database>(url, key);
+    const { count, error } = await sb
+      .from('products')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'active');
+    if (error || !count) return null;
+    return count;
+  } catch {
+    return null;
+  }
+}
+
 // Stock availability for a set of products. inventory RLS is admin-only, so the
 // public catalog can't read it with the anon client — we use the service-role
 // key SERVER-SIDE and expose ONLY a boolean (inStock) to the client; the exact

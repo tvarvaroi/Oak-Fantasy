@@ -1,0 +1,45 @@
+'use client';
+
+import { useParams, useRouter } from 'next/navigation';
+import Navbar from '@/components/Navbar';
+import Hero from '@/components/Hero';
+import StoryStrip from '@/components/StoryStrip';
+import WorkshopSection from '@/components/WorkshopSection';
+import ProductTease from '@/components/ProductTease';
+import CustomOrderTease from '@/components/CustomOrderTease';
+import NumbersStrip from '@/components/NumbersStrip';
+import CraftVideoTease from '@/components/CraftVideoTease';
+import WaitlistSection from '@/components/WaitlistSection';
+import Footer from '@/components/Footer';
+import FloatingCTA from '@/components/FloatingCTA';
+
+type Locale = 'ro' | 'en';
+
+// Homepage body (moved out of app/[locale]/page.tsx on 2026-11-19 so the
+// server page can pass the live active-product count to NumbersStrip).
+export default function HomeClient({ productCount }: { productCount: number | null }) {
+  const params = useParams();
+  const router = useRouter();
+  const locale = (params?.locale as Locale) ?? 'ro';
+  const language: Locale = locale === 'en' ? 'en' : 'ro';
+
+  const toggleLanguage = () => {
+    router.push(language === 'ro' ? '/en' : '/ro');
+  };
+
+  return (
+    <main style={{ backgroundColor: 'var(--cream-warm)' }}>
+      <Navbar language={language} onToggleLanguage={toggleLanguage} />
+      <Hero language={language} />
+      <StoryStrip language={language} />
+      <WorkshopSection language={language} />
+      <ProductTease language={language} />
+      <NumbersStrip language={language} productCount={productCount} />
+      <CustomOrderTease language={language} />
+      <CraftVideoTease language={language} />
+      <WaitlistSection language={language} />
+      <Footer language={language} />
+      <FloatingCTA language={language} />
+    </main>
+  );
+}
