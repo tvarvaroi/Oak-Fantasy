@@ -503,3 +503,20 @@ Reply-To = `LEGAL_INFO.contactEmail` (domeniul nu are căsuță); cele către ad
 **Motiv:** un env uitat pe Vercel ar fi trimis clienții pe domeniul vechi fără niciun semnal.
 **robots:** rămâne Disallow până la „lansăm”; Variant B e pregătită pe branch-ul local
 `launch/robots-allow`. **Gardă:** tests/e2e/domain.spec.ts; live: scripts/smoke-domain.mjs.
+
+## 2026-11-19 — CSP enforce în producție; 404 per limbă; gardă open-redirect
+
+**CSP:** `Content-Security-Policy` (enforce) pe build-ul de producție (Vercel Production + `next start`
+local); Report-Only pe Vercel Preview (toolbar/comentarii) și în `next dev` (+`'unsafe-eval'`).
+Motiv: 25 de pagini live cu zero încălcări Report-Only (scripts/smoke-domain.mjs). Smoke-urile
+(domain, ramburs, custom orders) pică acum la orice încălcare CSP, inclusiv în fluxurile admin.
+**404:** `app/[locale]/not-found.tsx` + catch-all `app/[locale]/[...rest]/page.tsx` → 404-ul are
+fonturile, navbar/footer și limba URL-ului (useParams). Căile cu punct (`/.env`, `/x.php`) ajung și
+ele acolo prin rewrite-ul `afterFiles` din next.config.js. `app/not-found.tsx` e doar „last resort”
+(ex. `/api/…`, `/admin/…` inexistente), stilizat inline, RO + link separat „English version”.
+**Catalog mobil (≤900px):** filtrele pe un singur rând derulabil orizontal — bara sticky scade de la
+~330px la ~128px.
+**Redirecturi:** `lib/safe-redirect.ts` pentru orice „unde mergi după” venit de la utilizator
+(signout `redirectTo`, callback `next`): fără `\` și caractere de control, origine neschimbată.
+**Comenzi de test:** OF-2026-0001…0009 șterse definitiv (cu items/history/stock_movements) la cererea
+founder-ului; stocul verificat identic. Backup JSON în scratchpad-ul sesiunii (temporar).

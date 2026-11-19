@@ -1283,3 +1283,44 @@ Redirect URLs; Supabase ignoră `redirect_to` nepermis și cade pe Site URL.
 **Fix (dashboard, founder):** Site URL = `https://oakfantasy.ro`; Redirect URLs =
 `https://oakfantasy.ro/**`, `http://localhost:3000/**` (+ temporar `https://www.oakfantasy.ro/**`).
 **Verificare fără inbox:** generateLink + `fetch(action_link, {redirect:'manual'})` → header Location.
+
+## 2026-11-19 — Rutele necunoscute sub /ro sau /en nu folosesc `[locale]/not-found.tsx`
+
+**Simptom:** 404-ul pentru `/en/orice` era pagina root (Georgia, text RO + EN amestecat).
+**Cauză:** în Next 14, URL-urile nepotrivite randează `app/not-found.tsx` (în afara layout-ului
+`[locale]`); `[locale]/not-found.tsx` prinde doar `notFound()` apelat dintr-o pagină a segmentului.
+**Fix:** catch-all `app/[locale]/[...rest]/page.tsx` care apelează `notFound()`; not-found-ul din
+segment citește limba cu `useParams()` (nu primește params).
+
+## 2026-11-19 — Garda `startsWith('/') && !startsWith('//')` lasă trecut `/\evil.com`
+
+Browserele tratează `\` ca `/` și ignoră tab/newline în URL: `/\evil.com` și `/\t/evil.com` ajung pe
+evil.com. Folosește `safeRedirectPath()` (lib/safe-redirect.ts): rezolvă cu `new URL(value, origin)`
+și compară originea. Test: tests/e2e/auth-redirect.spec.ts (pică pe garda veche).
+
+## 2026-11-19 — `next build` pică intermitent în next/font (descărcarea de la Google)
+
+**Simptom:** `An error occurred in next/font. TypeError: Cannot read properties of null (reading '1')`
+(google/loader.js:112) — 4 eșecuri din ~12 build-uri în aceeași seară, apoi 8 reușite la rând fără
+nicio schimbare de cod. Fișierul indicat varia (admin/layout, lib/fonts).
+**Cauză:** `next/font/google` descarcă CSS-ul + fonturile de la Google la FIECARE build; când
+răspunsul conține un URL fără extensie, regex-ul din loader întoarce null. Extern, nu din cod.
+Prima mea ipoteză (declarații duplicate) era greșită — build-ul a picat și după centralizare.
+**Fix:** rulează build-ul din nou (pe Vercel: Redeploy). Pentru a elimina dependența de rețea:
+fonturile ca fișiere locale (`next/font/local`, OFL) — propus founder-ului, neaplicat.
+`lib/fonts.ts` a rămas (o singură declarație, igienă), dar NU e fix-ul.
+
+## 2026-11-19 — 404-ul root (notFound() din layout) se servește fără niciun CSS
+
+**Simptom:** `/.env` → pagina 404 nestilizată (Times, alb pur), deși `app/not-found.tsx` importa
+`globals.css` + next/font. HTML-ul avea `<html id="__next_error__">` și zero `<link rel=stylesheet>`.
+**Cauză:** căile cu punct ocolesc middleware-ul și ajung în `[locale]` cu locale=".env";
+`notFound()` din LAYOUT randează not-found-ul root prin shell-ul de eroare al Next, care nu
+încarcă CSS-ul importat acolo.
+**Fix:** rewrite `afterFiles` în next.config.js: orice primă componentă care nu e ro/en/_next/api/
+auth/admin/robots.txt/sitemap.xml → `/ro/<cale>` → catch-all → 404-ul localizat, cu CSS. Root-ul
+a rămas „last resort” cu stiluri inline (hex = tokenii din globals.css).
+**Capcane:** (1) în regex-ul parametrului, lookahead-ul vede TOT restul căii: `(?!en$)` lăsa
+`/en/about` să fie rescris → 404 pe toată engleza. Corect: `(?!(?:ro|en|…)(?:/|$))`.
+(2) În `next dev`, robots.txt/sitemap.xml (metadata routes) se potrivesc DUPĂ afterFiles → excluse
+explicit. Gardă: tests/e2e/mobile-polish.spec.ts („rewrite leaves real routes and files alone”).
