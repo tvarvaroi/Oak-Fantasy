@@ -102,7 +102,7 @@ const ro: AboutContent = {
     eyebrow: 'Procesul',
     h2: 'Cinci pași între copac și bucătărie.',
     subHeading: 'De la copac la bucătărie',
-    lead: 'De la stejarul nealtoit din pădurile noastre până la tocătorul pe care îl primești acasă — fiecare etapă cere timp, atenție și mâinile aceluiași om.',
+    lead: 'De la stejarul nealtoit din pădurile României până la tocătorul pe care îl primești acasă — fiecare etapă cere timp, atenție și mâinile aceluiași om.',
     steps: [
       {
         num: '01',
@@ -218,7 +218,7 @@ const en: AboutContent = {
     eyebrow: 'The process',
     h2: 'Five steps between the tree and your kitchen.',
     subHeading: 'From tree to kitchen',
-    lead: 'From wild Romanian oak to the board that arrives at your home — every stage takes time, attention, and the same pair of hands.',
+    lead: 'From wild oak in Romania’s forests to the board that arrives at your home — every stage takes time, attention, and the same pair of hands.',
     steps: [
       {
         num: '01',
