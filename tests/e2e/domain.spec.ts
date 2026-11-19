@@ -114,13 +114,15 @@ test.describe('Domain — one origin everywhere', () => {
     expect(txt).not.toMatch(LEGACY);
   });
 
-  // Pre-launch lockdown: robots stays Disallow until the founder says "lansăm".
-  // The launch commit flips this test together with app/robots.ts.
-  test('robots.txt is still the pre-launch lockdown', async ({ request }) => {
+  // Launched (founder's "lansăm"): public site crawlable, private paths blocked.
+  test('robots.txt allows the site, blocks private paths, lists the sitemap', async ({ request }) => {
     const txt = await (await request.get('/robots.txt')).text();
-    expect(txt).toMatch(/Disallow: \/\s*$/m);
-    expect(txt).not.toMatch(/^Allow:/m);
-    expect(txt).not.toMatch(/Sitemap:/i);
+    expect(txt).toMatch(/^Allow: \/$/m);
+    expect(txt).not.toMatch(/^Disallow: \/$/m);
+    for (const p of ['/admin', '/api/', '/auth/', '/ro/cos', '/en/cart', '/ro/checkout', '/ro/multumim', '/en/thank-you', '/ro/login', '/ro/inregistrare', '/ro/parola-uitata', '/ro/reset-parola']) {
+      expect(txt, p).toContain(`Disallow: ${p}`);
+    }
+    expect(txt).toContain(`Sitemap: ${SITE}/sitemap.xml`);
   });
 });
 

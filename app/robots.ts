@@ -1,26 +1,38 @@
 import type { MetadataRoute } from 'next';
 
-// ⚠️ VARIANT A — PRE-LAUNCH LOCKDOWN (SEO audit fix #2). ⚠️
+import { LOCALES, PATHNAMES, type RouteKey } from '@/lib/i18n-routes';
+import { SITE_URL } from '@/lib/site-url';
+
+// VARIANT B — LAUNCHED (founder's "lansăm", SEO audit fix #2).
 //
-// oakfantasy.ro is connected (2026-11-19) and every canonical/hreflang/sitemap
-// URL points at it, but the shop is not launched yet, so ALL crawlers stay
-// blocked. The founder decides the launch; until then this file does not change.
-//
-// ═══ MUST-FLIP-AT-LAUNCH (only on the founder's explicit "lansăm") ═══
-// Variant B: allow all, disallow /admin, /api, /auth + transactional pages
-// (cos/cart, checkout, multumim/thank-you, auth pages), and add
-// sitemap = `${SITE_URL}/sitemap.xml` + host. Prepared as a separate
-// commit (branch launch/robots-allow). Tracked in
-// _brain/notes/SECURITY_CHECKLIST.md (pre-launch) and gotchas.md.
-// ═════════════════════════════════════════════════════════════════════
+// Crawlers may index the public site on https://oakfantasy.ro. Blocked:
+// admin, API and auth route handlers, plus the transactional and account
+// pages in both locales (cart, checkout, thank-you, login, register,
+// password reset) — they carry no search value and some are per-customer.
+// Every disallowed path is derived from PATHNAMES, so a renamed slug cannot
+// silently become crawlable.
+
+const PRIVATE_ROUTES: RouteKey[] = [
+  'cos',
+  'checkout',
+  'multumim',
+  'login',
+  'register',
+  'forgotPassword',
+  'resetPassword',
+];
 
 export default function robots(): MetadataRoute.Robots {
+  const privatePaths = Array.from(
+    new Set(PRIVATE_ROUTES.flatMap((key) => LOCALES.map((l) => `/${l}/${PATHNAMES[key][l]}`))),
+  );
   return {
     rules: {
       userAgent: '*',
-      disallow: '/',
+      allow: '/',
+      disallow: ['/admin', '/api/', '/auth/', ...privatePaths],
     },
-    // No sitemap reference while everything is blocked (Variant A). The
-    // sitemap itself (app/sitemap.ts) is already built and live for launch.
+    sitemap: `${SITE_URL}/sitemap.xml`,
+    host: SITE_URL,
   };
 }
