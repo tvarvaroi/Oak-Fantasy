@@ -65,6 +65,15 @@ test.describe('Origin claims stay plain', () => {
     });
   }
 
+  test('/despre process lead: "pădurile României", not "pădurile noastre"', async ({ page }) => {
+    await page.goto('/ro/despre');
+    const main = page.locator('main');
+    await expect(main).toContainText('De la stejarul nealtoit din pădurile României');
+    await expect(main).not.toContainText('pădurile noastre');
+    await page.goto('/en/about');
+    await expect(page.locator('main')).toContainText('From wild oak in Romania’s forests');
+  });
+
   test('/despre values card: Romanian oak, solid wood, worked by hand', async ({ page }) => {
     await page.goto('/ro/despre');
     await expect(page.locator('main')).toContainText('Lucrăm cu stejar românesc: lemn masiv, lucrat manual, fără compromis.');

@@ -63,6 +63,15 @@ test.describe('/atelier page + path-localized routing', () => {
     });
   }
 
+  // 2026-11-19: the planer card shows a HANDHELD electric planer (the old
+  // stock photo was a stationary machine).
+  test('planer card uses the handheld planer photo', async ({ page }) => {
+    await page.goto('/ro/atelier');
+    const card = page.locator('#unelte article').filter({ hasText: 'Rindea electrică' });
+    await expect(card.locator('img')).toHaveAttribute('src', /atelier-tool-hand-planer/);
+    await expect(card.locator('img')).toHaveAttribute('alt', /Rindea electrică de mână/);
+  });
+
   test('RO seasons section has all 4 seasons', async ({ page }) => {
     await page.goto('/ro/atelier');
     const sezon = page.locator('#sezon');
