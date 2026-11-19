@@ -1208,3 +1208,10 @@ ei — sau verifică `git diff --cached --stat` înainte de fiecare commit.
 **Simptom:** un titlu de test scris ca template literal cu `${path}` a ajuns `test(, …)` —
 bash a expandat `${path}` (gol) în ghilimelele duble. **Regulă:** cod TS/JS cu backtick-uri
 sau `${}` se scrie cu Edit/Write sau heredoc `<<'EOF'`, nu prin `node -e "…"`.
+
+## 2026-11-19 — e2e lung + sleep-ul Windows = eșecuri false (ERR_NETWORK_IO_SUSPENDED)
+
+**Simptom:** 9 teste picate, doar pe desktop, fără legătură între ele; suita a durat 8,9 h.
+**Cauză:** sistemul a intrat în sleep în timpul rulării: `net::ERR_NETWORK_IO_SUSPENDED`,
+`browserType.launch: Timeout 180000ms`. **Fix:** rerulează suita; un eșec cu aceste erori
+nu e un bug de cod. Atenție: `--last-failed` după o rulare vizuală curată re-rulează TOT.

@@ -538,3 +538,18 @@ NumbersStrip.tsx, about/content.ts, StoryStrip.tsx, public/llms.txt, tests (atel
 shared-components).
 **De ce contează:** o gardă e2e pe HTML-ul randat prinde și reintroducerile din DB sau din
 JSON-LD, nu doar din fișierele editate.
+
+---
+
+## 2026-11-19 — Stock pentru o unealtă anume: când Pexels n-are, decupează (licența permite)
+
+**Pattern descoperit:** pentru „rindea electrică de mână” Pexels dă aproape numai rindele
+manuale, mașini staționare sau poze cu brand/fețe. Singura potrivită avea fața lucrătorului →
+decupaj cu ffmpeg (`crop` + `colorbalance` + `hqdn3d`, WebP q72) în format peisaj apropiat de
+cardul `object-fit: cover`, ca subiectul să nu fie tăiat. Verificare vizuală a fiecărui
+candidat cu Read înainte, a decupajului după, și a cardului randat la 4 viewporturi.
+Pentru inventare mari (afirmații de pe tot site-ul): workflow pe zone + critic de
+completitudine + agent de grupare pe „fapt” → pagină artifact cu `db` unde founder-ul
+marchează, iar noi citim marcajele cu ArtifactData în loc de o listă lungă în chat.
+**Aplicat la:** public/stock/atelier-tool-hand-planer.webp, docs/stock-credits.md,
+artifact „Verificarea afirmațiilor”.

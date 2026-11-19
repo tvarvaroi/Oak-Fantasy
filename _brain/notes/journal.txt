@@ -1542,3 +1542,23 @@ VERIFICARE: typecheck ✓ · lint ✓ · check:i18n ✓ · build ✓ zero warnin
   22 skipped / 0 failed · vizual 78/78 (7 regenerate) + 78/78 confirmare · hidratare 0 (28) ·
   scanare HTML randat pe 18 pagini + llms.txt: 0 branduri / absolute · design-qa 57 capturi
   (/atelier RO+EN × 4 vp + RM, banda de cifre RO/EN × 4 vp, cardul din Despre).
+
+═══════════════════════════════════════════════════════════════════
+2026-11-19 (3) — „PĂDURILE ROMÂNIEI”, POZĂ RINDEA DE MÂNĂ, INVENTAR AFIRMAȚII [LIVRAT]
+═══════════════════════════════════════════════════════════════════
+1. Despre (lead „Procesul”): „din pădurile noastre” → „din pădurile României”; EN „From wild
+   Romanian oak” → „From wild oak in Romania’s forests”.
+2. Poza „Rindea electrică”: Pexels nu are aproape deloc rindele electrice DE MÂNĂ fără brand și
+   fără fețe (7 căutări, 8 candidate respinse vizual). Ales 14441384 (singura reală) DECUPAT:
+   fără fața lucrătorului, fără cablul jupuit; ușor încălzit; 1100×734 WebP 152 KB →
+   public/stock/atelier-tool-hand-planer.webp; stock-credits.md actualizat. Fișierul vechi
+   rămâne pentru slideshow-ul ascuns.
+3. Titebond III: neatins (cerere founder).
+4. Inventar afirmații: workflow 5 agenți pe zone + critic de completitudine (446 itemi) →
+   agent de grupare → 114 fapte / 905 apariții / 69 cu contradicții → pagină artifact
+   privată cu marcaje (db, colecția „marks”): https://claude.ai/artifact/15U9aoRWMkFnV9FNE6tjcj
+   Founder-ul marchează Adevărat / Fals / De corectat; citim marcajele cu ArtifactData list.
+VERIFICARE: typecheck ✓ · lint ✓ · check:i18n ✓ · build ✓ · e2e 470 passed / 22 skipped / 0
+  failed (prima rulare: 9 eșecuri de mediu — sistemul a intrat în sleep, ERR_NETWORK_IO_SUSPENDED;
+  rerun complet curat) · vizual 78/78 (1 regenerată) + 78/78 · hidratare 0 · design-qa 40
+  capturi (/atelier + /despre RO/EN × 4 vp + RM).
