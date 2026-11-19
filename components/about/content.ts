@@ -193,7 +193,7 @@ const ro: AboutContent = {
   },
   cta: {
     h2: 'Lucrate manual, în stoc limitat.',
-    p: 'Fiecare piesă iese din atelier una câte una. Ce vezi în catalog e gata de trimis.',
+    p: 'Fiecare piesă iese din atelier una câte una. Unele sunt gata făcute, altele le lucrăm după comandă. Expediem în cel mult 5–10 zile lucrătoare.',
     primaryLabel: 'Vezi tocătoarele noastre',
     primaryRoute: 'tocatoare',
     ghostLabel: 'Vezi atelierul',
@@ -310,7 +310,7 @@ const en: AboutContent = {
   },
   cta: {
     h2: 'Handmade, in limited stock.',
-    p: 'Every piece leaves the workshop one at a time. What you see in the catalog is ready to ship.',
+    p: 'Every piece leaves the workshop one at a time. Some are ready-made, others we make once you order. We ship within 5–10 business days at the latest.',
     primaryLabel: 'See our cutting boards',
     primaryRoute: 'tocatoare',
     ghostLabel: 'See the workshop',

@@ -51,7 +51,13 @@ function isRouteKey(value: string): value is RouteKey {
 const INLINE = /(\{[a-zA-Z]+\}|\[[^\]]+\]\([^)\s]+\)|\*\*[^*]+\*\*)/g;
 
 export function renderLegalInline(text: string, locale: Locale): ReactNode {
-  const parts = text.split(INLINE);
+  // A token whose value already ends in "." (ROOBO PELLETS S.R.L.) printed at
+  // the end of a sentence gave "S.R.L.." — drop the sentence's own period
+  // (2026-11-19). Also covers a bold token: **{companyName}**.
+  const normalized = text.replace(/\{([a-zA-Z]+)\}(\*\*)?\./g, (match, name: string, bold?: string) =>
+    plainToken(name, locale)?.endsWith('.') ? `{${name}}${bold ?? ''}` : match,
+  );
+  const parts = normalized.split(INLINE);
   return parts.map((part, i) => {
     if (!part) return null;
 

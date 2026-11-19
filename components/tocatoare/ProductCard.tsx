@@ -7,6 +7,7 @@ import { formatPriceRon, formatDimensions } from './content';
 import type { TocatoareContent, Tier } from './content';
 import { localizedPath, type Locale } from '@/lib/i18n-routes';
 import type { Database } from '@/types/supabase';
+import { keepUnits } from '@/lib/typography';
 
 type Product = Database['public']['Tables']['products']['Row'];
 
@@ -18,9 +19,10 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, content, locale, inStock = true }: ProductCardProps) {
-  const name = locale === 'ro' ? product.name_ro : product.name_en;
-  const desc =
-    locale === 'ro' ? product.short_description_ro : product.short_description_en;
+  const name = keepUnits(locale === 'ro' ? product.name_ro : product.name_en);
+  const desc = keepUnits(
+    locale === 'ro' ? product.short_description_ro : product.short_description_en,
+  );
   const dims = formatDimensions(product.dimensions, locale);
   const tier = product.tier as Tier;
   // Task 3.1: both CTAs route to the product detail page (locale-aware URL;

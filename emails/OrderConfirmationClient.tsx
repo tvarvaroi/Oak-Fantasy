@@ -15,6 +15,7 @@ import {
 import * as React from 'react';
 
 import { LEGAL_INFO } from '@/lib/legal-info';
+import { keepUnits } from '@/lib/typography';
 
 // Client-facing order confirmation (Task 3.5). RO/EN by order.locale. Branded
 // like the Sprint-1 contact emails: inline palette (React Email strips Tailwind),
@@ -86,12 +87,13 @@ const copy = {
     statusPending: 'Așteptăm confirmarea plății.',
     itemsHeading: 'Produse',
     engraving: 'Gravare',
+    quantity: 'Cantitate',
     subtotal: 'Subtotal',
     shipping: 'Transport',
     freeShipping: 'Gratuit',
     total: 'Total',
     shippingToHeading: 'Livrare către',
-    leadTime: 'După confirmare, lucrăm comanda în 5–10 zile lucrătoare; curierul o livrează de regulă în 1–3 zile lucrătoare.',
+    leadTime: 'Expediem comanda în cel mult 5–10 zile lucrătoare de la confirmare; curierul o livrează apoi, de regulă, în 1–3 zile lucrătoare.',
     viewOrder: 'Vezi comanda',
     browse: 'Vezi tocătoarele',
     sign: 'Cu lemn proaspăt pe banc,',
@@ -111,12 +113,13 @@ const copy = {
     statusPending: 'We are waiting for payment confirmation.',
     itemsHeading: 'Items',
     engraving: 'Engraving',
+    quantity: 'Quantity',
     subtotal: 'Subtotal',
     shipping: 'Shipping',
     freeShipping: 'Free',
     total: 'Total',
     shippingToHeading: 'Shipping to',
-    leadTime: 'Once confirmed, we make your order in 5–10 business days; the courier usually delivers it in 1–3 business days.',
+    leadTime: 'We ship your order within 5–10 business days of confirmation at the latest; the courier then usually delivers it in 1–3 business days.',
     viewOrder: 'View order',
     browse: 'Browse our boards',
     sign: 'With fresh wood on the bench,',
@@ -321,13 +324,11 @@ export default function OrderConfirmationClient({
                       color: palette.ink,
                     }}
                   >
-                    {it.name} × {it.quantity}
-                    {it.engravingText ? (
-                      <span style={{ color: palette.inkSoft, fontSize: 12 }}>
-                        {' '}
-                        · {t.engraving}: “{it.engravingText}”
-                      </span>
-                    ) : null}
+                    {keepUnits(it.name)}
+                  </Text>
+                  <Text style={{ margin: '2px 0 0', fontFamily: fonts.body, fontSize: 12, lineHeight: 1.5, color: palette.inkSoft }}>
+                    {t.quantity}: {it.quantity}
+                    {it.engravingText ? ` · ${t.engraving}: “${it.engravingText}”` : null}
                   </Text>
                 </Column>
                 <Column style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>

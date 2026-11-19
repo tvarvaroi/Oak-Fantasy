@@ -7,7 +7,7 @@ import { LEGAL_LAST_UPDATED, type LegalContent } from '../content';
 // and shipping prices are tokens (see ../content.ts), never typed in.
 // Facts confirmed by the founder at the 2026-11-19 gate: cash on delivery
 // only; Romania only, courier unnamed; manual confirmation by phone/WhatsApp;
-// 5–10 working days + 1–3 days in transit; refused COD parcel = cancelled at
+// max 5–10 working days to dispatch (some pieces ready-made, some made to order) + 1–3 days in transit; refused COD parcel = cancelled at
 // no cost; engraved orders cancellable free until engraving starts; 18+.
 
 export const TERMS_CONTENT: Record<Locale, LegalContent> = {
@@ -109,7 +109,7 @@ export const TERMS_CONTENT: Record<Locale, LegalContent> = {
           },
           {
             kind: 'p',
-            text: 'Lucrăm fiecare comandă în 5–10 zile lucrătoare de la confirmare.',
+            text: 'Unele produse sunt gata făcute, pe altele le lucrăm după ce primim comanda. În ambele cazuri, expediem comanda în cel mult 5–10 zile lucrătoare de la confirmare.',
           },
         ],
       },
@@ -190,7 +190,7 @@ export const TERMS_CONTENT: Record<Locale, LegalContent> = {
           },
           {
             kind: 'p',
-            text: 'Lucrăm comanda în 5–10 zile lucrătoare de la confirmare. După expediere, curierul o livrează de regulă în 1–3 zile lucrătoare. Dacă apare o întârziere, te anunțăm.',
+            text: 'Expediem comanda în cel mult 5–10 zile lucrătoare de la confirmare. După expediere, curierul o livrează de regulă în 1–3 zile lucrătoare. Dacă apare o întârziere, te anunțăm.',
           },
           {
             kind: 'p',
@@ -459,7 +459,7 @@ export const TERMS_CONTENT: Record<Locale, LegalContent> = {
           },
           {
             kind: 'p',
-            text: 'We make each order in 5–10 working days from confirmation.',
+            text: 'Some products are ready-made; others we make once we receive the order. Either way, we ship the order within 5–10 working days of confirmation at the latest.',
           },
         ],
       },
@@ -540,7 +540,7 @@ export const TERMS_CONTENT: Record<Locale, LegalContent> = {
           },
           {
             kind: 'p',
-            text: 'We make your order in 5–10 working days from confirmation. Once shipped, the courier usually delivers it in 1–3 working days. If there is a delay, we let you know.',
+            text: 'We ship your order within 5–10 working days of confirmation at the latest. Once shipped, the courier usually delivers it in 1–3 working days. If there is a delay, we let you know.',
           },
           {
             kind: 'p',
@@ -703,7 +703,7 @@ export const TERMS_CONTENT: Record<Locale, LegalContent> = {
       sectionLabel: 'Merchant details',
       labels: {
         operator: 'Merchant',
-        cui: 'Tax ID',
+        cui: 'Company ID (CUI)',
         regCom: 'Reg. Com.',
         sediu: 'Registered office',
         contact: 'Contact',

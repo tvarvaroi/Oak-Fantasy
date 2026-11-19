@@ -21,7 +21,10 @@ export interface ProductDetailContent {
   photoBadge: string;
   backToCatalog: string;
   galleryThumbAria: string;
+  /** Orderable (ready-made or made to order). Not a promise the piece is already made. */
   inStock: string;
+  /** Shown under the availability badge: max time to dispatch (2026-11-19). */
+  leadTime: string;
   outOfStock: string;
   outOfStockNote: string;
 }
@@ -43,7 +46,8 @@ export const PRODUCT_DETAIL_CONTENT: Record<Locale, ProductDetailContent> = {
     photoBadge: 'Foto în pregătire',
     backToCatalog: 'Înapoi la tocătoare',
     galleryThumbAria: 'Vezi imaginea',
-    inStock: 'În stoc',
+    inStock: 'Disponibil',
+    leadTime: 'Unele piese sunt gata făcute, altele le lucrăm după comandă. Expediem în cel mult 5–10 zile lucrătoare.',
     outOfStock: 'Stoc epuizat',
     outOfStockNote: 'Acest produs s-a epuizat. Scrie-ne dacă vrei să-l refacem.',
   },
@@ -63,7 +67,8 @@ export const PRODUCT_DETAIL_CONTENT: Record<Locale, ProductDetailContent> = {
     photoBadge: 'Photo coming soon',
     backToCatalog: 'Back to cutting boards',
     galleryThumbAria: 'View image',
-    inStock: 'In stock',
+    inStock: 'Available',
+    leadTime: 'Some pieces are ready-made, others we make once you order. We ship within 5–10 business days at the latest.',
     outOfStock: 'Out of stock',
     outOfStockNote: 'This piece is sold out. Write to us if you’d like us to make it again.',
   },

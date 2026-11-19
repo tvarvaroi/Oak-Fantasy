@@ -16,6 +16,7 @@ import * as React from 'react';
 
 import { LEGAL_INFO } from '@/lib/legal-info';
 import type { OrderEmailItem } from './OrderConfirmationClient';
+import { keepUnits } from '@/lib/typography';
 
 // Internal admin notification (Task 3.5). Always Romanian, sent to
 // RESEND_ADMIN_EMAIL on every placed order (cash-on-delivery now, card on
@@ -177,13 +178,11 @@ export default function OrderNotificationAdmin({
               <Row key={i} style={{ marginBottom: 8 }}>
                 <Column>
                   <Text style={{ margin: 0, fontFamily: fonts.body, fontSize: 14, color: palette.ink }}>
-                    {it.name} × {it.quantity}
-                    {it.engravingText ? (
-                      <span style={{ color: palette.inkSoft, fontSize: 12 }}>
-                        {' '}
-                        · Gravare: “{it.engravingText}”
-                      </span>
-                    ) : null}
+                    {keepUnits(it.name)}
+                  </Text>
+                  <Text style={{ margin: '2px 0 0', fontFamily: fonts.body, fontSize: 12, color: palette.inkSoft }}>
+                    Cantitate: {it.quantity}
+                    {it.engravingText ? ` · Gravare: “${it.engravingText}”` : null}
                   </Text>
                 </Column>
                 <Column style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>

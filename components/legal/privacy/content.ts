@@ -730,7 +730,7 @@ export const PRIVACY_CONTENT: Record<Locale, LegalContent> = {
       sectionLabel: 'Data controller',
       labels: {
         operator: 'Controller',
-        cui: 'Tax ID',
+        cui: 'Company ID (CUI)',
         regCom: 'Reg. Com.',
         sediu: 'Registered office',
         contact: 'Data protection contact',

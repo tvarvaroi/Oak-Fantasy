@@ -7,12 +7,12 @@ import { test, expect } from './fixtures';
 // at the gate, and the links that lead to these pages.
 
 const PAGES = [
-  { path: '/ro/termeni', h1: 'Termeni și condiții', sections: 15, date: '19 noiembrie 2026' },
-  { path: '/en/terms', h1: 'Terms and conditions', sections: 15, date: '19 November 2026' },
-  { path: '/ro/confidentialitate', h1: 'Politica de confidențialitate', sections: 12, date: '19 noiembrie 2026' },
-  { path: '/en/privacy', h1: 'Privacy policy', sections: 12, date: '19 November 2026' },
-  { path: '/ro/retur', h1: 'Politica de retur', sections: 10, date: '19 noiembrie 2026' },
-  { path: '/en/returns', h1: 'Returns policy', sections: 10, date: '19 November 2026' },
+  { path: '/ro/termeni', h1: 'Termeni și condiții', sections: 15, date: '20 noiembrie 2026' },
+  { path: '/en/terms', h1: 'Terms and conditions', sections: 15, date: '20 November 2026' },
+  { path: '/ro/confidentialitate', h1: 'Politica de confidențialitate', sections: 12, date: '20 noiembrie 2026' },
+  { path: '/en/privacy', h1: 'Privacy policy', sections: 12, date: '20 November 2026' },
+  { path: '/ro/retur', h1: 'Politica de retur', sections: 10, date: '20 noiembrie 2026' },
+  { path: '/en/returns', h1: 'Returns policy', sections: 10, date: '20 November 2026' },
 ] as const;
 
 test.describe('Legal pages — structure', () => {

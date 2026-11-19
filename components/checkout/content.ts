@@ -61,6 +61,8 @@ export interface CheckoutContent {
   placeOrderComingSoon: string;
   placing: string;
   engraving: string;
+  /** Line items: quantity on its own line, never "480 mm × 1" (2026-11-19). */
+  quantityLabel: string;
   errors: { generic: string; unavailable: string; outOfStock: string; paymentUnavailable: string };
 }
 
@@ -100,7 +102,7 @@ export const CHECKOUT_CONTENT: Record<Locale, CheckoutContent> = {
     shippingCostLabel: 'Transport',
     freeShipping: 'Gratuit',
     freeShippingHint: 'Transport gratuit de la 500 RON.',
-    leadTime: 'Lucrăm comanda în 5–10 zile lucrătoare, apoi curierul o livrează de regulă în 1–3 zile lucrătoare.',
+    leadTime: 'Expediem comanda în cel mult 5–10 zile lucrătoare de la confirmare, apoi curierul o livrează de regulă în 1–3 zile lucrătoare.',
 
     reviewHeading: 'Rezumat comandă',
     shippingToLabel: 'Livrare către',
@@ -119,6 +121,7 @@ export const CHECKOUT_CONTENT: Record<Locale, CheckoutContent> = {
     placeOrderComingSoon: 'Plata vine în curând — o activăm în pasul următor.',
     placing: 'Se procesează…',
     engraving: 'Gravare',
+    quantityLabel: 'Cantitate',
     errors: {
       generic: 'Ceva nu a mers. Te rugăm încearcă din nou.',
       unavailable: 'Un produs din coș nu mai este disponibil.',
@@ -161,7 +164,7 @@ export const CHECKOUT_CONTENT: Record<Locale, CheckoutContent> = {
     shippingCostLabel: 'Shipping',
     freeShipping: 'Free',
     freeShippingHint: 'Free shipping from 500 RON.',
-    leadTime: 'We make your order in 5–10 business days; the courier then usually delivers it in 1–3 business days.',
+    leadTime: 'We ship your order within 5–10 business days of confirmation at the latest; the courier then usually delivers it in 1–3 business days.',
 
     reviewHeading: 'Order summary',
     shippingToLabel: 'Shipping to',
@@ -180,6 +183,7 @@ export const CHECKOUT_CONTENT: Record<Locale, CheckoutContent> = {
     placeOrderComingSoon: 'Payment is coming soon — we enable it in the next step.',
     placing: 'Processing…',
     engraving: 'Engraving',
+    quantityLabel: 'Quantity',
     errors: {
       generic: 'Something went wrong. Please try again.',
       unavailable: 'A product in your cart is no longer available.',

@@ -7,6 +7,7 @@ import { useCartStore, type CartItem } from '@/lib/store/cart';
 import { formatPriceRon } from '@/components/tocatoare/content';
 import type { Locale } from '@/lib/i18n-routes';
 import type { CartContent } from './content';
+import { keepUnits } from '@/lib/typography';
 
 export default function CartLineItem({
   item,
@@ -22,7 +23,7 @@ export default function CartLineItem({
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const removeItem = useCartStore((s) => s.removeItem);
 
-  const name = locale === 'ro' ? item.name_ro : item.name_en;
+  const name = keepUnits(locale === 'ro' ? item.name_ro : item.name_en);
   const unitPrice = item.priceRon + (item.engraving?.priceRon ?? 0);
   const lineTotal = unitPrice * item.quantity;
   const thumb = compact ? 60 : 84;

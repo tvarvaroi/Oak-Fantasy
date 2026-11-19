@@ -64,7 +64,12 @@ export default function TocatoareCatalog({ products, content, locale, outOfStock
         ? content.sort.options.priceDesc
         : content.sort.button;
 
-  const tierKeys: FilterKey[] = ['all', 'entry', 'core', 'premium', 'hero'];
+  // Tiers with no active product are hidden (2026-11-19, founder): a pill that
+  // leads to an empty grid is noise. "All" always shows; a tier comes back on
+  // its own as soon as a product in it is activated.
+  const tierKeys = (['all', 'entry', 'core', 'premium', 'hero'] as FilterKey[]).filter(
+    (key) => key === 'all' || counts[key] > 0,
+  );
 
   return (
     <>

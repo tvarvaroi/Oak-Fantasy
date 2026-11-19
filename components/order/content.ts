@@ -12,6 +12,7 @@ export interface OrderConfirmContent {
   totalLabel: string;
   priceUnit: string;
   engraving: string;
+  quantityLabel: string;
   continueShopping: string;
 }
 
@@ -28,6 +29,7 @@ export const ORDER_CONFIRM_CONTENT: Record<Locale, OrderConfirmContent> = {
     totalLabel: 'Total',
     priceUnit: 'RON',
     engraving: 'Gravare',
+    quantityLabel: 'Cantitate',
     continueShopping: 'Vezi tocătoarele',
   },
   en: {
@@ -42,6 +44,7 @@ export const ORDER_CONFIRM_CONTENT: Record<Locale, OrderConfirmContent> = {
     totalLabel: 'Total',
     priceUnit: 'RON',
     engraving: 'Engraving',
+    quantityLabel: 'Quantity',
     continueShopping: 'Browse cutting boards',
   },
 };

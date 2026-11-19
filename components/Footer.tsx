@@ -77,7 +77,8 @@ function FooterLink({ href, children }: FooterLinkProps) {
   return (
     <a
       href={href}
-      className="font-lora block transition-colors duration-200"
+      // ≥ 44px tall on phones (design-qa 2026-11-19); compact from md up.
+      className="font-lora flex items-center min-h-[44px] md:block md:min-h-0 transition-colors duration-200"
       style={{
         fontSize: '0.92rem',
         color: 'rgba(245,235,216,0.55)',
@@ -267,7 +268,7 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
       brandDesc: 'Romanian oak cutting boards, handcrafted in our workshop in western Romania.',
       microTagline: 'solid wood · handmade · Romania',
       operatorLabel: 'Operator',
-      cuiLabel: 'VAT ID',
+      cuiLabel: 'Company ID (CUI)',
       signature: 'Made with care\nfor you.',
       legalLinks: [
         { label: 'Terms and Conditions', href: localizedPath('terms', 'en') },
@@ -312,7 +313,7 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
             <p className="label-caps" style={{ color: 'var(--copper)', fontSize: '0.6rem' }}>
               {nav.colNav}
             </p>
-            <nav className="flex flex-col gap-3" aria-label="Footer navigation">
+            <nav className="flex flex-col md:gap-3" aria-label="Footer navigation">
               {nav.navLinks.map(link => (
                 <FooterLink key={link.href} href={link.href}>
                   {link.label}
@@ -336,7 +337,7 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
               <FooterInfoRow label={nav.contactEmailLabel}>
                 <a
                   href={`mailto:${LEGAL_INFO.contactEmail}`}
-                  className="font-lora"
+                  className="font-lora inline-flex items-center min-h-[44px] -my-[11px] md:min-h-0 md:my-0"
                   style={{ fontSize: '0.92rem', color: 'rgba(245,235,216,0.6)', textDecoration: 'none', lineHeight: 1.5 }}
                   onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = 'rgba(245,235,216,0.9)')}
                   onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = 'rgba(245,235,216,0.6)')}
@@ -380,12 +381,12 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
               </FooterInfoRow>
 
               {/* social — REAL profiles (2026-07-11), single source LEGAL_INFO.social */}
-              <div className="flex flex-col gap-2" style={{ marginTop: 2 }}>
+              <div className="flex flex-col md:gap-2" style={{ marginTop: 2 }}>
                 <a
                   href={LEGAL_INFO.social.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 transition-opacity duration-200 hover:opacity-80"
+                  className="flex items-center gap-2 min-h-[44px] md:min-h-0 transition-opacity duration-200 hover:opacity-80"
                   style={{ color: 'rgba(245,235,216,0.5)', textDecoration: 'none', width: 'fit-content' }}
                   aria-label="Instagram"
                 >
@@ -396,7 +397,7 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
                   href={LEGAL_INFO.social.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 transition-opacity duration-200 hover:opacity-80"
+                  className="flex items-center gap-2 min-h-[44px] md:min-h-0 transition-opacity duration-200 hover:opacity-80"
                   style={{ color: 'rgba(245,235,216,0.5)', textDecoration: 'none', width: 'fit-content' }}
                   aria-label="Facebook"
                 >
@@ -407,7 +408,7 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
                   href={LEGAL_INFO.social.tiktok}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 transition-opacity duration-200 hover:opacity-80"
+                  className="flex items-center gap-2 min-h-[44px] md:min-h-0 transition-opacity duration-200 hover:opacity-80"
                   style={{ color: 'rgba(245,235,216,0.5)', textDecoration: 'none', width: 'fit-content' }}
                   aria-label="TikTok"
                 >
@@ -429,7 +430,7 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
             <p className="label-caps" style={{ color: 'var(--copper)', fontSize: '0.6rem' }}>
               {nav.colCont}
             </p>
-            <nav className="flex flex-col gap-3" aria-label={nav.colCont}>
+            <nav className="flex flex-col md:gap-3" aria-label={nav.colCont}>
               {nav.contLinks.map((link) => (
                 <FooterLink key={link.href} href={link.href}>
                   {link.label}
@@ -570,7 +571,7 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
               flexWrap: 'wrap',
               justifyContent: 'center',
               alignItems: 'center',
-              gap: '6px 12px',
+              gap: '0 12px',
               marginTop: 8,
             }}
           >
@@ -588,6 +589,7 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
               >
                 <a
                   href={link.href}
+                  className="inline-flex items-center min-h-[44px] px-3 -mx-3 md:min-h-0 md:px-0 md:mx-0"
                   style={{ color: 'inherit', textDecoration: 'none' }}
                   onMouseEnter={(e) =>
                     ((e.currentTarget as HTMLAnchorElement).style.color =
@@ -616,7 +618,7 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
               flexWrap: 'wrap',
               justifyContent: 'center',
               alignItems: 'center',
-              gap: '6px 14px',
+              gap: '0 14px',
               marginTop: 4,
             }}
           >
@@ -624,7 +626,7 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
               href="https://anpc.ro"
               target="_blank"
               rel="noopener noreferrer"
-              className="label-caps"
+              className="label-caps inline-flex items-center min-h-[44px] px-3 -mx-3 md:min-h-0 md:px-0 md:mx-0"
               style={{
                 color: 'var(--copper)',
                 fontSize: '0.6rem',
@@ -639,7 +641,7 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
               href="https://anpc.ro/ce-este-sal/"
               target="_blank"
               rel="noopener noreferrer"
-              className="label-caps"
+              className="label-caps inline-flex items-center min-h-[44px] px-3 -mx-3 md:min-h-0 md:px-0 md:mx-0"
               style={{
                 color: 'var(--copper)',
                 fontSize: '0.6rem',
@@ -666,6 +668,7 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
               href="https://www.vecteezy.com/free-png/tree"
               target="_blank"
               rel="noopener noreferrer"
+              className="inline-flex items-center min-h-[44px] md:min-h-0"
               style={{ color: 'inherit', textDecoration: 'underline' }}
             >
               Tree PNGs by Vecteezy

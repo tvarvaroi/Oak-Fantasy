@@ -64,6 +64,6 @@ export interface LegalContent {
 
 // Date the current texts took effect — one value for all three documents.
 export const LEGAL_LAST_UPDATED = {
-  ro: '19 noiembrie 2026',
-  en: '19 November 2026',
+  ro: '20 noiembrie 2026',
+  en: '20 November 2026',
 } as const;

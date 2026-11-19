@@ -1,9 +1,9 @@
 # Oak Fantasy
 
 > Workshop in western Romania handcrafting solid-wood cutting boards —
-> Romanian oak, and oak with ash on some models. What is in the catalog is
-> in stock: orders are made in 5–10 business days from confirmation and
-> delivered by courier. Romanian-first site (RO default, EN available).
+> Romanian oak, and oak with ash on some models. Some pieces are ready-made,
+> others are made once ordered; every order ships within 5–10 business days
+> of confirmation at the latest and is delivered by courier. Romanian-first site (RO default, EN available).
 > The store is open and selling.
 
 Oak Fantasy is a family business with its own workshop, not a factory.
@@ -21,7 +21,8 @@ Tagline: „Făcut cu drag în România." ("From Romanian oak, by hand.")
   gluing, sanding and oiling we do ourselves, in the same workshop.
 - Sanding: four to five grits, **from 80 to 320** — no rush, no pressure.
 - Finish: **food-safe oil**, layer after layer.
-- Lead time: orders are made in **5–10 business days** from confirmation.
+- Lead time: every order **ships within 5–10 business days** of confirmation
+  at the latest — some pieces are ready-made, others are made once ordered.
 - Shipping: **Romania only**, by courier (25 RON flat, free from 500 RON);
   usually 1–3 business days in transit once shipped.
 - Payment: **cash on delivery only** (paid to the courier). No card or

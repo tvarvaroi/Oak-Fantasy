@@ -11,6 +11,7 @@ import { localizedPath, type Locale } from '@/lib/i18n-routes';
 import { formatPriceRon } from '@/components/tocatoare/content';
 import { useCartStore } from '@/lib/store/cart';
 import { ORDER_CONFIRM_CONTENT } from './content';
+import { keepUnits } from '@/lib/typography';
 
 export interface ConfirmItem {
   nameRo: string;
@@ -105,14 +106,15 @@ export default function MultumimContent({
           </h2>
           <div className="flex flex-col gap-2.5">
             {items.map((it, i) => (
-              <div key={i} className="flex items-center justify-between gap-3">
-                <span className="font-lora" style={{ color: 'var(--ink)', fontSize: '0.92rem' }}>
-                  {(locale === 'ro' ? it.nameRo : it.nameEn)} × {it.quantity}
-                  {it.engravingText ? (
-                    <span style={{ color: 'var(--ink-soft)', fontSize: '0.8rem' }}> · {c.engraving}: “{it.engravingText}”</span>
-                  ) : null}
+              <div key={i} className="flex items-start justify-between gap-4">
+                <span className="font-lora" style={{ color: 'var(--ink)', fontSize: '0.92rem', flex: '1 1 auto', minWidth: 0 }}>
+                  <span style={{ display: 'block' }}>{keepUnits(locale === 'ro' ? it.nameRo : it.nameEn)}</span>
+                  <span style={{ display: 'block', color: 'var(--ink-soft)', fontSize: '0.8rem', marginTop: 2 }}>
+                    {c.quantityLabel}: {it.quantity}
+                    {it.engravingText ? <> · {c.engraving}: “{it.engravingText}”</> : null}
+                  </span>
                 </span>
-                <span className="font-lora" style={{ color: 'var(--ink)', fontSize: '0.92rem' }}>
+                <span className="font-lora" style={{ color: 'var(--ink)', fontSize: '0.92rem', flexShrink: 0, whiteSpace: 'nowrap' }}>
                   {formatPriceRon(it.lineTotalRon, locale)} {c.priceUnit}
                 </span>
               </div>

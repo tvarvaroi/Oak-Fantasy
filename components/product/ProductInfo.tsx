@@ -3,6 +3,8 @@ import type { CatalogProduct } from '@/lib/db/products';
 import { formatPriceRon, formatDimensions, TOCATOARE_CONTENT, type Tier } from '@/components/tocatoare/content';
 import { PRODUCT_DETAIL_CONTENT } from './content';
 import AddToCartPanel from './AddToCartPanel';
+import { noBreakRanges } from '@/lib/no-break-ranges';
+import { keepUnits } from '@/lib/typography';
 
 // Right column of the detail page: name, tier, price (+ sale), short
 // description, dimensions, weight, engraving availability, add-to-cart.
@@ -23,8 +25,8 @@ export default function ProductInfo({
   inStock: boolean;
 }) {
   const c = PRODUCT_DETAIL_CONTENT[locale];
-  const name = locale === 'ro' ? product.name_ro : product.name_en;
-  const shortDesc = locale === 'ro' ? product.short_description_ro : product.short_description_en;
+  const name = keepUnits(locale === 'ro' ? product.name_ro : product.name_en);
+  const shortDesc = keepUnits(locale === 'ro' ? product.short_description_ro : product.short_description_en);
   const tierLabel = TOCATOARE_CONTENT[locale].tierDisplay[product.tier as Tier];
   const dims = formatDimensions(product.dimensions, locale);
 
@@ -142,24 +144,33 @@ export default function ProductInfo({
         {c.shippingNote}
       </p>
 
-      {/* Stock status (Task 4.1) — binary only, never the exact count. */}
-      <div className="flex items-center gap-2">
-        <span
-          aria-hidden
-          style={{
-            width: 8,
-            height: 8,
-            borderRadius: 999,
-            backgroundColor: inStock ? 'var(--forest-mid)' : '#9F2D20',
-            display: 'inline-block',
-          }}
-        />
-        <span
-          className="label-caps"
-          style={{ color: inStock ? 'var(--forest-deep)' : '#9F2D20', fontSize: '0.62rem' }}
-        >
-          {inStock ? c.inStock : c.outOfStock}
-        </span>
+      {/* Stock status (Task 4.1) — binary only, never the exact count.
+          2026-11-19: "Disponibil" + max dispatch time — some pieces are
+          ready-made, others are made once ordered (founder). */}
+      <div>
+        <div className="flex items-center gap-2">
+          <span
+            aria-hidden
+            style={{
+              width: 8,
+              height: 8,
+              borderRadius: 999,
+              backgroundColor: inStock ? 'var(--forest-mid)' : '#9F2D20',
+              display: 'inline-block',
+            }}
+          />
+          <span
+            className="label-caps"
+            style={{ color: inStock ? 'var(--forest-deep)' : '#9F2D20', fontSize: '0.62rem' }}
+          >
+            {inStock ? c.inStock : c.outOfStock}
+          </span>
+        </div>
+        {inStock ? (
+          <p className="font-lora" style={{ fontSize: '0.85rem', color: 'var(--ink-soft)', lineHeight: 1.6, marginTop: 6 }}>
+            {noBreakRanges(c.leadTime)}
+          </p>
+        ) : null}
       </div>
 
       {inStock ? (

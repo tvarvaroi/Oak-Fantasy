@@ -25,7 +25,7 @@ export interface NumbersStripContent {
 //             (products.status='active'; `live: 'productCount'`, 2026-11-19)
 //   Lemn masiv, lucrat manual → founder fact (Terms §4). Replaced
 //           "100% stejar românesc" on 2026-11-19: no absolute origin claims.
-//   5–10    → working days to make an order (founder fact; Terms §4/§7)
+//   5–10    → working days until dispatch, at most (founder, 2026-11-19; Terms §4/§7)
 //   320     → final sanding grit, 80 → 320 (the /atelier process copy)
 // Removed 2026-11-19: '1.200+ pe listă' (2 test rows in the DB, false),
 // '8h per tocător' (catalogue range is 1–15 h) and '20+ ani' (no source).
@@ -37,7 +37,7 @@ export const numbersStripContent: Record<Locale, NumbersStripContent> = {
     stats: [
       { from: 0,  to: 0,   prefix: '',   suffix: '',  label: 'modele',            caption: 'În catalogul nostru', live: 'productCount' },
       { from: 0,  to: 0,   prefix: '',   suffix: '',  label: 'lucrat manual',     caption: 'Din stejar românesc', display: 'Lemn masiv' },
-      { from: 10, to: 10,  prefix: '5–', suffix: '',  label: 'zile lucrătoare',   caption: 'Cât lucrăm o comandă' },
+      { from: 10, to: 10,  prefix: '5–', suffix: '',  label: 'zile lucrătoare',   caption: 'Până expediem comanda' },
       { from: 0,  to: 320, prefix: '',   suffix: '',  label: 'granulație finală', caption: 'Șlefuit de la 80 la 320' },
     ],
   },
@@ -47,7 +47,7 @@ export const numbersStripContent: Record<Locale, NumbersStripContent> = {
     stats: [
       { from: 0,  to: 0,   prefix: '',   suffix: '',  label: 'models',          caption: 'In our catalogue', live: 'productCount' },
       { from: 0,  to: 0,   prefix: '',   suffix: '',  label: 'handcrafted',     caption: 'From Romanian oak', display: 'Solid wood' },
-      { from: 10, to: 10,  prefix: '5–', suffix: '',  label: 'business days',   caption: 'To make an order' },
+      { from: 10, to: 10,  prefix: '5–', suffix: '',  label: 'business days',   caption: 'Until your order ships' },
       { from: 0,  to: 320, prefix: '',   suffix: '',  label: 'final grit',      caption: 'Sanded from 80 to 320' },
     ],
   },

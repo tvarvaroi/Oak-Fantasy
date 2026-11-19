@@ -470,7 +470,7 @@ export const RETURNS_CONTENT: Record<Locale, LegalContent> = {
       sectionLabel: 'Merchant details',
       labels: {
         operator: 'Merchant',
-        cui: 'Tax ID',
+        cui: 'Company ID (CUI)',
         regCom: 'Reg. Com.',
         sediu: 'Registered office',
         contact: 'Returns contact',

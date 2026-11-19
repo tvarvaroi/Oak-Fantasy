@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { test, expect } from './fixtures';
 
 // 2026-11-19 — founder fact-check of every factual claim on the site
@@ -29,6 +30,11 @@ const REMOVED_RO = [
   ARAD,
   /capacitate maximă/,
   /Cel mai mult timp lucrăm cu unelte de mână/,
+  // 2026-11-19 (founder): stock is mixed — some pieces ready-made, others
+  // made to order; 5–10 working days is the maximum until dispatch.
+  /Ce vezi în catalog e (în stoc|gata de trimis)/,
+  /Lucrăm (fiecare )?comanda în 5–10/i,
+  /Cât lucrăm o comandă/,
 ];
 const REMOVED_EN = [
   /Bucegi|Apuseni/,
@@ -52,6 +58,10 @@ const REMOVED_EN = [
   ARAD,
   /full capacity/,
   /Most of the time we work with hand tools/,
+  /What you see in the catalog(ue)? is/,
+  /We make (your|each) order in/,
+  /orders are made in 5–10/,
+  /To make an order/,
 ];
 
 // Visible text AND the head: the fact-check also changed <title>, meta
@@ -118,11 +128,49 @@ test.describe('Fact-check: removed claims stay removed', () => {
     await expect(page.locator('main')).toContainText('The designs are CNC-carved');
   });
 
-  test('/tocatoare: catalogue is in stock, lead time matches checkout', async ({ page }) => {
+  // 2026-11-19 (founder): mixed stock; 5–10 working days = maximum until
+  // dispatch, said the same way on every surface.
+  test('/tocatoare + /despre + product page: mixed stock, max 5–10 days to ship', async ({ page }) => {
     await page.goto('/ro/tocatoare');
-    await expect(page.locator('main')).toContainText('Ce vezi în catalog e în stoc.');
-    await expect(page.locator('main')).toContainText('5–10 zile lucrătoare de la confirmare');
-    await expect(page.locator('main')).not.toContainText('Comanzi azi');
+    const main = page.locator('main');
+    await expect(main).toContainText('Unele piese sunt gata făcute, altele le lucrăm după comandă.');
+    await expect(main).toContainText('Expediem în cel mult 5–10 zile lucrătoare de la confirmare');
+    await expect(main).not.toContainText('Comanzi azi');
+    const href = await page.locator('a[href^="/ro/tocatoare/"]').first().getAttribute('href');
+
+    await page.goto('/en/cutting-boards');
+    await expect(page.locator('main')).toContainText('Some pieces are ready-made, others we make once you order.');
+    await expect(page.locator('main')).toContainText('We ship within 5–10 business days of confirmation at the latest');
+
+    await page.goto('/ro/despre');
+    await expect(page.locator('main')).toContainText('Unele sunt gata făcute, altele le lucrăm după comandă. Expediem în cel mult 5–10 zile lucrătoare.');
+    await page.goto('/en/about');
+    await expect(page.locator('main')).toContainText('Some are ready-made, others we make once you order.');
+
+    test.skip(!href, 'no active product');
+    await page.goto(href!);
+    await expect(page.locator('main')).toContainText('Disponibil');
+    await expect(page.locator('main')).toContainText('Expediem în cel mult 5–10 zile lucrătoare.');
+    await expect(page.locator('main')).not.toContainText('În stoc');
+  });
+
+  test('order confirmation email: same dispatch wording (static source check)', () => {
+    // emails/*.tsx are rendered server-side by Resend, not reachable by URL.
+    const src = readFileSync('emails/OrderConfirmationClient.tsx', 'utf8');
+    expect(src).toContain('Expediem comanda în cel mult 5–10 zile lucrătoare de la confirmare');
+    expect(src).toContain('We ship your order within 5–10 business days of confirmation at the latest');
+    expect(src).not.toMatch(/lucrăm comanda în 5–10|we make your order in 5–10/i);
+  });
+
+  test('Terms + llms.txt: 5–10 working days is the maximum until dispatch', async ({ page, request }) => {
+    await page.goto('/ro/termeni');
+    await expect(page.locator('main')).toContainText('expediem comanda în cel mult 5–10 zile lucrătoare de la confirmare');
+    await expect(page.locator('main')).toContainText('Expediem comanda în cel mult 5–10 zile lucrătoare de la confirmare.');
+    await page.goto('/en/terms');
+    await expect(page.locator('main')).toContainText('within 5–10 working days of confirmation at the latest');
+    const llms = await (await request.get('/llms.txt')).text();
+    expect(llms).toContain('ships within 5–10 business days');
+    expect(llms).not.toMatch(/catalog is\s+in stock|orders are made in/);
   });
 
   test('NumbersStrip model count equals the live catalogue (never hard-coded)', async ({ page }) => {

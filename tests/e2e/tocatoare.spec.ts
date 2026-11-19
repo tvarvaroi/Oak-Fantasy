@@ -59,11 +59,21 @@ test.describe('/tocatoare page', () => {
     await expect(page.locator('h1')).toContainText('Tocătoarele');
   });
 
-  test('Filter bar has 5 pills (All + 4 tiers)', async ({ page }) => {
+  // 2026-11-19 (founder): tiers with 0 products are hidden; "Toate" always
+  // shows and every visible tier pill has at least one product.
+  test('Filter bar: "Toate" + only tiers that have products', async ({ page }) => {
     await page.goto('/ro/tocatoare');
     const pills = page.locator('[data-filter-bar] button[data-filter]');
-    await expect(pills).toHaveCount(5);
     await expect(pills.first()).toContainText('Toate');
+    const n = await pills.count();
+    expect(n).toBeGreaterThanOrEqual(1);
+    expect(n).toBeLessThanOrEqual(5);
+    for (const pill of (await pills.all()).slice(1)) {
+      const count = Number((await pill.locator('span').innerText()).trim());
+      expect(count, await pill.innerText()).toBeGreaterThan(0);
+      await pill.click();
+      await expect(page.locator('[data-product]')).toHaveCount(count);
+    }
   });
 
   test('Sort dropdown opens on click and shows 3 options', async ({ page }) => {

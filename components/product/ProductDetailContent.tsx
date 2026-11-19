@@ -7,6 +7,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { localizedPath, type Locale } from '@/lib/i18n-routes';
 import { PRODUCT_DETAIL_CONTENT } from './content';
+import { keepUnits } from '@/lib/typography';
 
 // Client wrapper for the product detail page (check #0: global Navbar + Footer +
 // language toggle that preserves the product slug). gallery + info are passed in
@@ -52,7 +53,7 @@ export default function ProductDetailContent({
               {c.breadcrumbCatalog}
             </Link>
             <span style={{ margin: '0 8px' }}>›</span>
-            <span style={{ color: 'var(--ink)' }}>{productName}</span>
+            <span style={{ color: 'var(--ink)' }}>{keepUnits(productName)}</span>
           </nav>
 
           {/* Gallery | Info */}
@@ -69,7 +70,7 @@ export default function ProductDetailContent({
                   {c.detailsHeading}
                 </h2>
                 <p className="font-lora" style={{ fontSize: '1.02rem', color: 'var(--ink-soft)', lineHeight: 1.8, whiteSpace: 'pre-line' }}>
-                  {longDescription}
+                  {keepUnits(longDescription)}
                 </p>
               </section>
             ) : null}

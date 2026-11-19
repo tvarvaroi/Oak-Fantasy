@@ -155,12 +155,11 @@ export default async function OrderDetailPage({ params }: { params: { id: string
             return (
               <div key={it.id} className="flex items-start justify-between gap-3">
                 <span className="font-lora" style={{ color: 'var(--ink)', fontSize: '0.9rem' }}>
-                  {snap.name_ro ?? snap.name_en ?? '—'} × {it.quantity}
-                  {it.engraving_text ? (
-                    <span style={{ color: 'var(--ink-soft)', fontSize: '0.8rem' }}>
-                      {' '}· Gravare: “{it.engraving_text}”
-                    </span>
-                  ) : null}
+                  <span style={{ display: 'block' }}>{snap.name_ro ?? snap.name_en ?? '—'}</span>
+                  <span style={{ display: 'block', color: 'var(--ink-soft)', fontSize: '0.8rem', marginTop: 2 }}>
+                    Cantitate: {it.quantity}
+                    {it.engraving_text ? ` · Gravare: “${it.engraving_text}”` : null}
+                  </span>
                 </span>
                 <span className="font-lora" style={{ color: 'var(--ink)', fontSize: '0.9rem', whiteSpace: 'nowrap' }}>
                   {ronStr(it.line_total_ron)} RON

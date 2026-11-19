@@ -148,3 +148,63 @@ test.describe('404 — brand fonts, one language per page', () => {
     }
   });
 });
+
+// 2026-11-19 — pre-launch touches (founder list).
+test.describe('Pre-launch touches', () => {
+  test('footer links are ≥ 44px tall on phones', async ({ page, viewport }) => {
+    test.skip((viewport?.width ?? 1440) >= 768, 'mobile-only requirement');
+    await page.goto('/ro/contact');
+    const small = await page.locator('footer a').evaluateAll((els) =>
+      els
+        .map((el) => ({ t: (el.textContent || el.getAttribute('aria-label') || '').trim(), r: el.getBoundingClientRect() }))
+        .filter(({ r }) => r.width > 0 && r.height > 0 && (r.height < 44 || r.width < 44))
+        .map(({ t, r }) => `${t} ${Math.round(r.width)}×${Math.round(r.height)}`),
+    );
+    expect(small).toEqual([]);
+  });
+
+  test('EN footer labels the CUI as Company ID, never VAT ID', async ({ page }) => {
+    await page.goto('/en/contact');
+    const footer = page.locator('footer');
+    await expect(footer).toContainText('Company ID (CUI)');
+    await expect(footer).not.toContainText('VAT ID');
+  });
+
+  test('Terms: no double period after the company name (RO + EN)', async ({ page }) => {
+    for (const path of ['/ro/termeni', '/en/terms']) {
+      await page.goto(path);
+      const text = await page.locator('main').innerText();
+      expect(text, path).toContain('ROOBO PELLETS S.R.L.');
+      expect(text, path).not.toContain('S.R.L..');
+    }
+  });
+
+  test('product titles keep the number and its unit together', async ({ page }) => {
+    await page.goto('/ro/tocatoare');
+    const titles = await page.locator('[data-product] h3').allInnerTexts();
+    const withUnit = titles.filter((t) => /\d\s?mm/.test(t));
+    test.skip(withUnit.length === 0, 'no title with a size');
+    for (const t of withUnit) expect(t, t).toMatch(/\d mm/);
+  });
+
+  test('checkout review: quantity sits on its own line, not glued to the name', async ({ page }) => {
+    await page.goto('/ro/tocatoare');
+    const href = await page.locator('a[href^="/ro/tocatoare/"]').first().getAttribute('href');
+    test.skip(!href, 'no active product');
+    await page.goto(href!);
+    await page.getByRole('button', { name: 'Adaugă în coș' }).click();
+    await page.goto('/ro/checkout');
+    await page.fill('#co-email', 'test@example.com');
+    await page.fill('#co-name', 'Test Nume');
+    await page.fill('#co-phone', '0712345678');
+    await page.fill('#co-street', 'Str. Test 1');
+    await page.fill('#co-city', 'Arad');
+    await page.selectOption('#co-county', { label: 'Arad' });
+    await page.fill('#co-postal', '310001');
+    await page.getByRole('button', { name: 'Continuă' }).click();
+    await page.getByTestId('cod-info').waitFor();
+    const main = page.locator('main');
+    await expect(main).toContainText('Cantitate: 1');
+    expect(await main.innerText()).not.toMatch(/ × \d/);
+  });
+});

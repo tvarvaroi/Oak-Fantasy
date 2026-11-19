@@ -53,7 +53,7 @@ export const TOCATOARE_CONTENT: Record<Locale, TocatoareContent> = {
       titleEm: 'noastre.',
       note: {
         strong: 'Fiecare tocător pleacă din atelier gata de folosit.',
-        rest: 'Ce vezi în catalog e în stoc. Lucrăm comanda în 5–10 zile lucrătoare de la confirmare, apoi curierul o livrează de regulă în 1–3 zile lucrătoare.',
+        rest: 'Unele piese sunt gata făcute, altele le lucrăm după comandă. Expediem în cel mult 5–10 zile lucrătoare de la confirmare, apoi curierul livrează de regulă în 1–3 zile lucrătoare.',
       },
     },
     filters: {
@@ -110,7 +110,7 @@ export const TOCATOARE_CONTENT: Record<Locale, TocatoareContent> = {
       titleEm: 'boards.',
       note: {
         strong: 'Every board leaves the workshop ready to use.',
-        rest: 'What you see in the catalogue is in stock. We make your order in 5–10 business days from confirmation; the courier then usually delivers it in 1–3 business days.',
+        rest: 'Some pieces are ready-made, others we make once you order. We ship within 5–10 business days of confirmation at the latest; the courier then usually delivers in 1–3 business days.',
       },
     },
     filters: {
