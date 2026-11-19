@@ -335,9 +335,9 @@ const columns: Column[] = [
     titleRo: 'Stejar românesc',
     titleEn: 'Romanian Oak',
     bodyRo:
-      'Fiecare bucată de lemn vine din pădurile munților Bucegi și Apuseni — crăci doborâte natural, uscate lent, respectate din rădăcină până în fibră.',
+      'Alegem bucată cu bucată doar lemnul cu desen frumos. Restul îl folosim pentru alte lucruri.',
     bodyEn:
-      'Every plank comes from forests in the Bucegi and Apuseni mountains — naturally felled, slow-dried, honoured from root to grain.',
+      'We choose the wood piece by piece — only the pieces with beautiful grain. The rest we use for other things.',
   },
   {
     Ornament: CuttingBoardSVG,
@@ -346,9 +346,9 @@ const columns: Column[] = [
     titleRo: 'Lucrat manual',
     titleEn: 'Made by hand',
     bodyRo:
-      'Atelierul nostru din vestul României cioplește, șlefuiește și finisează fiecare tocător cu mâinile — fără linii de producție, fără grabă, fără compromis.',
+      'Atelierul nostru din vestul României cioplește, șlefuiește și finisează fiecare tocător cu mâinile — fără grabă.',
     bodyEn:
-      'Our workshop in western Romania shapes, sands and finishes every board by hand — no production lines, no rush, no compromise.',
+      'Our workshop in western Romania shapes, sands and finishes every board by hand — no rush.',
   },
   {
     Ornament: HeartLeavesSVG,

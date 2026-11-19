@@ -219,7 +219,7 @@ export default function Navbar({
                 lineHeight: 1,
               }}
             >
-              {language === 'ro' ? 'stejar · manual' : 'oak · handmade'}
+              {language === 'ro' ? 'lemn masiv · manual' : 'solid wood · handmade'}
             </span>
           </div>
         </Link>

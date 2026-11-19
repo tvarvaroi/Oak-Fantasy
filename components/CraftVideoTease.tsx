@@ -33,11 +33,6 @@ const SLIDES: Slide[] = [
     altEn: 'Sawdust and tools on a wooden workbench',
   },
   {
-    src: '/stock/atelier-tool-hand-tools.webp',
-    altRo: 'Dălți cu mânere de lemn pe un suport de perete',
-    altEn: 'Wooden-handled chisels on a wall rack',
-  },
-  {
     src: '/stock/atelier-tool-sander.webp',
     altRo: 'Șlefuitor orbital pe o placă de stejar',
     altEn: 'Orbital sander on an oak board',

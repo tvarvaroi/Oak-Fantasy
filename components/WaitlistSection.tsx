@@ -187,17 +187,15 @@ export default function WaitlistSection({ language }: { language: 'ro' | 'en' })
     ro: {
       eyebrow: 'Vești din atelier',
       headline: 'Rămâi aproape.',
-      sub: 'Abonează-te și primești ghidul nostru de îngrijire a lemnului — gratuit. Plus vești din atelier, doar când avem ceva de spus.',
+      sub: 'Abonează-te pentru vești din atelier, doar când avem ceva de spus.',
       formLabel: 'Adresa ta de email',
-      social: 'Alături de 1.200+ oameni care iubesc lucrurile făcute cu mâna.',
       privacy: 'Nu trimitem spam. Niciodată.',
     },
     en: {
       eyebrow: 'Workshop news',
       headline: 'Stay close.',
-      sub: 'Sign up and get our wood care guide — free. Plus workshop news, only when we have something to say.',
+      sub: 'Sign up for workshop news, only when we have something to say.',
       formLabel: 'Your email address',
-      social: 'Joined by 1,200+ people who love handmade things.',
       privacy: "We don't send spam. Ever.",
     },
   }[language];
@@ -303,35 +301,8 @@ export default function WaitlistSection({ language }: { language: 'ro' | 'en' })
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.4 }}
         >
-          {/* small avatars strip placeholder */}
-          <div className="flex items-center gap-2">
-            <div className="flex -space-x-2" aria-hidden>
-              {[
-                ['#8B5E3C', '#C9A66B'],
-                ['#5A6B3C', '#8FA068'],
-                ['#5C3A20', '#B87333'],
-                ['#2D3A1F', '#5A6B3C'],
-              ].map(([bg, border], i) => (
-                <div
-                  key={i}
-                  className="rounded-full"
-                  style={{
-                    width: 28,
-                    height: 28,
-                    backgroundColor: bg,
-                    border: `2px solid ${border}`,
-                    opacity: 0.85,
-                  }}
-                />
-              ))}
-            </div>
-            <p
-              className="font-lora text-sm"
-              style={{ color: 'var(--ink-soft)' }}
-            >
-              {copy.social}
-            </p>
-          </div>
+          {/* 2026-11-19 (founder fact-check): the "1.200+ people" social
+              proof and its avatar strip were invented — removed. */}
           <p
             className="font-lora text-xs"
             style={{ color: 'var(--ink-soft)', opacity: 0.55 }}

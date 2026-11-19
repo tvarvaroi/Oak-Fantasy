@@ -216,7 +216,7 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
       contactPhoneLabel: 'Telefon',
       contactAddressLabel: 'Atelier',
       contactHoursLabel: 'Program',
-      contactRegion: 'Arad, România',
+      contactRegion: 'vestul României',
       // COL3 — account links (Sprint 2 shipped auth; the "În curând" copy
       // was a pre-launch relic, replaced 2026-10-15).
       contLinks: [
@@ -227,7 +227,7 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
       tagline: 'Făcut cu drag în România.',
       copy: `© ${new Date().getFullYear()} Oak Fantasy. Toate drepturile rezervate.`,
       brandDesc: 'Tocătoare din stejar românesc, lucrate manual în atelierul nostru din vestul țării.',
-      microTagline: 'stejar · manual · România',
+      microTagline: 'lemn masiv · manual · România',
       operatorLabel: 'Operator',
       cuiLabel: 'CUI',
       signature: 'Lucrăm cu drag\npentru voi.',
@@ -256,7 +256,7 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
       contactPhoneLabel: 'Phone',
       contactAddressLabel: 'Workshop',
       contactHoursLabel: 'Hours',
-      contactRegion: 'Arad, Romania',
+      contactRegion: 'western Romania',
       contLinks: [
         { label: 'Log in', href: localizedPath('login', 'en') },
         { label: 'Create account', href: localizedPath('register', 'en') },
@@ -265,7 +265,7 @@ export default function Footer({ language }: { language: 'ro' | 'en' }) {
       tagline: 'Made with love in Romania.',
       copy: `© ${new Date().getFullYear()} Oak Fantasy. All rights reserved.`,
       brandDesc: 'Romanian oak cutting boards, handcrafted in our workshop in western Romania.',
-      microTagline: 'oak · handmade · Romania',
+      microTagline: 'solid wood · handmade · Romania',
       operatorLabel: 'Operator',
       cuiLabel: 'VAT ID',
       signature: 'Made with care\nfor you.',

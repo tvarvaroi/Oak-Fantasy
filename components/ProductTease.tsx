@@ -335,7 +335,7 @@ export default function ProductTease({ language }: { language: 'ro' | 'en' }) {
     ro: {
       eyebrow: 'Produsele noastre',
       title: ['Fiecare bucată,', 'unică.'],
-      sub: 'Tocătoarele noastre nu sunt produse în serie. Fiecare iese din atelier cu propria față a lemnului.',
+      sub: 'Fiecare tocător iese din atelier cu propria față a lemnului.',
       // Live shop (2026-10-15): the early-access / waitlist CTA is gone —
       // the gallery ends on the real catalog.
       cta: 'Vezi toate tocătoarele noastre',
@@ -343,7 +343,7 @@ export default function ProductTease({ language }: { language: 'ro' | 'en' }) {
     en: {
       eyebrow: 'Our products',
       title: ['Every piece,', 'unique.'],
-      sub: "Our boards aren't mass-produced. Each leaves the workshop with its own face of wood.",
+      sub: 'Every board leaves the workshop with its own face of wood.',
       cta: 'See all our cutting boards',
     },
   }[language];

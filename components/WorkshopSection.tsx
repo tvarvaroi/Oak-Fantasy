@@ -93,20 +93,25 @@ function SignatureSVG({ signing }: { signing: boolean }) {
    scrolled past the viewport — users saw a big "empty band" of invisible
    copy. whileInView reveals each line when the LINE itself is on screen,
    which is correct at every viewport height. */
+// 2026-11-19 (design-qa): the hand-broken lines only fit the wide desktop
+// column. Below xl they wrapped one by one into stray one-word lines, so there
+// the spans are inline and the paragraph flows (opacity still staggers; the
+// y-offset only applies where the spans are blocks).
 function RevealLines({ lines }: { lines: string[] }) {
   const prefersReduced = useReducedMotion();
   return (
-    <div className="flex flex-col" style={{ gap: '0.55em' }}>
+    <div className="xl:flex xl:flex-col" style={{ gap: '0.55em' }}>
       {lines.map((line, i) => (
         <motion.span
           key={i}
-          style={{ display: 'block' }}
+          className="inline xl:block"
           initial={prefersReduced ? false : { opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-8%' }}
           transition={{ duration: 0.55, delay: i * 0.09, ease: [0.16, 1, 0.3, 1] }}
         >
           {line}
+          {i < lines.length - 1 ? ' ' : ''}
         </motion.span>
       ))}
     </div>
@@ -122,15 +127,15 @@ const copy = {
     body1: [
       'Intrați în atelierul nostru din vestul României.',
       'Miros de rumeguș proaspăt, lumina de după-amiază filtrată',
-      'prin geam, sunetul rindelei pe stejar — asta e Oak Fantasy',
+      'prin geam, sunetul uneltelor pe stejar — asta e Oak Fantasy',
       'înainte să fie un produs.',
     ],
     body2: [
-      'Fiecare tocător trece prin aceleași mâini de la început',
-      'până la capăt. Nu există operatorul numărul unu sau doi.',
-      'Există muncitorul care știe că un tocător bun',
-      'va sta pe masa cuiva zeci de ani.',
+      'Fiecare tocător trece prin mâinile noastre',
+      'de la început până la capăt. Suntem o afacere',
+      'de familie, nu o fabrică cu operatori.',
     ],
+    photoNote: 'Fotografie ilustrativă.',
     quote:
       '"Un obiect bun nu se termină când iese din atelier — începe."',
     signature: '— familia noastră',
@@ -141,15 +146,15 @@ const copy = {
     body1: [
       'Step into our workshop in western Romania.',
       'Fresh sawdust scent, afternoon light filtered',
-      'through the window, the sound of a plane on oak — this is Oak',
+      'through the window, the sound of tools on oak — this is Oak',
       'Fantasy before it becomes a product.',
     ],
     body2: [
-      'Every cutting board passes through the same hands',
-      'from start to finish. There is no operator one or two.',
-      'There is the craftsman who knows a good board',
-      'will sit on someone\'s table for decades.',
+      'Every cutting board passes through our hands',
+      'from start to finish. We are a family business,',
+      'not a factory with operators.',
     ],
+    photoNote: 'Illustrative photo.',
     quote:
       '"A good object doesn\'t end when it leaves the workshop — it begins."',
     signature: '— our family',
@@ -236,6 +241,20 @@ export default function WorkshopSection({ language }: { language: 'ro' | 'en' })
                 style={{ objectPosition: 'center 30%' }}
                 sizes="(max-width: 1024px) 100vw, 55vw"
               />
+              {/* Stock photo caption (founder fact-check, 2026-11-19). Inside
+                  the parallax layer so it always sits on the photo, never on
+                  the strip the parallax offset uncovers at the card's top. */}
+              <span
+                className="absolute top-3 right-3 z-[1] rounded px-2 py-0.5 italic"
+                style={{
+                  backgroundColor: 'rgba(31,24,16,0.55)',
+                  color: 'rgba(245,235,216,0.9)',
+                  fontFamily: 'var(--font-lora)',
+                  fontSize: '0.76rem',
+                }}
+              >
+                {c.photoNote}
+              </span>
             </motion.div>
 
             {/* subtle warm vignette */}
