@@ -218,8 +218,8 @@ const ro: AtelierContent = {
         name: 'Rindea electrică',
         role: 'Suprafețe perfect plane după lipire.',
         desc: 'Tăieri subțiri, pe direcția fibrei, până când blocul e perfect plan.',
-        image: '/stock/atelier-tool-planer.webp',
-        imageAlt: 'Placă de lemn trecută printr-un rindeluitor electric, cu așchii',
+        image: '/stock/atelier-tool-hand-planer.webp',
+        imageAlt: 'Rindea electrică de mână trecută peste un bloc de lemn, cu rumeguș în aer',
       },
       {
         tag: 'Șlefuit',
@@ -400,8 +400,8 @@ const en: AtelierContent = {
         name: 'Electric hand planer',
         role: 'Perfectly flat surfaces after glueing.',
         desc: 'Thin cuts, along the grain, until the block is perfectly flat.',
-        image: '/stock/atelier-tool-planer.webp',
-        imageAlt: 'Wood board fed through an electric planer, with shavings',
+        image: '/stock/atelier-tool-hand-planer.webp',
+        imageAlt: 'Electric hand planer passing over a wooden block, with shavings in the air',
       },
       {
         tag: 'Sanding',

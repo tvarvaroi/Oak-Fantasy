@@ -18,7 +18,8 @@
 | `public/stock/atelier-tool-circular-saw.webp` | /atelier · Tools 1 (P5) | https://www.pexels.com/photo/close-up-photo-of-wood-getting-cut-by-a-table-saw-7492584/ | cottonbro studio | Pexels License |
 | `public/stock/atelier-tool-router.webp` | /atelier · Tools 2 (P5) | https://www.pexels.com/photo/carpenter-operating-wood-planer-in-workshop-37178403/ | Nguyendesigner | Pexels License |
 | `public/stock/atelier-tool-clamps.webp` | /atelier · Tools 3 (P5) | https://www.pexels.com/photo/carpentry-metal-equipment-with-wooden-handles-10066173/ | Harold Granados | Pexels License |
-| `public/stock/atelier-tool-planer.webp` | /atelier · Tools 4 (P5) | https://www.pexels.com/photo/crop-artisan-flattening-lumber-on-planer-in-workroom-5974016/ | Ono Kosuki | Pexels License |
+| `public/stock/atelier-tool-planer.webp` | ~~/atelier · Tools 4 (P5)~~ → din 2026-11-19 doar în slideshow-ul CraftVideoTease (ascuns) | https://www.pexels.com/photo/crop-artisan-flattening-lumber-on-planer-in-workroom-5974016/ | Ono Kosuki | Pexels License |
+| `public/stock/atelier-tool-hand-planer.webp` | /atelier · Tools 4 „Rindea electrică” (2026-11-19) | https://www.pexels.com/photo/a-man-scraping-a-wood-with-electric-wood-scraper-14441384/ | NSHCVKS HXJSG | Pexels License |
 | `public/stock/atelier-tool-sander.webp` | /atelier · Tools 5 (P5) | https://www.pexels.com/photo/close-up-of-sanding-wood-5466146/ | adventurestudio | Pexels License |
 | `public/stock/atelier-tool-hand-tools.webp` | /atelier · Tools 6 (P5) | https://www.pexels.com/photo/set-of-professional-tools-on-wall-5973878/ | Ono Kosuki | Pexels License |
 | `public/stock/atelier-place-window.webp` | /atelier · WorkshopPlace sus (P6) | https://www.pexels.com/photo/12591659/ | Cmoon | Pexels License |
@@ -46,3 +47,14 @@ Orice asset stock nou intră în tabelul ăsta ÎNAINTE de commit, cu: fișier l
 slot, URL-ul paginii sursă, autor, licența exactă. Surse acceptate: Pexels License,
 Unsplash License, Pixabay Content License (toate: gratuit comercial, fără atribuire).
 Nu folosim imagini „Editorial use only" sau din colecțiile plătite (Unsplash+/iStock).
+
+> **2026-11-19:** poza veche de la „Rindea electrică” arăta o mașină staționară de rindeluit,
+> nu o rindea de mână. Înlocuită cu Pexels 14441384 — singura rindea electrică DE MÂNĂ găsită
+> pe Pexels fără brand lizibil, după 7 căutări (respinse după verificare vizuală: 7109995,
+> 7109999 „STANLEY”, 6790088 — rindele manuale; 18948978 Makita; 374049, 6790107 — fețe /
+> unelte manuale; 8821530 — polizor unghiular; 38251141 — Metabo, din descriere). Fotografia originală arată fața
+> lucrătorului → **decupată** (Licența Pexels permite modificarea): doar mâna cu mănușă,
+> rindeaua și blocul de lemn; cablul cu fire desfăcute din dreapta e scos din cadru. Ușoară
+> corecție de culoare spre cald (ffmpeg `colorbalance`) + denoise; cadru peisaj ~1,5:1
+> (ca să încapă mâna, rindeaua și blocul în cardul `object-fit: cover`), 1100×734 WebP q72 = 152 KB.
+> Fișierul vechi `atelier-tool-planer.webp` rămâne doar pentru slideshow-ul ascuns.
