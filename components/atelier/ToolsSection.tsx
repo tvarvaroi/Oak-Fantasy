@@ -6,8 +6,9 @@ import type { AtelierContent } from './content';
 import styles from './atelier.module.css';
 
 // Tools — v3-catalog.html. The centerpiece of Variant C.
-// 12-col grid: cards 1+2 span-6 (top row), cards 3-5 span-4 (bottom row).
-// 2026-10-15: 5 tools (hand-tool set removed), "Featured ·" tags dropped.
+// 12-col grid: rows of 2 (span-6) / 3 (span-4) / 2 (span-6).
+// 2026-10-15: hand-tool set removed, "Featured ·" tags dropped.
+// 2026-11-19: CNC router + laser engraving added (7 tools).
 // Hover lift via CSS only (no framer-motion needed for hover).
 
 export default function ToolsSection({ content }: { content: AtelierContent }) {
@@ -50,6 +51,7 @@ export default function ToolsSection({ content }: { content: AtelierContent }) {
             </Reveal>
           ))}
         </div>
+        <p className={styles.photoNote}>{content.photoNote}</p>
       </div>
     </section>
   );

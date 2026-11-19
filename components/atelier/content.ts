@@ -34,7 +34,7 @@ export interface Tool {
 }
 
 export interface DayMoment {
-  /** "7:00–10:00 · Dimineața" */
+  /** "Prima parte a zilei" — no clock hours (2026-11-19, founder fact-check). */
   time: string;
   title: string;
   body: string;
@@ -87,8 +87,9 @@ export interface AtelierContent {
     /** Rendered with <em>. */
     h2Em: string;
     intro: string;
-    /** 5 tools (2026-10-15: "Set unelte de mână" removed). */
-    items: [Tool, Tool, Tool, Tool, Tool];
+    /** 7 tools (2026-10-15: "Set unelte de mână" removed; 2026-11-19: CNC
+        router + laser engraving added, founder fact-check). */
+    items: [Tool, Tool, Tool, Tool, Tool, Tool, Tool];
   };
   place: {
     eyebrow: string;
@@ -102,6 +103,8 @@ export interface AtelierContent {
     imageTopAlt: string;
     imageBottomAlt: string;
   };
+  /** Discreet caption under stock photo groups (2026-11-19, founder). */
+  photoNote: string;
   day: {
     eyebrow: string;
     h2Line1: string;
@@ -141,7 +144,7 @@ export interface AtelierContent {
     h2Line1: string;
     h2Em: string;
     intro: string;
-    items: [ArticleCard, ArticleCard, ArticleCard, ArticleCard];
+    items: ArticleCard[];
   };
   cta: {
     h2Line1: string;
@@ -154,24 +157,24 @@ export interface AtelierContent {
 const ro: AtelierContent = {
   nav: { link: 'Atelier' },
   meta: {
-    title: 'Atelierul Oak Fantasy — Cum se face fiecare tocător din stejar',
-    // 143 chars
+    title: 'Atelierul Oak Fantasy — Cum se face fiecare tocător',
+    // 138 chars
     description:
-      'Atelier mic în vestul României. Stejar românesc, uscat 6–12 luni, cinci unelte. Cum lucrăm manual fiecare tocător — de la lemn la ceară de albine.',
+      'Atelier în vestul României. Stejar românesc, uscat până devine stabil. Uneltele noastre și cum lucrăm fiecare tocător — de la lemn la ulei alimentar.',
   },
   hero: {
     eyebrow: 'Documentar · Atelier',
-    h1Line1: 'Un atelier mic, în vestul României.',
+    h1Line1: 'Un atelier în vestul României.',
     h1Line2Em: 'Și o singură regulă:',
     h1Line2Tail: 'nu grăbim lemnul.',
-    sub: 'Un loc, cinci unelte, o zi de lucru · Atelier Oak Fantasy',
+    sub: 'Un loc și uneltele lui · Atelier Oak Fantasy',
     readTime: 'Citește în ~7 minute',
     // Order chosen for silhouette rhythm in the 3×3 (rectangular / long /
     // square / free-form alternate). OF-07 (frasin-stejar 300 mm) left out:
     // at ~150px its three-tone stripes and oval handle read as noise, while
     // OF-08 (same size) has clear dark/light contrast.
     cells: [
-      { src: '/products/atelier-tocator-taur-alb.webp', alt: 'Tocător din stejar cu taur frezat, contur alb' },
+      { src: '/products/atelier-tocator-taur-alb.webp', alt: 'Tocător din stejar și frasin cu taur frezat, contur alb' },
       { src: '/products/atelier-platou-lung-servire.webp', alt: 'Platou lung din stejar cu margine naturală' },
       { src: '/products/atelier-ceas-custom-cerb.webp', alt: 'Ceas de perete din stejar, model cerb gravat' },
       { src: '/products/atelier-tava-servire-premium.webp', alt: 'Tavă de servire cu model valuri și mânere metalice' },
@@ -187,7 +190,7 @@ const ro: AtelierContent = {
     h2Line1: 'Catalogul',
     h2Em: 'uneltelor',
     intro:
-      'Nu sunt multe unelte într-un atelier care face tocătoare. Sunt cele potrivite. Fiecare cu rolul ei, fiecare aleasă cu motiv. Mai jos sunt cele pe care le folosim aproape în fiecare zi — în ordinea în care intră în lucru.',
+      'Nu sunt multe unelte într-un atelier care face tocătoare. Sunt cele potrivite. Fiecare cu rolul ei, fiecare aleasă cu motiv. Mai jos sunt câteva dintre ele, în ordinea în care intră în lucru.',
     items: [
       {
         tag: 'Tăiere',
@@ -207,9 +210,9 @@ const ro: AtelierContent = {
       },
       {
         tag: 'Asamblare',
-        name: 'Presă manuală cu șuruburi (4 buc.)',
-        role: 'Patru prese, 24 de ore, niciodată mai puțin.',
-        desc: 'Pentru lipirea plăcilor în bloc. Patru prese pe un bloc de 35×25cm, presiune uniformă.',
+        name: 'Presă manuală cu șuruburi',
+        role: '24 de ore, niciodată mai puțin.',
+        desc: 'Pentru lipirea plăcilor în bloc, cu presiune uniformă.',
         image: '/stock/atelier-tool-clamps.webp',
         imageAlt: 'Prese cu șuruburi strângând plăci de lemn la lipire',
       },
@@ -222,12 +225,28 @@ const ro: AtelierContent = {
         imageAlt: 'Rindea electrică de mână trecută peste un bloc de lemn, cu rumeguș în aer',
       },
       {
+        tag: 'Desen',
+        name: 'Freză CNC',
+        role: 'Desenele de pe tocătoare.',
+        desc: 'Taurul, peștele, cerbul, inima cu îndrăgostiții: le frezăm pe CNC, după desen. Tăierea, lipirea, șlefuirea și uleiul le facem noi, în atelier.',
+        image: '/stock/atelier-tool-cnc.webp',
+        imageAlt: 'Capul unei freze CNC tăind într-o placă de lemn, cu așchii în aer',
+      },
+      {
         tag: 'Șlefuit',
         name: 'Șlefuitor orbital',
         role: 'De la 80 la 320. Fără apăsare, fără grabă.',
         desc: 'Patru-cinci graduri de hârtie abrazivă. Mișcare circulară, fără apăsare, fără grabă.',
         image: '/stock/atelier-tool-sander.webp',
         imageAlt: 'Șlefuitor orbital pe o placă de stejar',
+      },
+      {
+        tag: 'Personalizare',
+        name: 'Gravare laser',
+        role: 'Nume, date, desene.',
+        desc: 'Pentru comenzile personalizate: nume, date, rețete, desene sau sigle, gravate direct în lemn.',
+        image: '/stock/atelier-tool-laser.webp',
+        imageAlt: 'Capul unui gravor laser deasupra unui bloc de lemn cu litere gravate',
       },
     ],
   },
@@ -236,42 +255,45 @@ const ro: AtelierContent = {
     h2Line1: 'Locul unde se face',
     h2Em: 'treaba.',
     paragraphs: [
-      'Atelierul nostru e o încăpere de vreo șaizeci de metri pătrați, în vestul României, unde tâmplăria are rădăcini vechi. Are lumină naturală bună până pe la patru după-amiaza, apoi aprindem lămpile. Iarna intră soarele direct pe geamul de est dimineața — atunci facem treaba care cere ochi bun, șlefuit fin, asamblare. Vara stăm mai mult în partea umbrită, unde temperatura rămâne stabilă.',
-      'Miroase a stejar — un miros dulce, ușor acrișor, care se ține în haine și în păr. Sunetul depinde de ce facem: motoarele de la ferăstrăul circular și de la freză sunt cele zgomotoase, dar le folosim pe rând și nu toată ziua. Cel mai mult timp lucrăm cu unelte de mână — și atunci e liniște, doar fierăstrău, raspel, șmirghel.',
+      'Atelierul nostru e în vestul României, unde tâmplăria are rădăcini vechi. Are lumină naturală bună până pe la patru după-amiaza, apoi aprindem lămpile.',
+      'Miroase a stejar — un miros dulce, ușor acrișor, care se ține în haine și în păr. Pe podea e rumeguș, pe degete rămâne ulei. Sunetul depinde de ce facem: unele unelte sunt zgomotoase, altele lucrează aproape în liniște.',
     ],
     imageTopAlt: 'Banc de lucru vechi lângă o fereastră, în lumină naturală',
     imageBottomAlt: 'Așchii de lemn și creioane pe un blat de lucru',
   },
+  photoNote: 'Fotografii ilustrative.',
   day: {
     eyebrow: 'O zi în atelier',
     h2Line1: 'Ritmul',
     h2Em: 'unei zile.',
+    // 2026-11-19 (founder fact-check): no clock hours, no instruments, no
+    // claims about our routine beyond the general order the wood asks for.
     intro:
-      'Nu există două zile identice — depinde de ce SKU lucrăm, de etapa la care suntem, de vreme. Dar ritmul general e cam același.',
+      'Nu există două zile identice — depinde de ce lucrăm, de etapa la care suntem, de vreme. Dar ordinea lucrurilor e cam aceeași, pentru că așa o cere lemnul.',
     moments: [
       {
-        time: '7:00–10:00 · Dimineața',
-        title: 'Verificări și muncă grea',
-        body: 'Verificăm temperatura și umiditatea în atelier — trebuie să fie între 18–22°C și 45–55% umiditate. Dacă nu sunt, ajustăm cu dezumidificator sau aerisire. Apoi cea mai grea muncă a zilei: tăieri și asamblare. Mintea e proaspătă, ochiul e atent.',
+        time: 'Prima parte a zilei',
+        title: 'Muncă grea',
+        body: 'Tăieri și lipiri — treaba care cere forță și precizie, cât mintea e proaspătă. Piesele lipite intră la presă și rămân acolo 24 de ore.',
       },
       {
-        time: '10:00–11:00 · Pauză',
+        time: 'Pauza',
         title: 'O cafea, o respirație',
-        body: 'O cafea, o gustare, o respirație. Atelierul rămâne în liniște — lemnul lucrat dimineața se «odihnește» după presare.',
+        body: 'O cafea, o gustare, o respirație. Lemnul lipit stă la presă; nu-l grăbim.',
       },
       {
-        time: '11:00–15:00 · După-amiaza',
+        time: 'După-amiaza',
         title: 'Lucrări de finețe',
-        body: 'Lucrări de finețe — șlefuit, frezat margini, gravare dacă avem comenzi personalizate. Muzică liniștită pe fundal. Pauze scurte la fiecare oră.',
+        body: 'Șlefuit, frezat margini, gravare când avem comenzi personalizate. Treaba care cere ochi atent o facem cât e lumină naturală bună.',
       },
       {
-        time: '15:00–18:00 · Seara',
+        time: 'Spre seară',
         title: 'Finisaj și închidere',
-        body: 'Aplicare ulei și ceară, ambalare comenzi gata, ordine în atelier pentru a doua zi. Curățare unelte, sortat rumeguș pentru aprins focul iarna. Ultimul lucru: notați ce am făcut, ce mai e de făcut.',
+        body: 'Ulei alimentar pe piesele terminate, ambalare pentru comenzile gata, ordine în atelier pentru a doua zi.',
       },
     ],
   },
-  pullquote: 'Cel mai mult timp lucrăm cu unelte de mână — și atunci e liniște.',
+  pullquote: 'Lucrăm fără grabă. Fiecare tocător primește timpul de care are nevoie.',
   process: {
     eyebrow: 'Procesul în sumar',
     h2Line1: 'Cinci pași,',
@@ -279,11 +301,11 @@ const ro: AtelierContent = {
     intro:
       'Procesul detaliat — cu mărimile, uneltele și timpii — e descris pe pagina noastră despre. Aici e versiunea scurtă, pentru context.',
     steps: [
-      { n: 'i.',   title: 'Alegerea lemnului',      body: 'Stejar local, fără noduri, cu desen frumos. Restul îl folosim altfel.' },
-      { n: 'ii.',  title: 'Uscarea',                body: '6–12 luni în aer, până ajunge la 8–10% umiditate.' },
+      { n: 'i.',   title: 'Alegerea lemnului',      body: 'Stejar cu desen frumos. Restul îl folosim altfel.' },
+      { n: 'ii.',  title: 'Uscarea',                body: 'Până devine stabil, în echilibru cu aerul din jur.' },
       { n: 'iii.', title: 'Tăierea și asamblarea', body: 'Dimensiuni precise, adeziv alimentar, presare 24 de ore.' },
       { n: 'iv.',  title: 'Șlefuirea',              body: 'Patru-cinci graduri, de la 80 la 320.' },
-      { n: 'v.',   title: 'Finisajul',              body: 'Ulei alimentar și ceară de albine, strat după strat.' },
+      { n: 'v.',   title: 'Finisajul',              body: 'Ulei alimentar, strat după strat.' },
     ],
     crossLinkLabel: 'Detalii complete pe pagina Despre',
   },
@@ -292,16 +314,18 @@ const ro: AtelierContent = {
     h2Line1: 'Lucruri pe care',
     h2Em: 'nu le vezi,',
     h2Tail: 'dar contează.',
+    // 2026-11-19 (founder fact-check): general, true wood behaviour — no
+    // instruments, ranges or storage set-up claimed for our workshop.
     intro:
-      'Două lucruri pe care le verificăm zilnic și care fac diferența între un tocător care durează zeci de ani și unul care plesnește în primele luni.',
+      'Două lucruri care nu se văd, dar fac diferența între un tocător care durează zeci de ani și unul care plesnește în primele luni.',
     cards: [
       {
-        label: 'Higrometru & termometru',
-        body: 'Lemnul e un material viu. Răspunde la umiditate, la temperatură, la cum e depozitat. De-asta ținem în atelier un **higrometru** și un **termometru** — și verificăm de două ori pe zi. Umiditatea aerului trebuie să fie între 45 și 55%. Sub 40%, lemnul își pierde apa proprie și începe să crape. Peste 60%, absoarbe apă din aer și se umflă.',
+        label: 'Umiditatea aerului',
+        body: 'Lemnul e un material viu: schimbă apă cu aerul din jur până ajunge la echilibru cu el. Sub **40%** umiditate, își pierde apa proprie și începe să crape. Peste **60%**, absoarbe apă din aer și se umflă.',
       },
       {
-        label: 'Două zone de depozitare',
-        body: 'Lemnul așteaptă în două locuri: **zona de uscat** (pentru bucățile care se usucă lent, 6–12 luni) și **zona de lucru** (pentru ce e gata pus în operă, săptămâna asta sau luna asta). Niciodată nu amestecăm. Și niciodată nu folosim lemn care nu și-a făcut timpul.',
+        label: 'Lemn uscat, lemn stabil',
+        body: 'Lemnul se lucrează după ce s-a uscat și s-a stabilizat. Cel neuscat cum trebuie continuă să se miște și după ce devine tocător: **se strâmbă** sau **crapă** în primele luni.',
       },
     ],
   },
@@ -309,12 +333,12 @@ const ro: AtelierContent = {
     eyebrow: 'Sezonalitatea',
     h2Line1: 'Vremea',
     h2Em: 'schimbă',
-    h2Tail: 'munca.',
+    h2Tail: 'lemnul.',
     cards: [
-      { title: 'Iarna',     body: 'Aerul mai uscat, lemnul mai stabil. E sezonul cel mai bun pentru asamblări mari — blocurile end-grain, platourile lungi. Atelierul e încălzit cu lemn (resturi de la noi), temperatura constantă.' },
-      { title: 'Primăvara', body: 'Umiditatea urcă. Suntem atenți la depozitare. E perioada în care primim lemn nou de la furnizori — bucățile de stejar care vor sta la uscat 6–12 luni înainte să devină tocătoare.' },
-      { title: 'Vara',      body: 'Cele mai grele luni — căldură, umiditate variabilă. Lucrăm mai mult dimineața devreme și seara târziu. Dezumidificatorul merge non-stop. Asamblări complexe le evităm vara — așteptăm toamna.' },
-      { title: 'Toamna',    body: 'Sezonul favorit. Aer stabil, temperatură plăcută, lemnul reacționează predictibil. Multe comenzi pentru cadouri de Crăciun — atelierul lucrează la capacitate maximă.' },
+      { title: 'Iarna',     body: 'Aerul încălzit din case e uscat, iar lemnul pierde din apă și se strânge. De-asta un tocător nu stă lângă calorifer sau sobă.' },
+      { title: 'Primăvara', body: 'Primim lemn nou de la furnizori, care intră la uscat. Umiditatea aerului crește, iar lemnul o simte.' },
+      { title: 'Vara',      body: 'Aerul cald și umed face lemnul să se umfle ușor. Un tocător șters după spălare și uns la timp cu ulei trece ușor peste vară.' },
+      { title: 'Toamna',    body: 'Pornesc caloriferele și aerul din casă începe să se usuce. E un moment bun pentru o trecere cu ulei.' },
     ],
   },
   articles: {
@@ -324,9 +348,8 @@ const ro: AtelierContent = {
     intro:
       'Articole care explică în detaliu părți specifice din ce facem. Vor fi disponibile când publicăm secțiunea noastră de blog.',
     items: [
-      { topic: 'Tehnică · Uscare',      title: 'De ce uscăm lemnul 6–12 luni — știința umidității',                  meta: 'Articol în pregătire' },
-      { topic: 'Tehnică · Construcție', title: 'End-grain vs edge-grain — diferența care nu se vede',                meta: 'Articol în pregătire' },
-      { topic: 'Finisaj',                title: 'Ulei și ceară de albine — finisajul tradițional pentru lemn alimentar', meta: 'Articol în pregătire' },
+      { topic: 'Tehnică · Uscare',      title: 'De ce uscăm lemnul — știința umidității',                           meta: 'Articol în pregătire' },
+      { topic: 'Finisaj',                title: 'Uleiul alimentar — finisajul tradițional pentru lemnul de bucătărie', meta: 'Articol în pregătire' },
       { topic: 'Ghid',                   title: 'Cum alegi mărimea potrivită pentru bucătăria ta',                    meta: 'Articol în pregătire' },
     ],
   },
@@ -340,20 +363,20 @@ const ro: AtelierContent = {
 const en: AtelierContent = {
   nav: { link: 'Workshop' },
   meta: {
-    title: 'Oak Fantasy Workshop — How every oak cutting board is made',
+    title: 'Oak Fantasy Workshop — How every cutting board is made',
     // 142 chars
     description:
-      'Small workshop in western Romania. Romanian oak, dried 6–12 months, five tools. How we handcraft every cutting board — from wood to beeswax.',
+      'A workshop in western Romania. Romanian oak, dried until stable. Our tools and how we make every cutting board — from wood to food-safe oil.',
   },
   hero: {
     eyebrow: 'Documentary · Workshop',
-    h1Line1: 'A small workshop in western Romania.',
+    h1Line1: 'A workshop in western Romania.',
     h1Line2Em: 'And one rule:',
     h1Line2Tail: "we don't rush the wood.",
-    sub: 'One place, five tools, one working day · Oak Fantasy Workshop',
+    sub: 'One place and its tools · Oak Fantasy Workshop',
     readTime: 'Read in ~7 minutes',
     cells: [
-      { src: '/products/atelier-tocator-taur-alb.webp', alt: 'Oak cutting board with a carved bull, white outline' },
+      { src: '/products/atelier-tocator-taur-alb.webp', alt: 'Oak and ash cutting board with a carved bull, white outline' },
       { src: '/products/atelier-platou-lung-servire.webp', alt: 'Long live-edge oak serving board' },
       { src: '/products/atelier-ceas-custom-cerb.webp', alt: 'Oak wall clock with an engraved stag' },
       { src: '/products/atelier-tava-servire-premium.webp', alt: 'Serving tray with a wave pattern and metal handles' },
@@ -369,7 +392,7 @@ const en: AtelierContent = {
     h2Line1: 'The catalog of our',
     h2Em: 'tools.',
     intro:
-      "There aren't many tools in a workshop that makes cutting boards. There are the right ones. Each with its role, each chosen for a reason. Below are the ones we use almost every day — in the order they come into work.",
+      "There aren't many tools in a workshop that makes cutting boards. There are the right ones. Each with its role, each chosen for a reason. Below are some of them, in the order they come into work.",
     items: [
       {
         tag: 'Cutting',
@@ -389,9 +412,9 @@ const en: AtelierContent = {
       },
       {
         tag: 'Assembly',
-        name: 'Manual screw clamps (4 pcs.)',
-        role: 'Four clamps, 24 hours, never less.',
-        desc: 'For glueing planks into a block. Four clamps on a 35×25cm block, uniform pressure.',
+        name: 'Manual screw clamps',
+        role: '24 hours, never less.',
+        desc: 'For glueing planks into a block, with uniform pressure.',
         image: '/stock/atelier-tool-clamps.webp',
         imageAlt: 'Screw clamps holding glued wood boards',
       },
@@ -404,12 +427,28 @@ const en: AtelierContent = {
         imageAlt: 'Electric hand planer passing over a wooden block, with shavings in the air',
       },
       {
+        tag: 'Design',
+        name: 'CNC router',
+        role: 'The designs on our boards.',
+        desc: 'The bull, the fish, the stag, the heart with the lovers: we CNC-carve them from a drawing. The cutting, gluing, sanding and oiling we do ourselves, in the workshop.',
+        image: '/stock/atelier-tool-cnc.webp',
+        imageAlt: 'CNC router head cutting into a wooden board, with chips in the air',
+      },
+      {
         tag: 'Sanding',
         name: 'Orbital sander',
         role: 'From 80 to 320. No pressure, no rush.',
         desc: 'Four-five grits of sandpaper. Circular motion, no pressure, no rush.',
         image: '/stock/atelier-tool-sander.webp',
         imageAlt: 'Orbital sander on an oak board',
+      },
+      {
+        tag: 'Personalisation',
+        name: 'Laser engraving',
+        role: 'Names, dates, drawings.',
+        desc: 'For custom orders: names, dates, recipes, drawings or logos, engraved straight into the wood.',
+        image: '/stock/atelier-tool-laser.webp',
+        imageAlt: 'Laser engraver head above a wooden block with engraved letters',
       },
     ],
   },
@@ -420,42 +459,43 @@ const en: AtelierContent = {
     h2Line1: 'The place where the work',
     h2Em: 'gets done.',
     paragraphs: [
-      'Our workshop is a room of about sixty square meters, in western Romania, where woodworking runs old and deep. It has good natural light until around four in the afternoon, then we turn on the lamps. In winter the sun comes in directly through the east window in the morning — that is when we do the work that needs a careful eye: fine sanding, assembly. In summer we stay more in the shaded part, where the temperature stays stable.',
-      "It smells of oak — a sweet, slightly tart smell that clings to clothes and hair. The sound depends on what we are doing: the motors of the table saw and router are the loud ones, but we use them one at a time, not all day. Most of the time we work with hand tools — and then it is quiet, just saw, rasp, sandpaper.",
+      'Our workshop is in western Romania, where woodworking runs old and deep. It has good natural light until around four in the afternoon, then we turn on the lamps.',
+      'It smells of oak — a sweet, slightly tart smell that clings to clothes and hair. There is sawdust on the floor and oil on our fingers. The sound depends on what we are doing: some tools are loud, others work almost in silence.',
     ],
     imageTopAlt: 'Old workbench by a window, in natural light',
     imageBottomAlt: 'Wood shavings and pencils on a worktop',
   },
+  photoNote: 'Illustrative photos.',
   day: {
     eyebrow: 'A day in the workshop',
     h2Line1: 'The rhythm of',
     h2Em: 'a day.',
     intro:
-      "No two days are alike — it depends on which SKU we're working on, what stage we're at, the weather. But the general rhythm is about the same.",
+      "No two days are alike — it depends on what we're working on, what stage we're at, the weather. But the order of things is about the same, because the wood asks for it.",
     moments: [
       {
-        time: '7:00–10:00 · Morning',
-        title: 'Checks and heavy work',
-        body: "We check temperature and humidity in the workshop — should be between 18–22°C and 45–55% humidity. If not, we adjust with a dehumidifier or ventilation. Then the hardest work of the day: cuts and assembly. Mind is fresh, eye is sharp.",
+        time: 'Early in the day',
+        title: 'Heavy work',
+        body: 'Cutting and gluing — the work that takes strength and precision, while the mind is fresh. Glued pieces go into the clamps and stay there for 24 hours.',
       },
       {
-        time: '10:00–11:00 · Break',
+        time: 'The break',
         title: 'A coffee, a breath',
-        body: 'A coffee, a snack, a breath. The workshop stays quiet — the wood worked in the morning «rests» after clamping.',
+        body: 'A coffee, a snack, a breath. The glued wood stays in the clamps; we don’t rush it.',
       },
       {
-        time: '11:00–15:00 · Afternoon',
+        time: 'Afternoon',
         title: 'Fine work',
-        body: 'Fine work — sanding, edge routing, engraving if we have custom orders. Quiet music in the background. Short breaks every hour.',
+        body: 'Sanding, edge routing, engraving when we have custom orders. The work that needs a careful eye we do while the natural light is good.',
       },
       {
-        time: '15:00–18:00 · Evening',
+        time: 'Towards evening',
         title: 'Finishing and closing',
-        body: "Applying oil and wax, packing finished orders, tidying the workshop for the next day. Cleaning tools, sorting sawdust for winter fire-starting. Last thing: notes on what we did, what's left to do.",
+        body: 'Food-safe oil on the finished pieces, packing the orders that are ready, tidying the workshop for the next day.',
       },
     ],
   },
-  pullquote: "Most of the time we work with hand tools — and then it's quiet.",
+  pullquote: 'We work without rushing. Every board gets the time it needs.',
   process: {
     eyebrow: 'The process in summary',
     h2Line1: 'Five steps,',
@@ -463,11 +503,11 @@ const en: AtelierContent = {
     intro:
       "The detailed process — with measurements, tools, and timings — is described on our about page. Here's the short version, for context.",
     steps: [
-      { n: 'i.',   title: 'Choosing the wood',    body: 'Local oak, no knots, beautiful grain. The rest we use otherwise.' },
-      { n: 'ii.',  title: 'Drying',                body: '6–12 months in air, until it reaches 8–10% humidity.' },
+      { n: 'i.',   title: 'Choosing the wood',    body: 'Oak with beautiful grain. The rest we use otherwise.' },
+      { n: 'ii.',  title: 'Drying',                body: 'Until it is stable, in balance with the air around it.' },
       { n: 'iii.', title: 'Cutting and assembly', body: 'Precise dimensions, food-safe adhesive, 24-hour clamping.' },
       { n: 'iv.',  title: 'Sanding',               body: 'Four-five grits, from 80 to 320.' },
-      { n: 'v.',   title: 'Finishing',             body: 'Food-safe oil and beeswax, layer after layer.' },
+      { n: 'v.',   title: 'Finishing',             body: 'Food-safe oil, layer after layer.' },
     ],
     crossLinkLabel: 'Full details on the About page',
   },
@@ -477,15 +517,15 @@ const en: AtelierContent = {
     h2Em: "don't see,",
     h2Tail: 'but matter.',
     intro:
-      'Two things we check daily that make the difference between a cutting board that lasts decades and one that cracks in the first months.',
+      "Two things you don't see that make the difference between a cutting board that lasts decades and one that cracks in the first months.",
     cards: [
       {
-        label: 'Hygrometer & thermometer',
-        body: "Wood is a living material. It responds to humidity, temperature, how it's stored. That's why we keep a **hygrometer** and **thermometer** in the workshop — and check them twice a day. Air humidity should be between 45 and 55%. Below 40%, wood loses its own water and starts to crack. Above 60%, it absorbs water from the air and swells.",
+        label: 'Air humidity',
+        body: 'Wood is a living material: it trades water with the air around it until it reaches balance. Below **40%** humidity, it loses its own water and starts to crack. Above **60%**, it absorbs water from the air and swells.',
       },
       {
-        label: 'Two storage zones',
-        body: "Wood waits in two places: the **drying zone** (for pieces drying slowly, 6–12 months) and the **work zone** (for what's ready to be used, this week or this month). We never mix. And we never use wood that hasn't had its time.",
+        label: 'Dry wood, stable wood',
+        body: "Wood is worked once it has dried and settled. Wood that hasn't dried properly keeps moving after it becomes a board: it **warps** or **cracks** in the first months.",
       },
     ],
   },
@@ -493,12 +533,12 @@ const en: AtelierContent = {
     eyebrow: 'The seasons',
     h2Line1: 'The weather',
     h2Em: 'changes',
-    h2Tail: 'the work.',
+    h2Tail: 'the wood.',
     cards: [
-      { title: 'Winter', body: 'Drier air, more stable wood. The best season for big assemblies — end-grain blocks, long platters. The workshop is heated with wood (our scraps), temperature constant.' },
-      { title: 'Spring', body: "Humidity rises. We're careful with storage. It's when we receive new wood from suppliers — oak pieces that will sit drying for 6–12 months before becoming cutting boards." },
-      { title: 'Summer', body: 'The hardest months — heat, variable humidity. We work more early in the morning and late in the evening. The dehumidifier runs non-stop. Complex assemblies we avoid in summer — we wait for autumn.' },
-      { title: 'Autumn', body: 'Favorite season. Stable air, pleasant temperature, wood responds predictably. Many orders for Christmas gifts — the workshop works at full capacity.' },
+      { title: 'Winter', body: 'Heated indoor air is dry, so wood loses water and shrinks. That is why a board shouldn’t sit next to a radiator or a stove.' },
+      { title: 'Spring', body: 'We receive new wood from suppliers, and it goes to dry. Air humidity rises, and the wood feels it.' },
+      { title: 'Summer', body: 'Warm, humid air makes wood swell slightly. A board wiped dry after washing and oiled in time gets through summer easily.' },
+      { title: 'Autumn', body: 'The heating comes on and indoor air starts to dry out. A good time to give the board a coat of oil.' },
     ],
   },
   articles: {
@@ -508,9 +548,8 @@ const en: AtelierContent = {
     intro:
       "Articles that explain in detail specific parts of what we do. They'll be available when we publish our blog section.",
     items: [
-      { topic: 'Technique · Drying',       title: 'Why we dry wood for 6–12 months — the science of humidity', meta: 'Article coming soon' },
-      { topic: 'Technique · Construction', title: "End-grain vs edge-grain — the difference you don't see",     meta: 'Article coming soon' },
-      { topic: 'Finishing',                 title: 'Oil and beeswax — the traditional finish for food-safe wood', meta: 'Article coming soon' },
+      { topic: 'Technique · Drying',       title: 'Why we dry wood — the science of humidity',                 meta: 'Article coming soon' },
+      { topic: 'Finishing',                 title: 'Food-safe oil — the traditional finish for kitchen wood',  meta: 'Article coming soon' },
       { topic: 'Guide',                     title: 'How to choose the right size for your kitchen',                meta: 'Article coming soon' },
     ],
   },

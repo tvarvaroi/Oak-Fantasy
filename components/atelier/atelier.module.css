@@ -46,6 +46,8 @@
   letter-spacing: -0.012em;
   color: var(--cream-warm);
   margin-bottom: 28px;
+  /* 2026-11-19: no lone "vestul" / "western" line in the narrow column. */
+  text-wrap: balance;
 }
 .heroH1 em { font-style: italic; color: var(--copper); }
 .heroSub {
@@ -161,18 +163,28 @@
 .toolsFeature > * { grid-column: span 4; }
 .toolsFeature > :nth-child(1),
 .toolsFeature > :nth-child(2) { grid-column: span 6; }
-/* 2026-10-15: 5 cards — bottom row = 3 × span-4 (the old span-8 sixth
-   card is gone). */
-.toolsFeature > :nth-child(5) { grid-column: span 4; }
+/* 2026-11-19: 7 cards — rows of 2 (span-6) / 3 (span-4) / 2 (span-6). */
+.toolsFeature > :nth-child(6),
+.toolsFeature > :nth-child(7) { grid-column: span 6; }
 /* FIX 2 (2026-05-28): use :nth-child(n) selectors so specificity (0,2,0)
    matches the per-child asymmetric overrides above. With `> *` alone the
    media queries were silently losing on tablet/mobile. */
 @media (max-width: 1024px) {
   .toolsFeature > :nth-child(n) { grid-column: span 6; }
-  /* 5 cards on a 2-col tablet grid leave the last one orphaned — let it
+  /* 7 cards on a 2-col tablet grid leave the last one orphaned — let it
      take the full row (design-qa 2026-10-15). */
-  .toolsFeature > :nth-child(5) { grid-column: span 12; }
+  .toolsFeature > :nth-child(7) { grid-column: span 12; }
 }
+/* "Fotografii ilustrative." — the tool and place photos are stock
+   (founder, 2026-11-19). Quiet, below the photos it qualifies. */
+.photoNote {
+  font-family: var(--font-lora);
+  font-style: italic;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  margin-top: -32px;
+}
+.placeSide .photoNote { margin-top: 0; }
 @media (max-width: 640px) {
   .toolsFeature > :nth-child(n) { grid-column: span 12; }
 }

@@ -21,7 +21,9 @@
 | `public/stock/atelier-tool-planer.webp` | ~~/atelier · Tools 4 (P5)~~ → din 2026-11-19 doar în slideshow-ul CraftVideoTease (ascuns) | https://www.pexels.com/photo/crop-artisan-flattening-lumber-on-planer-in-workroom-5974016/ | Ono Kosuki | Pexels License |
 | `public/stock/atelier-tool-hand-planer.webp` | /atelier · Tools 4 „Rindea electrică” (2026-11-19) | https://www.pexels.com/photo/a-man-scraping-a-wood-with-electric-wood-scraper-14441384/ | NSHCVKS HXJSG | Pexels License |
 | `public/stock/atelier-tool-sander.webp` | /atelier · Tools 5 (P5) | https://www.pexels.com/photo/close-up-of-sanding-wood-5466146/ | adventurestudio | Pexels License |
-| `public/stock/atelier-tool-hand-tools.webp` | /atelier · Tools 6 (P5) | https://www.pexels.com/photo/set-of-professional-tools-on-wall-5973878/ | Ono Kosuki | Pexels License |
+| ~~`public/stock/atelier-tool-hand-tools.webp`~~ | ȘTERS 2026-11-19 (dălțile nu sunt în atelier — fact-check fondator) | https://www.pexels.com/photo/set-of-professional-tools-on-wall-5973878/ | Ono Kosuki | Pexels License |
+| `public/stock/atelier-tool-cnc.webp` | /atelier · Tools „Freză CNC” (2026-11-19) | https://www.pexels.com/photo/7480234/ | cottonbro studio | Pexels License |
+| `public/stock/atelier-tool-laser.webp` | /atelier · Tools „Gravare laser” (2026-11-19) | https://www.pexels.com/photo/38030790/ | soc-nang-d-ng (Pexels) | Pexels License |
 | `public/stock/atelier-place-window.webp` | /atelier · WorkshopPlace sus (P6) | https://www.pexels.com/photo/12591659/ | Cmoon | Pexels License |
 | `public/stock/atelier-place-sawdust.webp` | /atelier · WorkshopPlace jos (P6) | https://www.pexels.com/photo/close-up-shot-of-sawdust-and-tools-on-a-wooden-surface-6790748/ | Tima Miroshnichenko | Pexels License |
 
@@ -58,3 +60,11 @@ Nu folosim imagini „Editorial use only" sau din colecțiile plătite (Unsplash
 > corecție de culoare spre cald (ffmpeg `colorbalance`) + denoise; cadru peisaj ~1,5:1
 > (ca să încapă mâna, rindeaua și blocul în cardul `object-fit: cover`), 1100×734 WebP q72 = 152 KB.
 > Fișierul vechi `atelier-tool-planer.webp` rămâne doar pentru slideshow-ul ascuns.
+
+> **2026-11-19 (fact-check fondator):** /atelier are 7 unelte — adăugate „Freză CNC” (Pexels 7480234,
+> capul frezei + așchii, fără brand) și „Gravare laser” (Pexels 38030790, cap de gravor deasupra unui
+> bloc de lemn; literele gravate nu formează un brand). Respinse: 7254428 / 7254423 (Opt Lasers, brand),
+> 10119306 (etichete pe ax), 17260646 (avertizări + etichete lizibile). Procesare: crop 3:2, 1100 px,
+> `colorbalance` spre cald + `hqdn3d`, WebP q72 (19 KB și 21 KB — cadre cu mult bokeh). Toate pozele
+> stock de pe /atelier, /despre și homepage poartă acum mențiunea „Fotografii ilustrative.” /
+> „Fotografie ilustrativă.” Slideshow-ul ascuns CraftVideoTease are 4 cadre (dălțile scoase).

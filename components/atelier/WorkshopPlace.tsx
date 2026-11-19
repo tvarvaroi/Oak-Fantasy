@@ -8,8 +8,9 @@ import styles from './atelier.module.css';
 // Place — v3-catalog.html. 1.2fr/1fr 2-col: text left, 2-img stack right
 // (second image offset 32px left for editorial asymmetry).
 // 2026-08-10: stock photos (Pexels — docs/stock-credits.md). Detail shots on
-// purpose, NOT a wide shot: the copy describes our real 60sqm room, and a
+// purpose, NOT a wide shot: the copy describes our real room, and a
 // stock wide shot of someone else's workshop would visibly contradict it.
+// 2026-11-19: captioned "Fotografii ilustrative." (founder fact-check).
 
 export default function WorkshopPlace({ content }: { content: AtelierContent }) {
   const { place } = content;
@@ -47,6 +48,7 @@ export default function WorkshopPlace({ content }: { content: AtelierContent }) 
               style={{ objectFit: 'cover' }}
             />
           </div>
+          <p className={styles.photoNote}>{content.photoNote}</p>
         </Reveal>
       </div>
     </section>
