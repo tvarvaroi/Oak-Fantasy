@@ -102,7 +102,12 @@ async function main() {
     await page.waitForTimeout(500);
     await page.goto(`${BASE}/ro/checkout`, { waitUntil: 'networkidle' });
     check('checkout has 2 steps', (await page.locator('ol li').count()) === 2);
-    const smokeEmail = `smoke-ramburs+${Date.now()}@example.com`;
+    // SMOKE_GUEST_EMAIL: a real inbox when running against production, so the
+    // client confirmation (sent once the Resend domain is verified) does not
+    // bounce off example.com. A `+tag` is appended to keep runs distinct.
+    const smokeEmail = process.env.SMOKE_GUEST_EMAIL
+      ? process.env.SMOKE_GUEST_EMAIL.replace('@', `+smoke-ramburs-${Date.now()}@`)
+      : `smoke-ramburs+${Date.now()}@example.com`;
     await page.fill('#co-email', smokeEmail);
     await page.fill('#co-name', 'Smoke Ramburs');
     await page.fill('#co-phone', '0712345678');
