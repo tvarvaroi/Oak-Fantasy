@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Caudex, Caveat, Lora } from 'next/font/google';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Analytics } from '@vercel/analytics/next';
 import PageTransition from '@/components/PageTransition';
 import { isLocale, type Locale } from '@/lib/i18n-routes';
 import { LEGAL_INFO, hasPlaceholder } from '@/lib/legal-info';
@@ -165,6 +166,7 @@ export default function LocaleLayout({
             every page. Its useEffect injector dedupes by script src, so the
             locale-switch remount never double-loads. */}
         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );
