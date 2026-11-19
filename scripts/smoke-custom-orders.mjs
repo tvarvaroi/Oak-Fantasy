@@ -103,6 +103,19 @@ async function deleteThroughDialog(page) {
 
 async function main() {
   const browser = await chromium.launch();
+  // CSP (enforced in production since 2026-11-19): every refused resource on
+  // any page of the customer or admin flow is collected and fails the smoke.
+  const cspViolations = [];
+  const watchCsp = (c) => {
+    c.on('page', (pg) =>
+      pg.on('console', (m) => {
+        if (/Content Security Policy|Content-Security-Policy/i.test(m.text())) {
+          cspViolations.push(`${pg.url()}: ${m.text().slice(0, 200)}`);
+        }
+      }),
+    );
+    return c;
+  };
   let tempAdminId = null;
   try {
     const newBefore = await countNew();
@@ -115,7 +128,7 @@ async function main() {
     check('anon INSERT rejected by RLS', ins.error?.code === '42501', ins.error?.code ?? 'no error');
 
     // ── 2. Visitor submits (RO + EN) ─────────────────────────────────────
-    const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    const ctx = watchCsp(await browser.newContext({ viewport: { width: 1280, height: 900 } }));
     const page = await ctx.newPage();
 
     await submitSlip(page, {
@@ -181,7 +194,7 @@ async function main() {
       console.log(`temporary admin created (${adminEmail})`);
     }
 
-    const actx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    const actx = watchCsp(await browser.newContext({ viewport: { width: 1280, height: 900 } }));
     const admin = await actx.newPage();
     await admin.goto(`${BASE}/admin/login`, { waitUntil: 'networkidle' });
     await admin.fill('#admin-email', adminEmail);
@@ -244,6 +257,8 @@ async function main() {
       console.log('temporary admin deleted');
     }
   }
+  // After cleanup, so a CSP failure never leaves temporary data behind.
+  check('no CSP violations in the customer + admin flow', cspViolations.length === 0, cspViolations.slice(0, 3).join(' | '));
 
   const failed = results.filter((r) => !r.ok).length;
   console.log(`\nSMOKE CUSTOM ORDERS: ${results.length - failed}/${results.length} checks passed`);

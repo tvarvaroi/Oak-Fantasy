@@ -1,11 +1,12 @@
 /** @type {import('next').NextConfig} */
 const path = require('path');
 
-// Content-Security-Policy — REPORT-ONLY for now (SEO audit #8, decided
-// 2026-07-06): violations show up in the browser console / report layer
-// without breaking anything. Promote to enforcing `Content-Security-Policy`
-// only after a verification window with zero unexpected violations
-// (checkout + images + fonts are the break-prone surfaces).
+// Content-Security-Policy (SEO audit #8). Report-Only from 2026-07-06; ENFORCED
+// in production from 2026-11-19 after a live check of 25 pages on
+// oakfantasy.ro with zero Report-Only violations (scripts/smoke-domain.mjs).
+//   - production build on Vercel Production (and local `next start`): enforced
+//   - Vercel Preview: Report-Only (keeps the Vercel toolbar / comments working)
+//   - `next dev`: Report-Only + 'unsafe-eval' (dev React refresh uses eval)
 //
 // Source inventory this policy is built from:
 // - Next.js hydration: inline <script> bootstrap → script-src 'unsafe-inline'
@@ -22,9 +23,12 @@ const path = require('path');
 //   → no stripe.com sources needed
 // - 2026-10-15: Three.js/R3F removed from the site (hero is a static logo
 //   now) → the defensive `blob:` worker allowance for drei loaders is gone.
-const CSP_REPORT_ONLY = [
+const IS_DEV = process.env.NODE_ENV !== 'production';
+const ENFORCE_CSP = !IS_DEV && process.env.VERCEL_ENV !== 'preview';
+
+const CSP = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  `script-src 'self' 'unsafe-inline'${IS_DEV ? " 'unsafe-eval'" : ''}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://*.supabase.co",
   "font-src 'self' data:",
@@ -42,7 +46,10 @@ const SECURITY_HEADERS = [
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
   { key: 'X-Frame-Options', value: 'DENY' },
   { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
-  { key: 'Content-Security-Policy-Report-Only', value: CSP_REPORT_ONLY },
+  {
+    key: ENFORCE_CSP ? 'Content-Security-Policy' : 'Content-Security-Policy-Report-Only',
+    value: CSP,
+  },
 ];
 
 // Domain switch (2026-11-19): the old production alias permanently redirects

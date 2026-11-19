@@ -1,4 +1,4 @@
-// Smoke test — live domain (2026-11-19, switch to https://oakfantasy.ro).
+// Smoke test — live domain (2026-11-19, switch to https://oakfantasy.ro; CSP enforced).
 //
 //   1. Pages (RO + EN): 200, served on the expected host, canonical/hreflang/
 //      og:url on https://oakfantasy.ro, no old Vercel alias in the HTML, no
@@ -146,6 +146,15 @@ async function main() {
     userId = created.user.id;
 
     const actx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    actx.on('page', (pg) =>
+      pg.on('console', (m) => {
+        const t = m.text();
+        if (/Content Security Policy|Content-Security-Policy/i.test(t)) {
+          const key = t.replace(/\s+/g, ' ').slice(0, 260);
+          csp.set(key, (csp.get(key) ?? new Set()).add(pg.url()));
+        }
+      }),
+    );
     const ap = await actx.newPage();
     const origin = new URL(apexFinal).origin; // the host that actually serves pages
 
@@ -227,9 +236,10 @@ async function main() {
     }
   }
 
-  console.log('\nCSP Report-Only violations (message → pages):');
+  console.log('\nCSP violations, enforced or Report-Only (message → pages):');
   if (csp.size === 0) console.log('  none');
   for (const [msg, pages] of csp) console.log(`  ${msg}\n    on: ${[...pages].join(', ')}`);
+  check('no CSP violations (pages + auth flow)', csp.size === 0, `${csp.size} distinct`);
 
   const failed = results.filter((r) => !r.ok);
   console.log(`\n${results.length - failed.length}/${results.length} checks passed`);
