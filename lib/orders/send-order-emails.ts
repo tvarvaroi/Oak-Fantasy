@@ -17,23 +17,13 @@ import { Resend } from 'resend';
 
 import { fetchOrderConfirmation } from './get-order';
 import { LEGAL_INFO } from '@/lib/legal-info';
+import { SITE_URL } from '@/lib/site-url';
+import { resendConfig } from '@/lib/email/resend-config';
 import { localizedPath } from '@/lib/i18n-routes';
 import OrderConfirmationClient, {
   type OrderEmailItem,
 } from '@/emails/OrderConfirmationClient';
 import OrderNotificationAdmin from '@/emails/OrderNotificationAdmin';
-
-const RESEND_SANDBOX_DOMAIN = 'onboarding@resend.dev';
-
-function envOr(name: string, fallback: string): string {
-  const v = process.env[name];
-  return v && v.length > 0 ? v : fallback;
-}
-
-function appOrigin(): string {
-  const env = process.env.NEXT_PUBLIC_APP_URL;
-  return (env || 'https://oak-fantasy.vercel.app').replace(/\/$/, '');
-}
 
 interface SnapshotShape {
   name_ro?: string;
@@ -58,15 +48,11 @@ export async function sendOrderEmails(orderId: string): Promise<void> {
     }
     const { order, items } = result;
 
-    const apiKey = process.env.RESEND_API_KEY;
+    const { apiKey, from, adminEmail, isTestMode, customerReplyTo } = resendConfig();
     if (!apiKey) {
       console.error('[order-emails] RESEND_API_KEY missing — emails skipped');
       return;
     }
-
-    const fromEmail = envOr('RESEND_FROM_EMAIL', RESEND_SANDBOX_DOMAIN);
-    const adminEmail = envOr('RESEND_ADMIN_EMAIL', 'tvarvaroi@gmail.com');
-    const isTestMode = fromEmail === RESEND_SANDBOX_DOMAIN;
 
     // locale isn't in the generated types until the migration is applied + types
     // regenerated — read it defensively.
@@ -74,7 +60,7 @@ export async function sendOrderEmails(orderId: string): Promise<void> {
       (order as { locale?: string }).locale === 'en' ? 'en' : 'ro';
 
     const resend = new Resend(apiKey);
-    const origin = appOrigin();
+    const origin = SITE_URL;
     const orderUrl = `${origin}${localizedPath('multumim', locale)}/${order.id}`;
     const adminOrdersUrl = `${origin}/admin/comenzi`;
 
@@ -108,8 +94,6 @@ export async function sendOrderEmails(orderId: string): Promise<void> {
           phone: sa.phone ?? '',
         }
       : null;
-
-    const from = `${LEGAL_INFO.brandName} <${fromEmail}>`;
 
     // ── 1. Admin notification (always) ──────────────────────────────────
     try {
@@ -159,6 +143,8 @@ export async function sendOrderEmails(orderId: string): Promise<void> {
         const clientRes = await resend.emails.send({
           from,
           to: clientTo,
+          // The sending domain has no mailbox — replies go to the contact inbox.
+          replyTo: customerReplyTo,
           subject: isTestMode ? `[TEST] ${subject}` : subject,
           react: OrderConfirmationClient({
             locale,

@@ -7,6 +7,7 @@ import { isLocale, type Locale } from '@/lib/i18n-routes';
 import { LEGAL_INFO, hasPlaceholder } from '@/lib/legal-info';
 import '../globals.css';
 import { OG_IMAGE_DEFAULT, OG_IMAGE_WIDTH, OG_IMAGE_HEIGHT } from '@/lib/seo';
+import { SITE_URL } from '@/lib/site-url';
 
 const caudex = Caudex({
   subsets: ['latin'],
@@ -28,8 +29,6 @@ const lora = Lora({
   variable: '--font-lora',
   display: 'swap',
 });
-
-const SITE_URL = 'https://oakfantasy.ro';
 
 // Sitewide entity graph (SEO audit fix #4). Organization + WebSite with stable
 // @id anchors — subpages (despre/atelier/contact/termeni) reference these ids

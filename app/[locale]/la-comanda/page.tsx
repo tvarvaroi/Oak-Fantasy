@@ -6,11 +6,11 @@ import { CUSTOM_ORDER_CONTENT } from '@/components/la-comanda/content';
 import { LEGAL_INFO } from '@/lib/legal-info';
 import { isLocale, localizedPath, type Locale } from '@/lib/i18n-routes';
 import { OG_IMAGE_DEFAULT as OG_IMAGE } from '@/lib/seo';
+import { SITE_URL } from '@/lib/site-url';
 
 // /ro/la-comanda · /en/custom-orders (2026-11-18). Server component: metadata
 // + JSON-LD; the page body is the client wrapper (Navbar + sections + Footer).
 
-const SITE_URL = `https://${LEGAL_INFO.brandDomain}`;
 
 const ALTERNATES_LANGS = {
   ro: '/ro/la-comanda',

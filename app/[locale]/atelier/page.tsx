@@ -4,9 +4,7 @@ import { ATELIER_CONTENT } from '@/components/atelier/content';
 import AtelierContent from '@/components/atelier/AtelierContent';
 import { isLocale, localizedPath, type Locale } from '@/lib/i18n-routes';
 import { OG_IMAGE_DEFAULT as OG_IMAGE } from '@/lib/seo';
-
-const SITE_URL = 'https://oakfantasy.ro';
-
+import { SITE_URL } from '@/lib/site-url';
 
 const ALTERNATES_LANGS = {
   ro: '/ro/atelier',

@@ -4,6 +4,7 @@ import { Resend } from 'resend';
 import ContactAdminEmail from '@/emails/ContactAdminEmail';
 import ContactAutoReplyEmail from '@/emails/ContactAutoReplyEmail';
 import { LEGAL_INFO } from '@/lib/legal-info';
+import { resendConfig } from '@/lib/email/resend-config';
 import { getClientIp, rateLimit } from '@/lib/rate-limit';
 import {
   SUBJECT_LABELS,
@@ -19,13 +20,6 @@ export const dynamic = 'force-dynamic';
 const MAX_PER_HOUR = 5;
 const HOUR_MS = 60 * 60 * 1000;
 const MIN_FORM_FILL_MS = 2000;
-
-const RESEND_SANDBOX_DOMAIN = 'onboarding@resend.dev';
-
-function envOr(name: string, fallback: string): string {
-  const v = process.env[name];
-  return v && v.length > 0 ? v : fallback;
-}
 
 // Standard JSON response helper — keeps headers consistent.
 function json(
@@ -103,15 +97,11 @@ export async function POST(request: Request) {
   }
 
   // ── Resend configuration ──────────────────────────────────────────────
-  const apiKey = process.env.RESEND_API_KEY;
+  const { apiKey, from, adminEmail, isTestMode, customerReplyTo } = resendConfig();
   if (!apiKey) {
     console.error('[contact] RESEND_API_KEY missing — cannot send email');
     return json({ error: 'server_misconfigured' }, { status: 500 });
   }
-
-  const fromEmail = envOr('RESEND_FROM_EMAIL', RESEND_SANDBOX_DOMAIN);
-  const adminEmail = envOr('RESEND_ADMIN_EMAIL', 'tvarvaroi@gmail.com');
-  const isTestMode = fromEmail === RESEND_SANDBOX_DOMAIN;
 
   const resend = new Resend(apiKey);
 
@@ -121,7 +111,7 @@ export async function POST(request: Request) {
   // ── 1. Admin notification ─────────────────────────────────────────────
   try {
     const adminResult = await resend.emails.send({
-      from: `${LEGAL_INFO.brandName} <${fromEmail}>`,
+      from,
       to: adminEmail,
       replyTo: data.email,
       subject: `[${LEGAL_INFO.brandName}] ${subjectLabel} — ${data.name}`,
@@ -156,8 +146,10 @@ export async function POST(request: Request) {
   if (!isTestMode) {
     try {
       const replyResult = await resend.emails.send({
-        from: `${LEGAL_INFO.brandName} <${fromEmail}>`,
+        from,
         to: data.email,
+        // The sending domain has no mailbox — replies go to the contact inbox.
+        replyTo: customerReplyTo,
         subject:
           data.locale === 'ro'
             ? `Mulțumim pentru mesaj — ${LEGAL_INFO.brandName}`

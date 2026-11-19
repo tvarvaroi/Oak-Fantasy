@@ -7,8 +7,7 @@ import LegalShell from '@/components/legal/LegalShell';
 import { TERMS_CONTENT } from '@/components/legal/terms/content';
 import { LEGAL_INFO } from '@/lib/legal-info';
 import { isLocale, localizedPath, type Locale } from '@/lib/i18n-routes';
-
-const SITE_URL = `https://${LEGAL_INFO.brandDomain}`;
+import { SITE_URL } from '@/lib/site-url';
 
 const ALTERNATES_LANGS = {
   ro: '/ro/termeni',

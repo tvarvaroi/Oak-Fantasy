@@ -7,6 +7,7 @@ import { PRODUCT_DETAIL_CONTENT } from '@/components/product/content';
 import ProductDetailContent from '@/components/product/ProductDetailContent';
 import ProductGallery from '@/components/product/ProductGallery';
 import ProductInfo from '@/components/product/ProductInfo';
+import { SITE_URL } from '@/lib/site-url';
 
 // ISR (D2): pre-render active products at build, revalidate every 60s so admin
 // activations/edits reflect without a redeploy; dynamicParams lets products
@@ -52,7 +53,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: metaTitle,
     description: metaDescription,
-    metadataBase: new URL('https://oakfantasy.ro'),
+    metadataBase: new URL(SITE_URL),
     alternates: {
       canonical,
       languages: { ro: roUrl, en: enUrl, 'x-default': roUrl },
@@ -90,7 +91,7 @@ export default async function ProductPage({ params }: PageProps) {
     new Set([product.hero_image_url, ...(product.gallery_image_urls ?? [])].filter((x): x is string => !!x)),
   );
 
-  const origin = 'https://oakfantasy.ro';
+  const origin = SITE_URL;
   const canonicalUrl = `${origin}${localizedPath('tocatoare', locale)}/${product.slug}`;
   const homeUrl = `${origin}/${locale}`;
   const catalogUrl = `${origin}${localizedPath('tocatoare', locale)}`;

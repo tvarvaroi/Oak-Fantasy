@@ -45,8 +45,27 @@ const SECURITY_HEADERS = [
   { key: 'Content-Security-Policy-Report-Only', value: CSP_REPORT_ONLY },
 ];
 
+// Domain switch (2026-11-19): the old production alias permanently redirects
+// to the apex domain, path + query preserved, so old links, bookmarks and any
+// stale email link land on oakfantasy.ro. Exact host match only — preview
+// deployments (other *.vercel.app hosts) keep working. next.config is CJS and
+// cannot import lib/site-url.ts; tests/e2e/domain.spec.ts asserts this
+// destination stays equal to SITE_URL.
+const LEGACY_HOST = 'oak-fantasy.vercel.app';
+const CANONICAL_ORIGIN = 'https://oakfantasy.ro';
+
 const nextConfig = {
   reactStrictMode: true,
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: LEGACY_HOST }],
+        destination: `${CANONICAL_ORIGIN}/:path*`,
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

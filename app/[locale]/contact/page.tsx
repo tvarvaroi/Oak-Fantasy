@@ -6,9 +6,9 @@ import ContactPage from '@/components/contact/ContactPage';
 import { CONTACT_CONTENT } from '@/components/contact/content';
 import { LEGAL_INFO } from '@/lib/legal-info';
 import { isLocale, localizedPath, type Locale } from '@/lib/i18n-routes';
+import { SITE_URL } from '@/lib/site-url';
 
-// Canonical site URL — mirrors patterns in app/[locale]/despre/page.tsx.
-const SITE_URL = `https://${LEGAL_INFO.brandDomain}`;
+// Absolute canonical/hreflang/OG URLs are built from SITE_URL (lib/site-url).
 
 const ALTERNATES_LANGS = {
   ro: '/ro/contact',

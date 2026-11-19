@@ -4,6 +4,7 @@ import { isLocale, localizedPath, type Locale } from '@/lib/i18n-routes';
 import { fetchActiveProducts, fetchOutOfStockIds } from '@/lib/db/products';
 import { TOCATOARE_CONTENT, formatPriceRon } from '@/components/tocatoare/content';
 import TocatoareContent from '@/components/tocatoare/TocatoareContent';
+import { SITE_URL } from '@/lib/site-url';
 
 // ISR per D6: catalog rarely changes; activations from Studio reflect within
 // ~60s without a redeploy. fetchActiveProducts returns [] gracefully on any
@@ -27,7 +28,7 @@ export async function generateMetadata({
   return {
     title: c.title,
     description: c.description,
-    metadataBase: new URL('https://oakfantasy.ro'),
+    metadataBase: new URL(SITE_URL),
     alternates: {
       canonical: canonicalPath,
       languages: {
@@ -71,7 +72,7 @@ export default async function TocatoarePage({ params }: PageProps) {
   // Stock availability (boolean only — exact counts never reach the client).
   const outOfStockIds = await fetchOutOfStockIds(products.map((p) => p.id));
 
-  const origin = 'https://oakfantasy.ro';
+  const origin = SITE_URL;
   const canonicalUrl = `${origin}${localizedPath('tocatoare', locale)}`;
   const homeUrl = `${origin}/${locale}`;
 

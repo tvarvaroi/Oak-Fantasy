@@ -2,19 +2,17 @@ import type { MetadataRoute } from 'next';
 
 // ⚠️ VARIANT A — PRE-LAUNCH LOCKDOWN (SEO audit fix #2). ⚠️
 //
-// We are live only on the oak-fantasy.vercel.app preview domain while every
-// page's canonical/hreflang already points at https://oakfantasy.ro (which
-// does not resolve yet). Indexing the vercel.app origin has zero upside and
-// real downside (duplicate-domain content at DNS cutover), so ALL crawlers
-// are blocked.
+// oakfantasy.ro is connected (2026-11-19) and every canonical/hreflang/sitemap
+// URL points at it, but the shop is not launched yet, so ALL crawlers stay
+// blocked. The founder decides the launch; until then this file does not change.
 //
-// ═══ MUST-FLIP-BEFORE-LAUNCH ═══
-// In the SAME PR that connects oakfantasy.ro (Vercel → Domains), replace this
-// with Variant B: allow all, disallow /admin,/api,/auth + transactional pages
+// ═══ MUST-FLIP-AT-LAUNCH (only on the founder's explicit "lansăm") ═══
+// Variant B: allow all, disallow /admin, /api, /auth + transactional pages
 // (cos/cart, checkout, multumim/thank-you, auth pages), and add
-// `sitemap: 'https://oakfantasy.ro/sitemap.xml'` + host. Tracked in
+// sitemap = `${SITE_URL}/sitemap.xml` + host. Prepared as a separate
+// commit (branch launch/robots-allow). Tracked in
 // _brain/notes/SECURITY_CHECKLIST.md (pre-launch) and gotchas.md.
-// ════════════════════════════════
+// ═════════════════════════════════════════════════════════════════════
 
 export default function robots(): MetadataRoute.Robots {
   return {

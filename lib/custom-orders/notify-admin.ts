@@ -13,20 +13,10 @@ import { Resend } from 'resend';
 
 import CustomOrderAdmin from '@/emails/CustomOrderAdmin';
 import { LEGAL_INFO } from '@/lib/legal-info';
+import { SITE_URL } from '@/lib/site-url';
+import { resendConfig } from '@/lib/email/resend-config';
 import { formatRoPhone } from '@/lib/whatsapp';
 import { customerGreeting } from './whatsapp-greeting';
-
-const RESEND_SANDBOX_DOMAIN = 'onboarding@resend.dev';
-
-function envOr(name: string, fallback: string): string {
-  const v = process.env[name];
-  return v && v.length > 0 ? v : fallback;
-}
-
-function appOrigin(): string {
-  const env = process.env.NEXT_PUBLIC_APP_URL;
-  return (env || 'https://oak-fantasy.vercel.app').replace(/\/$/, '');
-}
 
 export async function notifyAdminOfCustomOrder(request: {
   id: string;
@@ -37,14 +27,12 @@ export async function notifyAdminOfCustomOrder(request: {
   createdAt: string;
 }): Promise<void> {
   try {
-    const apiKey = process.env.RESEND_API_KEY;
+    const { apiKey, from, adminEmail } = resendConfig();
     if (!apiKey) {
       console.warn('[custom-order] RESEND_API_KEY missing — admin email skipped');
       return;
     }
 
-    const fromEmail = envOr('RESEND_FROM_EMAIL', RESEND_SANDBOX_DOMAIN);
-    const adminEmail = envOr('RESEND_ADMIN_EMAIL', 'tvarvaroi@gmail.com');
     const submittedAt = new Intl.DateTimeFormat('ro-RO', {
       dateStyle: 'medium',
       timeStyle: 'short',
@@ -52,7 +40,7 @@ export async function notifyAdminOfCustomOrder(request: {
     }).format(new Date(request.createdAt));
 
     const result = await new Resend(apiKey).emails.send({
-      from: `${LEGAL_INFO.brandName} <${fromEmail}>`,
+      from,
       to: adminEmail,
       subject: `[${LEGAL_INFO.brandName}] Cerere la comandă — ${request.name}`,
       react: CustomOrderAdmin({
@@ -62,7 +50,7 @@ export async function notifyAdminOfCustomOrder(request: {
         idea: request.idea,
         locale: request.locale,
         submittedAt,
-        adminUrl: `${appOrigin()}/admin/comenzi-custom/${request.id}`,
+        adminUrl: `${SITE_URL}/admin/comenzi-custom/${request.id}`,
       }),
     });
 

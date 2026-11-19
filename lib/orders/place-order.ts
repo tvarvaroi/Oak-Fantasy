@@ -8,6 +8,7 @@ import { getStripe, isStripeConfigured } from '@/lib/stripe/server';
 import { CARD_PAYMENTS_ENABLED, DEFAULT_PAYMENT_METHOD } from '@/lib/config/payments';
 import { createOrder } from './create-order';
 import { sendOrderEmails } from './send-order-emails';
+import { SITE_URL } from '@/lib/site-url';
 
 export interface PlaceOrderInput {
   checkout: unknown; // CheckoutData — re-validated here, never trusted from the client
@@ -19,11 +20,6 @@ export type PlaceOrderResult =
   | { ok: true; mode: 'stripe'; url: string }
   | { ok: true; mode: 'thankyou'; path: string }
   | { ok: false; error: string };
-
-function appOrigin(): string {
-  const env = process.env.NEXT_PUBLIC_APP_URL;
-  return (env || 'https://oak-fantasy.vercel.app').replace(/\/$/, '');
-}
 
 export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResult> {
   const parsed = checkoutSchema.safeParse(input.checkout);
@@ -82,7 +78,7 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderResu
     return { ok: false, error: 'stripe_unconfigured' };
   }
 
-  const origin = appOrigin();
+  const origin = SITE_URL;
   const stripe = getStripe();
 
   const lineItems = created.lines.map((l) => ({

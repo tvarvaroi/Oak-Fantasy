@@ -2,14 +2,13 @@ import type { MetadataRoute } from 'next';
 
 import { PATHNAMES, localizedPath, type RouteKey } from '@/lib/i18n-routes';
 import { fetchActiveProducts } from '@/lib/db/products';
+import { SITE_URL } from '@/lib/site-url';
 
 // Bilingual sitemap (SEO audit fix #2). Reuses lib/i18n-routes localizedPath()
 // as the single slug source of truth (never a second hardcoded map) and
 // fetchActiveProducts() (status='active' only, fails open to [] on a Supabase
 // hiccup so the build never crashes). Not referenced by robots.ts until the
 // Variant A → B flip at domain cutover, but built and valid now.
-
-const SITE_URL = 'https://oakfantasy.ro';
 
 // Public, indexable, non-transactional content only. Excluded on purpose:
 // cos/checkout/multumim (transactional, noindex), login/register/password

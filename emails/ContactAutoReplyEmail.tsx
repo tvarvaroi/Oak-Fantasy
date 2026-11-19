@@ -13,6 +13,7 @@ import {
 import * as React from 'react';
 
 import { LEGAL_INFO } from '@/lib/legal-info';
+import { SITE_URL } from '@/lib/site-url';
 
 export interface ContactAutoReplyEmailProps {
   name: string;
@@ -86,7 +87,7 @@ export default function ContactAutoReplyEmail({
   locale,
 }: ContactAutoReplyEmailProps) {
   const t = copy[locale];
-  const siteOrigin = `https://${LEGAL_INFO.brandDomain}`;
+  const siteOrigin = SITE_URL;
 
   return (
     <Html lang={locale}>

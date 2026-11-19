@@ -4,12 +4,9 @@ import { ABOUT_CONTENT } from '@/components/about/content';
 import AboutContent from '@/components/about/AboutContent';
 import { isLocale, localizedPath, type Locale } from '@/lib/i18n-routes';
 import { OG_IMAGE_DEFAULT as OG_IMAGE } from '@/lib/seo';
+import { SITE_URL } from '@/lib/site-url';
 
-// Canonical site URL — domain target per CLAUDE.md §14. Until the domain is
-// connected, Next.js still emits absolute hreflang/canonical URLs against
-// this base; OG images resolve to the same base. Vercel preview URLs won't
-// inherit; that's fine for the visible-product /despre page.
-const SITE_URL = 'https://oakfantasy.ro';
+// Absolute canonical/hreflang/OG URLs are built from SITE_URL (lib/site-url).
 
 const ALTERNATES_LANGS = {
   ro: '/ro/despre',
