@@ -521,3 +521,20 @@ NumbersStrip, emails/OrderConfirmationClient.tsx, lib/orders/send-order-emails.t
 lib/rate-limit.ts (sweep la fiecare apel, ca să fie adevărat „o fereastră de o oră”).
 **De ce contează:** când politica spune ceva, codul trebuie să facă exact acel lucru —
 ținem textul și codul legate prin teste (tokeni rezolvați, linkuri, faptele de la gate).
+
+---
+
+## 2026-11-19 — Curățare branduri + afirmații absolute: caută în HTML-ul randat, nu doar în repo
+
+**Pattern descoperit:** pentru „scoate X de peste tot”, grep-ul în repo nu ajunge: textul
+vine și din DB (descrieri de produs) și apare în JSON-LD / RSC payload. Am făcut trei treceri:
+grep în repo, scanare a tuturor câmpurilor `products` prin REST (service role) și o scanare a
+HTML-ului randat (`page.content()`) pe toate paginile publice + llms.txt, cu același regex.
+Când o instrucțiune e ambiguă ca întindere (o expresie exactă vs. o afirmație formulată în
+mai multe feluri), o întrebare scurtă cu 3 opțiuni a dat un răspuns diferit de toate trei —
+merită întrebat înainte de a rescrie copy de brand.
+**Aplicat la:** components/atelier/content.ts, numbers-strip-content.ts (+ Stat.display),
+NumbersStrip.tsx, about/content.ts, StoryStrip.tsx, public/llms.txt, tests (atelier, despre,
+shared-components).
+**De ce contează:** o gardă e2e pe HTML-ul randat prinde și reintroducerile din DB sau din
+JSON-LD, nu doar din fișierele editate.

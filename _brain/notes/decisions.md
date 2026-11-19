@@ -438,3 +438,20 @@ avocatul le rafinează. Tokenii elimină a doua sursă de adevăr pentru datele 
 **Alternative respinse:** texte „schiță” cu banner (founder: nu), HTML/Markdown liber în
 content (ar pierde paritatea RO/EN verificată de check:i18n și tokenii), nota de gravură
 mereu vizibilă (zgomot pentru 8 din 10 modele care nu au gravură).
+
+---
+
+## 2026-11-19 — Fără branduri de unelte și fără afirmații absolute de origine
+
+**Decizie:** (1) Uneltele de pe /atelier se numesc după TIPUL lor (Ferăstrău circular de
+masă, Rindea electrică, Șlefuitor orbital…) — niciun brand, cod de model sau specificație
+valabilă doar pentru un model, nicăieri (text, alt, JSON-LD). (2) Originea lemnului se
+descrie simplu („stejar românesc”), fără absolute: fără „100%”, „doar”, „fără import”,
+„din pădurile noastre”, „păduri certificate”. Banda de cifre are în locul lui „100% stejar
+românesc” celula text „Lemn masiv · lucrat manual” (Stat.display).
+
+**Motiv:** founder-ul nu poate dovedi exclusivitatea originii și nu vrea să facă reclamă
+unor branduri / să se lege de modele care se pot schimba. Ce rămâne pe site e verificabil.
+
+**Gardă:** tests/e2e/despre.spec.ts („Origin claims stay plain”) + atelier.spec.ts (fără
+branduri în HTML-ul randat).

@@ -1520,3 +1520,25 @@ VERIFICARE: typecheck ✓ · lint ✓ · check:i18n ✓ (4 warnings admin pre-ex
   contact + înregistrare, 4 viewporturi, EN, reduced-motion pe /retur) — revizuite.
 COMMITURI: rebase local (nepushat) ca ștergerile deja din index (Legal* + netlify.toml) să
   intre în commiturile lor, nu în cel cu legal-info — vezi gotcha.
+
+═══════════════════════════════════════════════════════════════════
+2026-11-19 (2) — UNELTE GENERICE PE /ATELIER + FĂRĂ AFIRMAȚII ABSOLUTE DE ORIGINE [LIVRAT]
+═══════════════════════════════════════════════════════════════════
+UNELTE (components/atelier/content.ts, RO + EN): fără brand / cod de model nicăieri (titlu,
+  descriere, alt, JSON-LD ItemList — generat din același content):
+  Planou circular Bosch GTS 635-216 → Ferăstrău circular de masă (EN Table saw); scoasă
+  specificația „lamă subțire, ghidaj fix, masă mare” + typo „Tăie” → „Taie”.
+  Rindeluitor electric Makita KP0810 → Rindea electrică (EN Electric hand planer).
+  Șlefuitor orbital Festool ETS 150/3 → Șlefuitor orbital (EN Orbital sander).
+  Freza verticală cu ghidaj și presele cu șuruburi erau deja generice. „planoiul circular”
+  din textul despre atelier → „ferăstrăul circular”.
+GATE scurt (AskUserQuestion) pe „100% stejar românesc”: founder → doar formulările absolute
+  (100%, „doar”, „fără import”) din bandă / Hero / Despre; „stejar românesc” rămâne descriere;
+  plus „păduri certificate” scos peste tot. Bandă: celulă text „Lemn masiv · lucrat manual ·
+  Din stejar românesc” (Stat.display, fără count-up). Despre: „Lucrăm cu stejar românesc: lemn
+  masiv, lucrat manual, fără compromis.” Hero: nu avea formulări absolute — neatins.
+  StoryStrip + llms.txt: fără „certified”. DB produse scanat (11): 0 branduri / absolute.
+VERIFICARE: typecheck ✓ · lint ✓ · check:i18n ✓ · build ✓ zero warnings · e2e 464 passed /
+  22 skipped / 0 failed · vizual 78/78 (7 regenerate) + 78/78 confirmare · hidratare 0 (28) ·
+  scanare HTML randat pe 18 pagini + llms.txt: 0 branduri / absolute · design-qa 57 capturi
+  (/atelier RO+EN × 4 vp + RM, banda de cifre RO/EN × 4 vp, cardul din Despre).

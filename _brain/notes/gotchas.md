@@ -1202,3 +1202,9 @@ tranziția. Verificat cu `mouse.wheel` + 1,5 s: fundal `rgb(245,235,216)`. Nu e 
 `git restore --source=HEAD^ --staged --worktree <căi>` + `commit --amend`, apoi `git rm` în
 commitul corect. Prevenție: șterge cu `rm` simplu și pune ștergerea în index abia la commitul
 ei — sau verifică `git diff --cached --stat` înainte de fiecare commit.
+
+## 2026-11-19 — Același gotcha, altă formă: `${…}` în `node -e "…"`
+
+**Simptom:** un titlu de test scris ca template literal cu `${path}` a ajuns `test(, …)` —
+bash a expandat `${path}` (gol) în ghilimelele duble. **Regulă:** cod TS/JS cu backtick-uri
+sau `${}` se scrie cu Edit/Write sau heredoc `<<'EOF'`, nu prin `node -e "…"`.
