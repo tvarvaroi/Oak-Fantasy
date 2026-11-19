@@ -43,6 +43,28 @@ function Counter({
     return () => controls.stop();
   }, [play, prefersReduced, stat.from, stat.to, index]);
 
+  // Text stat (no count-up), e.g. "Lemn masiv": smaller type, kept on one line
+  // so two words fit a quarter column (number size wrapped it at 1440), but the same box height as the numbers so labels and
+  // captions stay on one baseline across the row.
+  if (stat.display) {
+    return (
+      <div
+        className="font-caudex flex items-end justify-center text-center"
+        style={{
+          minHeight: 'clamp(2.8rem, 5.5vw, 5rem)',
+          fontSize: 'clamp(1.6rem, 2.6vw, 2.4rem)',
+          fontWeight: 700,
+          color: 'var(--cream-warm)',
+          lineHeight: 1.05,
+          whiteSpace: 'nowrap',
+          letterSpacing: '-0.01em',
+        }}
+      >
+        {stat.display}
+      </div>
+    );
+  }
+
   /* format thousands per locale */
   const formatted =
     stat.to >= 1000

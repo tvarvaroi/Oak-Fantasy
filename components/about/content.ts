@@ -176,7 +176,7 @@ const ro: AboutContent = {
       },
       {
         title: 'Lemn local',
-        body: 'Lucrăm doar cu stejar românesc din pădurile noastre, fără import, fără compromis.',
+        body: 'Lucrăm cu stejar românesc: lemn masiv, lucrat manual, fără compromis.',
       },
       {
         title: 'Durabil',
@@ -292,7 +292,7 @@ const en: AboutContent = {
       },
       {
         title: 'Local wood',
-        body: 'We work only with Romanian oak from our own forests — no imports, no compromise.',
+        body: 'We work with Romanian oak: solid wood, worked by hand, no compromise.',
       },
       {
         title: 'Built to last',

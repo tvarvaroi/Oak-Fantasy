@@ -335,9 +335,9 @@ const columns: Column[] = [
     titleRo: 'Stejar românesc',
     titleEn: 'Romanian Oak',
     bodyRo:
-      'Fiecare bucată de lemn vine din păduri certificate din munții Bucegi și Apuseni — crăci doborâte natural, uscate lent, respectate din rădăcină până în fibră.',
+      'Fiecare bucată de lemn vine din pădurile munților Bucegi și Apuseni — crăci doborâte natural, uscate lent, respectate din rădăcină până în fibră.',
     bodyEn:
-      'Every plank comes from certified forests in the Bucegi and Apuseni mountains — naturally felled, slow-dried, honoured from root to grain.',
+      'Every plank comes from forests in the Bucegi and Apuseni mountains — naturally felled, slow-dried, honoured from root to grain.',
   },
   {
     Ornament: CuttingBoardSVG,
