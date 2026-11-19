@@ -162,8 +162,8 @@ export default function CheckoutContent({ locale, prefill }: { locale: Locale; p
                     <button
                       type="button"
                       onClick={() => setStep((s) => Math.max(1, s - 1))}
-                      className="font-caudex transition-opacity hover:opacity-70"
-                      style={{ color: 'var(--ink-soft)', fontSize: '0.95rem' }}
+                      className="font-caudex inline-flex items-center transition-opacity hover:opacity-70"
+                      style={{ color: 'var(--ink-soft)', fontSize: '0.95rem', minHeight: 44, paddingRight: 8 }}
                     >
                       ← {c.back}
                     </button>

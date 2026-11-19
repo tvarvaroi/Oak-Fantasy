@@ -99,7 +99,7 @@ export default function AddToCartPanel({ product, locale }: { product: AddToCart
             onClick={() => setQuantity((q) => Math.max(1, q - 1))}
             aria-label="-"
             className="flex items-center justify-center transition-opacity hover:opacity-70"
-            style={{ width: 42, height: 48, color: 'var(--oak-deep)' }}
+            style={{ width: 44, height: 48, color: 'var(--oak-deep)' }}
           >
             <Minus size={16} strokeWidth={2} />
           </button>
@@ -111,7 +111,7 @@ export default function AddToCartPanel({ product, locale }: { product: AddToCart
             onClick={() => setQuantity((q) => Math.min(MAX_QTY, q + 1))}
             aria-label="+"
             className="flex items-center justify-center transition-opacity hover:opacity-70"
-            style={{ width: 42, height: 48, color: 'var(--oak-deep)' }}
+            style={{ width: 44, height: 48, color: 'var(--oak-deep)' }}
           >
             <Plus size={16} strokeWidth={2} />
           </button>

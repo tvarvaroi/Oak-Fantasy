@@ -52,6 +52,15 @@
     scroll-behavior: smooth;
   }
 
+  /* Tailwind preflight paints placeholders cold grey (#9ca3af). Warm ink at
+     reduced opacity instead — still reads as a hint, never as entered text
+     (design-qa 2026-11-19). Utilities like placeholder:* still override. */
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--ink-soft);
+    opacity: 0.75;
+  }
+
   body {
     background-color: var(--cream-warm);
     color: var(--ink);

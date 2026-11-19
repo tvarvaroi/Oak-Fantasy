@@ -30,8 +30,10 @@ export default function CartIcon({
       type="button"
       onClick={openDrawer}
       aria-label={`${c.cartAria}${count > 0 ? ` (${count})` : ''}`}
-      className="relative flex items-center transition-colors duration-200 hover:opacity-80"
-      style={{ color, transition: colorTransition }}
+      className="relative flex items-center justify-center transition-colors duration-200 hover:opacity-80"
+      // 44×44 touch target around the 22px icon; the negative margin keeps the
+      // icon exactly where it sat in the navbar (design-qa 2026-11-19).
+      style={{ color, transition: colorTransition, width: 44, height: 44, margin: -11 }}
     >
       <ShoppingBag size={22} strokeWidth={1.75} aria-hidden />
       {count > 0 ? (
@@ -39,8 +41,8 @@ export default function CartIcon({
           className="font-caudex"
           style={{
             position: 'absolute',
-            top: -7,
-            right: -9,
+            top: 4,
+            right: 2,
             minWidth: 17,
             height: 17,
             padding: '0 4px',

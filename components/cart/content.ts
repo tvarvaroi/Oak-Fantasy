@@ -13,6 +13,8 @@ export interface CartContent {
   checkout: string;
   checkoutComingSoon: string;
   remove: string;
+  decrease: string;
+  increase: string;
   close: string;
   quantity: string;
   engraving: string;
@@ -35,6 +37,8 @@ export const CART_CONTENT: Record<Locale, CartContent> = {
     checkout: 'Finalizează comanda',
     checkoutComingSoon: 'Finalizarea comenzii vine în curând.',
     remove: 'Elimină',
+    decrease: 'Scade cantitatea',
+    increase: 'Crește cantitatea',
     close: 'Închide',
     quantity: 'Cantitate',
     engraving: 'Gravare',
@@ -54,6 +58,8 @@ export const CART_CONTENT: Record<Locale, CartContent> = {
     checkout: 'Checkout',
     checkoutComingSoon: 'Checkout is coming soon.',
     remove: 'Remove',
+    decrease: 'Decrease quantity',
+    increase: 'Increase quantity',
     close: 'Close',
     quantity: 'Quantity',
     engraving: 'Engraving',

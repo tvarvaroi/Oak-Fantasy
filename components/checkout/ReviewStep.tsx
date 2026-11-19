@@ -73,14 +73,16 @@ export default function ReviewStep({
           const name = locale === 'ro' ? item.name_ro : item.name_en;
           const unit = item.priceRon + (item.engraving?.priceRon ?? 0);
           return (
-            <div key={item.lineId} style={rowStyle}>
-              <span className="font-lora" style={{ color: 'var(--ink)', fontSize: '0.9rem' }}>
+            // Long product names wrap on their own column; the price never breaks
+            // ("180 / RON") and keeps a gap from the name (design-qa 2026-11-19).
+            <div key={item.lineId} style={{ ...rowStyle, alignItems: 'flex-start', gap: 16 }}>
+              <span className="font-lora" style={{ color: 'var(--ink)', fontSize: '0.9rem', flex: '1 1 auto', minWidth: 0 }}>
                 {name} × {item.quantity}
                 {item.engraving?.text ? (
                   <span style={{ color: 'var(--ink-soft)', fontSize: '0.8rem' }}> · {c.engraving}: “{item.engraving.text}”</span>
                 ) : null}
               </span>
-              <span className="font-lora" style={{ color: 'var(--ink)', fontSize: '0.9rem' }}>
+              <span className="font-lora" style={{ color: 'var(--ink)', fontSize: '0.9rem', flexShrink: 0, whiteSpace: 'nowrap' }}>
                 {formatPriceRon(unit * item.quantity, locale)} {c.priceUnit}
               </span>
             </div>
@@ -145,8 +147,13 @@ export default function ReviewStep({
 
       {/* Terms */}
       <div>
-        <label className="flex items-start gap-2.5 cursor-pointer">
-          <input type="checkbox" {...register('termsAccepted')} style={{ marginTop: 3, accentColor: 'var(--oak-warm)' }} />
+        {/* The whole label is the touch target (≥ 44px tall); the box itself is 20px. */}
+        <label className="flex items-start gap-3 cursor-pointer" style={{ minHeight: 44, paddingTop: 10, paddingBottom: 10 }}>
+          <input
+            type="checkbox"
+            {...register('termsAccepted')}
+            style={{ width: 20, height: 20, marginTop: 1, flexShrink: 0, accentColor: 'var(--oak-warm)' }}
+          />
           <span className="font-lora" style={{ color: 'var(--ink)', fontSize: '0.88rem' }}>
             {c.termsPrefix}{' '}
             <Link href={localizedPath('terms', locale)} target="_blank" style={{ color: 'var(--oak-warm)', textDecoration: 'underline' }}>

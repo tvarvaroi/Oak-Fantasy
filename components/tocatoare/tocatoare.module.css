@@ -107,6 +107,10 @@
   gap: 10px;
 }
 .filterPill {
+  /* ≥ 44px touch target (design-qa 2026-11-19: was 37px). */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   font-family: var(--font-caudex);
   text-transform: uppercase;
   letter-spacing: 0.14em;
@@ -132,6 +136,7 @@
 .sortToggle {
   display: inline-flex;
   align-items: center;
+  min-height: 44px;
   gap: 10px;
   font-family: var(--font-caudex);
   text-transform: uppercase;
@@ -378,6 +383,7 @@
   letter-spacing: 0.14em;
   font-size: 0.72rem;
   color: var(--oak-warm);
+  min-height: 44px;
   padding: 10px 0;
   border-bottom: 1px solid var(--oak-warm);
   transition: gap 0.2s, color 0.2s;

@@ -49,8 +49,9 @@ export default function CartLineItem({
             type="button"
             onClick={() => removeItem(item.lineId)}
             aria-label={content.remove}
-            className="shrink-0 transition-opacity hover:opacity-70"
-            style={{ color: 'var(--ink-soft)' }}
+            className="shrink-0 flex items-center justify-center transition-opacity hover:opacity-70"
+            // 44×44 touch target; negative margins keep the 16px icon where it was.
+            style={{ color: 'var(--ink-soft)', width: 44, height: 44, margin: '-14px -14px -14px 0' }}
           >
             <Trash2 size={16} strokeWidth={1.75} />
           </button>
@@ -68,9 +69,9 @@ export default function CartLineItem({
             <button
               type="button"
               onClick={() => updateQuantity(item.lineId, item.quantity - 1)}
-              aria-label="-"
+              aria-label={content.decrease}
               className="flex items-center justify-center transition-opacity hover:opacity-70"
-              style={{ width: 28, height: 28, color: 'var(--oak-deep)' }}
+              style={{ width: 44, height: 44, color: 'var(--oak-deep)' }}
             >
               <Minus size={14} strokeWidth={2} />
             </button>
@@ -80,9 +81,9 @@ export default function CartLineItem({
             <button
               type="button"
               onClick={() => updateQuantity(item.lineId, item.quantity + 1)}
-              aria-label="+"
+              aria-label={content.increase}
               className="flex items-center justify-center transition-opacity hover:opacity-70"
-              style={{ width: 28, height: 28, color: 'var(--oak-deep)' }}
+              style={{ width: 44, height: 44, color: 'var(--oak-deep)' }}
             >
               <Plus size={14} strokeWidth={2} />
             </button>

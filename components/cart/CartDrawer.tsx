@@ -67,9 +67,15 @@ export default function CartDrawer({ locale }: { locale: Locale }) {
           height: '100dvh',
           width: 'min(420px, 90vw)',
           backgroundColor: 'var(--cream-warm)',
-          boxShadow: '-8px 0 32px rgba(31,24,16,0.18)',
+          // The shadow only exists while open: off-canvas at translateX(100%) its
+          // 32px blur still bled onto the right edge of every page.
+          boxShadow: isOpen ? '-8px 0 32px rgba(31,24,16,0.18)' : 'none',
           transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
-          transition: 'transform 0.32s cubic-bezier(0.4, 0, 0.2, 1)',
+          // visibility flips after the slide-out, so a closed drawer is also out
+          // of the tab order.
+          visibility: isOpen ? 'visible' : 'hidden',
+          transition:
+            'transform 0.32s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.32s ease, visibility 0.32s',
           zIndex: 61,
           display: 'flex',
           flexDirection: 'column',
@@ -83,7 +89,13 @@ export default function CartDrawer({ locale }: { locale: Locale }) {
           <span className="font-caudex" style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--oak-deep)' }}>
             {c.title}
           </span>
-          <button type="button" onClick={closeDrawer} aria-label={c.close} className="transition-opacity hover:opacity-70" style={{ color: 'var(--ink-soft)' }}>
+          <button
+            type="button"
+            onClick={closeDrawer}
+            aria-label={c.close}
+            className="flex items-center justify-center transition-opacity hover:opacity-70"
+            style={{ color: 'var(--ink-soft)', width: 44, height: 44, margin: -11 }}
+          >
             <X size={22} strokeWidth={1.75} />
           </button>
         </div>
@@ -98,8 +110,8 @@ export default function CartDrawer({ locale }: { locale: Locale }) {
               <Link
                 href={localizedPath('tocatoare', locale)}
                 onClick={closeDrawer}
-                className="font-caudex"
-                style={{ color: 'var(--oak-warm)', textDecoration: 'underline', fontSize: '0.9rem' }}
+                className="font-caudex inline-flex items-center justify-center"
+                style={{ color: 'var(--oak-warm)', textDecoration: 'underline', fontSize: '0.9rem', minHeight: 44 }}
               >
                 {c.emptyCta}
               </Link>
@@ -145,8 +157,8 @@ export default function CartDrawer({ locale }: { locale: Locale }) {
             <Link
               href={localizedPath('cos', locale)}
               onClick={closeDrawer}
-              className="font-caudex text-center"
-              style={{ color: 'var(--oak-warm)', textDecoration: 'underline', fontSize: '0.88rem' }}
+              className="font-caudex text-center inline-flex items-center justify-center"
+              style={{ color: 'var(--oak-warm)', textDecoration: 'underline', fontSize: '0.88rem', minHeight: 44 }}
             >
               {c.viewCart}
             </Link>

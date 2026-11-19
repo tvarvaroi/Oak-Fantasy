@@ -113,8 +113,8 @@ export default function CartPageContent({ locale }: { locale: Locale }) {
                 </Link>
                 <Link
                   href={localizedPath('tocatoare', locale)}
-                  className="font-caudex text-center"
-                  style={{ color: 'var(--oak-warm)', textDecoration: 'underline', fontSize: '0.88rem' }}
+                  className="font-caudex text-center inline-flex items-center justify-center"
+                  style={{ color: 'var(--oak-warm)', textDecoration: 'underline', fontSize: '0.88rem', minHeight: 44 }}
                 >
                   {c.emptyCta}
                 </Link>

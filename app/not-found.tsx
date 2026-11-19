@@ -1,59 +1,64 @@
 import Link from 'next/link';
+import { fontVariables } from '@/lib/fonts';
 
-// Root-level 404. Renders when notFound() fires OUTSIDE the [locale] layout —
-// e.g. the locale guard rejecting dotted junk paths (/robots.txt handled by
-// metadata routes, /.env, /x.jpg → real 404; SEO audit fix #1). The root
-// layout (app/layout.tsx) is a passthrough without <html>/<body> (they live in
-// [locale]/layout.tsx), so this page must provide its own document shell.
-// Generic on purpose: no admin/login hints (Task 2.3 security lesson).
+import { NOT_FOUND_CONTENT, ROOT_ENGLISH_LINK } from '@/components/not-found/content';
+import '@/app/globals.css';
+
+// Root-level 404 — only for paths WITHOUT a locale (dotted junk such as
+// /.env or /x.jpg rejected by the [locale] guard; SEO audit fix #1). Every
+// /ro/... and /en/... 404 is app/[locale]/not-found.tsx. The root layout is a
+// passthrough, so this page provides its own document and loads the brand
+// fonts itself. Romanian copy, with the English home as a separate link
+// (2026-11-19: no more mixed RO/EN sentence). Generic on purpose: no
+// admin/login hints (Task 2.3 security lesson).
 
 export default function RootNotFound() {
+  const c = NOT_FOUND_CONTENT.ro;
   return (
-    <html lang="ro">
-      <body
-        style={{
-          margin: 0,
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: '#F5EBD8',
-          color: '#2A2218',
-          fontFamily: 'Georgia, "Times New Roman", serif',
-        }}
-      >
-        <main style={{ textAlign: 'center', padding: '48px 24px' }}>
-          <p
-            style={{
-              margin: 0,
-              fontSize: 12,
-              letterSpacing: '0.18em',
-              textTransform: 'uppercase',
-              color: '#B87333',
-            }}
-          >
-            404
-          </p>
-          <h1 style={{ margin: '12px 0 8px', fontSize: 28, color: '#5C3A20' }}>
-            Pagina nu există
-          </h1>
-          <p style={{ margin: '0 0 24px', fontSize: 16, color: '#5D4E3A' }}>
-            The page you are looking for does not exist.
-          </p>
-          <Link
-            href="/ro"
-            style={{
-              display: 'inline-block',
-              backgroundColor: '#8B5E3C',
-              color: '#F5EBD8',
-              borderRadius: 8,
-              padding: '12px 28px',
-              textDecoration: 'none',
-              fontSize: 15,
-            }}
-          >
-            Înapoi acasă
-          </Link>
+    <html lang="ro" className={fontVariables}>
+      <body>
+        <main
+          className="paper-texture flex items-center justify-center px-6"
+          style={{ minHeight: '100vh', backgroundColor: 'var(--cream-warm)' }}
+        >
+          <div className="text-center" style={{ maxWidth: 520 }}>
+            <p className="label-caps" style={{ color: 'var(--copper)', fontSize: '0.72rem' }}>
+              {c.label}
+            </p>
+            <h1
+              className="font-caudex"
+              style={{ color: 'var(--oak-deep)', fontSize: 'clamp(1.9rem, 6vw, 2.6rem)', lineHeight: 1.15, marginTop: 14 }}
+            >
+              {c.title}
+            </h1>
+            <p className="font-lora" style={{ color: 'var(--ink-soft)', fontSize: '1rem', lineHeight: 1.7, marginTop: 14 }}>
+              {c.body}
+            </p>
+            <div className="flex flex-col items-center gap-2" style={{ marginTop: 30 }}>
+              <Link
+                href="/ro"
+                className="font-caudex inline-flex items-center justify-center"
+                style={{
+                  backgroundColor: 'var(--oak-warm)',
+                  color: 'var(--cream-warm)',
+                  borderRadius: 8,
+                  minHeight: 48,
+                  padding: '0 28px',
+                  fontSize: '0.95rem',
+                }}
+              >
+                {c.home}
+              </Link>
+              <Link
+                href="/en"
+                lang="en"
+                className="font-lora inline-flex items-center justify-center"
+                style={{ color: 'var(--oak-warm)', textDecoration: 'underline', minHeight: 44, fontSize: '0.9rem' }}
+              >
+                {ROOT_ENGLISH_LINK}
+              </Link>
+            </div>
+          </div>
         </main>
       </body>
     </html>
