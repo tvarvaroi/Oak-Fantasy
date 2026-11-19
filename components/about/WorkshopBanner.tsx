@@ -37,6 +37,7 @@ export default function WorkshopBanner({
           className={styles.workshopBannerImg}
           style={{ objectFit: 'cover' }}
         />
+        <p className={styles.workshopPhotoNote}>{workshop.photoNote}</p>
         <Reveal className={styles.workshopOverlay}>
           <div>
             <p className={styles.eyebrow}>{workshop.eyebrow}</p>

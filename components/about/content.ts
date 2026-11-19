@@ -62,6 +62,8 @@ export interface AboutContent {
     paragraph: string;
     /** Alt text for the full-bleed banner photo (stock — neutral, no claims about our space). */
     imageAlt: string;
+    /** Discreet caption on the stock banner photo (2026-11-19, founder). */
+    photoNote: string;
     /** Cross-link label rendered in workshop banner overlay -> /atelier. */
     crossLinkLabel: string;
   };
@@ -86,9 +88,9 @@ const ro: AboutContent = {
   nav: { link: 'Despre' },
   meta: {
     title: 'Despre Oak Fantasy — Atelier de tocătoare din stejar românesc',
-    // 146 chars; includes "tocător din lemn de stejar", "manual", "atelier românesc".
+    // 126 chars; includes "tocător din lemn de stejar", "manual", "atelier".
     description:
-      'Tocător din lemn de stejar lucrat manual într-un atelier mic din vestul României. Stejar românesc, finisaj food-safe, fără linie de producție, fără grabă.',
+      'Tocător din lemn de stejar lucrat manual într-un atelier din vestul României. Stejar românesc, finisaj food-safe, fără grabă.',
   },
   hero: {
     eyebrow: 'Despre noi',
@@ -102,30 +104,30 @@ const ro: AboutContent = {
     eyebrow: 'Procesul',
     h2: 'Cinci pași între copac și bucătărie.',
     subHeading: 'De la copac la bucătărie',
-    lead: 'De la stejarul nealtoit din pădurile României până la tocătorul pe care îl primești acasă — fiecare etapă cere timp, atenție și mâinile aceluiași om.',
+    lead: 'De la stejarul nealtoit din pădurile României până la tocătorul pe care îl primești acasă — fiecare etapă cere timp, atenție și mâinile noastre.',
     steps: [
       {
         num: '01',
         tick: 'Pas unu',
         title: 'Alegerea lemnului',
-        body: 'Cumpărăm stejar de la oameni din vestul țării, doar bucăți cu desen frumos și fără noduri în lemnul de muncă. Restul îl folosim pentru alte lucruri.',
-        bodyCompact: 'Cumpărăm stejar din vestul țării, doar bucăți cu desen frumos. Restul îl folosim pentru alte lucruri.',
+        body: 'Cumpărăm stejar ales, doar bucăți cu desen frumos. Restul îl folosim pentru alte lucruri.',
+        bodyCompact: 'Cumpărăm stejar ales, doar bucăți cu desen frumos. Restul îl folosim pentru alte lucruri.',
         placeholder: 'oak log · forest edge · light',
       },
       {
         num: '02',
         tick: 'Pas doi',
         title: 'Uscarea',
-        body: 'Lemnul stă la uscat între 6 și 12 luni, până ajunge la umiditatea potrivită (8–10%). Fără asta, tocătorul ar plesni în primele luni de folosință. Nu sărim peste pas.',
-        bodyCompact: 'Lemnul stă la uscat 6–12 luni, până ajunge la 8–10% umiditate. Fără asta, tocătorul ar plesni în primele luni.',
+        body: 'Lemnul stă la uscat până devine stabil, în echilibru cu aerul din jur. Lemnul neuscat cum trebuie se strâmbă sau plesnește în primele luni de folosință.',
+        bodyCompact: 'Lemnul stă la uscat până devine stabil. Fără asta, tocătorul ar plesni în primele luni.',
         placeholder: 'drying rack · stacked boards · barn',
       },
       {
         num: '03',
         tick: 'Pas trei',
         title: 'Tăierea și asamblarea',
-        body: 'Tăiem la dimensiunile fiecărui SKU, apoi lipim cu adeziv alimentar Titebond III — același folosit în atelierele de mobilier din SUA și Europa de zeci de ani. Presăm și lăsăm să se odihnească 24 de ore.',
-        bodyCompact: 'Tăiem la dimensiunile fiecărui SKU, apoi lipim cu adeziv alimentar Titebond III. Presăm 24 de ore.',
+        body: 'Tăiem la dimensiunile fiecărui SKU, apoi lipim cu adeziv alimentar. Presăm și lăsăm să se odihnească 24 de ore.',
+        bodyCompact: 'Tăiem la dimensiunile fiecărui SKU, apoi lipim cu adeziv alimentar. Presăm 24 de ore.',
         placeholder: 'clamps · glue-up · workbench',
       },
       {
@@ -140,8 +142,8 @@ const ro: AboutContent = {
         num: '05',
         tick: 'Pas cinci',
         title: 'Finisajul',
-        body: 'Ungem cu ulei alimentar + ceară de albine — câteva straturi, fiecare lăsat să intre în lemn 24 de ore. Asta îți protejează tocătorul, hrănește lemnul, și-l face să arate mai bun cu vârsta.',
-        bodyCompact: 'Ungem cu ulei alimentar și ceară de albine — câteva straturi, fiecare lăsat să intre în lemn 24 de ore.',
+        body: 'Ungem cu ulei alimentar, în câteva straturi, lăsând fiecare strat să intre în lemn înainte de următorul. Asta îți protejează tocătorul, hrănește lemnul, și-l face să arate mai bun cu vârsta.',
+        bodyCompact: 'Ungem cu ulei alimentar, în câteva straturi, lăsând fiecare strat să intre în lemn.',
         placeholder: 'oil rag · finished board · low light',
       },
     ],
@@ -149,20 +151,21 @@ const ro: AboutContent = {
   },
   philosophy: {
     eyebrow: 'Filosofia noastră',
-    h2Line1: 'Un atelier mic.',
-    h2Line2Em: 'Un singur copac.',
+    h2Line1: 'Un atelier propriu.',
+    h2Line2Em: 'Lemn ales bucată cu bucată.',
     paragraphs: [
-      'În atelierul nostru, fiecare tocător începe ca o bucată de stejar românesc — uscată încet, ani de zile, până când lemnul devine stabil și gata să primească mâna omului. Tăiem, lipim și finisăm fiecare placă singuri, fără linie de producție, fără grabă. Asta înseamnă că nu putem face mii pe lună. Înseamnă, în schimb, că fiecare tocător care iese din atelierul nostru poartă semnele unei singure perechi de mâini și ale unui singur copac.',
-      'Stejarul românesc e dens, închis la culoare, cu desen frumos pe oriunde îl tai. E lemnul potrivit pentru ceva ce vei folosi în fiecare zi pentru următorii zece, douăzeci, treizeci de ani. Asta facem noi — obiecte care durează cât bucătăria.',
-      'Nu suntem o fabrică. Suntem un atelier mic, român, care crede că un tocător din lemn poate fi un obiect care merită păstrat.',
+      'În atelierul nostru, fiecare tocător începe ca o bucată de stejar românesc — uscată încet, până când lemnul devine stabil și gata să primească mâna omului. Tăiem, lipim și finisăm fiecare placă singuri, fără grabă. Desenele le frezăm pe CNC; tăierea, lipirea, șlefuirea și uleiul le facem noi, în atelier. Asta înseamnă că nu putem face mii pe lună. Înseamnă, în schimb, că fiecare tocător care iese din atelierul nostru poartă semnele mâinilor noastre și ale lemnului din care a fost făcut.',
+      'Stejarul e dens și dur, cu desen frumos pe oriunde îl tai. E lemnul potrivit pentru ceva ce vei folosi în fiecare zi pentru următorii zece, douăzeci, treizeci de ani. Asta facem noi — obiecte care durează cât bucătăria.',
+      'Nu suntem o fabrică. Suntem un atelier românesc, care crede că un tocător din lemn poate fi un obiect care merită păstrat.',
     ],
   },
   workshop: {
     eyebrow: 'Atelierul',
     h2: 'Cu rumeguș pe podele și ulei pe degete.',
     paragraph:
-      'Lucrăm într-un atelier mic, în vestul României, unde lumina e bună dimineața și liniștită seara. Aici tăiem, șlefuim și împachetăm fiecare tocător. Aici primim și mesajele voastre. Nu e showroom — e atelier.',
+      'Lucrăm într-un atelier din vestul României, unde lumina e bună dimineața și liniștită seara. Aici tăiem, șlefuim și împachetăm fiecare tocător. Aici primim și mesajele voastre. Nu e showroom — e atelier.',
     imageAlt: 'Banc de lucru cu lemn și o lampă aprinsă, în lumină caldă',
+    photoNote: 'Fotografie ilustrativă.',
     crossLinkLabel: 'Vezi atelierul în detaliu',
   },
   values: {
@@ -175,7 +178,7 @@ const ro: AboutContent = {
         body: 'Lemnul nu se grăbește, nici noi. Fiecare tocător primește timpul de care are nevoie.',
       },
       {
-        title: 'Lemn local',
+        title: 'Lemn masiv',
         body: 'Lucrăm cu stejar românesc: lemn masiv, lucrat manual, fără compromis.',
       },
       {
@@ -184,7 +187,7 @@ const ro: AboutContent = {
       },
       {
         title: 'Manual',
-        body: 'Nicio linie de producție. Doar mâini, scule, și atenție.',
+        body: 'Un atelier propriu, nu o fabrică: mâini, scule și atenție.',
       },
     ],
   },
@@ -202,9 +205,9 @@ const en: AboutContent = {
   nav: { link: 'About' },
   meta: {
     title: 'About Oak Fantasy — Romanian oak cutting board workshop',
-    // ~152 chars; mirrors RO with EN keywords (oak cutting boards, handmade, Romanian workshop).
+    // ~126 chars; mirrors RO with EN keywords (oak cutting boards, handmade, Romanian workshop).
     description:
-      'Handmade oak cutting boards from a small workshop in western Romania. Romanian oak, food-safe finish, no production line, no rush — built to last for decades.',
+      'Handmade oak cutting boards from a workshop in western Romania. Romanian oak, food-safe finish, no rush — built to last for decades.',
   },
   hero: {
     eyebrow: 'About us',
@@ -218,30 +221,30 @@ const en: AboutContent = {
     eyebrow: 'The process',
     h2: 'Five steps between the tree and your kitchen.',
     subHeading: 'From tree to kitchen',
-    lead: 'From wild oak in Romania’s forests to the board that arrives at your home — every stage takes time, attention, and the same pair of hands.',
+    lead: 'From wild oak in Romania’s forests to the board that arrives at your home — every stage takes time, attention, and our own hands.',
     steps: [
       {
         num: '01',
         tick: 'Step one',
         title: 'Choosing the wood',
-        body: 'We buy oak from people in western Romania — only pieces with beautiful grain and no knots in the working surface. The rest we use for other things.',
-        bodyCompact: 'We buy oak from western Romania, only pieces with beautiful grain. The rest we use for other things.',
+        body: 'We buy selected oak — only pieces with beautiful grain. The rest we use for other things.',
+        bodyCompact: 'We buy selected oak — only pieces with beautiful grain. The rest we use for other things.',
         placeholder: 'oak log · forest edge · light',
       },
       {
         num: '02',
         tick: 'Step two',
         title: 'Drying',
-        body: 'The wood dries for 6 to 12 months, until it reaches the right moisture (8–10%). Without this, the board would crack in its first months of use. We don’t skip this step.',
-        bodyCompact: 'Wood dries for 6–12 months until it reaches 8–10% humidity. Without this, the board would crack in its first months.',
+        body: 'The wood dries until it is stable, in balance with the air around it. Wood that hasn’t dried properly warps or cracks in its first months of use.',
+        bodyCompact: 'The wood dries until it is stable. Without this, the board would crack in its first months.',
         placeholder: 'drying rack · stacked boards · barn',
       },
       {
         num: '03',
         tick: 'Step three',
         title: 'Cutting and assembly',
-        body: 'We cut to each SKU’s dimensions, then glue with Titebond III food-safe adhesive — the same one used in furniture workshops across the US and Europe for decades. We press and let it rest for 24 hours.',
-        bodyCompact: 'We cut to each SKU’s dimensions, then glue with food-safe Titebond III adhesive. We press for 24 hours.',
+        body: 'We cut to each SKU’s dimensions, then glue with food-safe adhesive. We press and let it rest for 24 hours.',
+        bodyCompact: 'We cut to each SKU’s dimensions, then glue with food-safe adhesive. We press for 24 hours.',
         placeholder: 'clamps · glue-up · workbench',
       },
       {
@@ -256,8 +259,8 @@ const en: AboutContent = {
         num: '05',
         tick: 'Step five',
         title: 'The finish',
-        body: 'We rub in food-safe oil + beeswax — a few coats, each left to soak into the wood for 24 hours. This protects your board, feeds the wood, and makes it look better with age.',
-        bodyCompact: 'We rub in food-safe oil and beeswax — a few coats, each left to soak into the wood for 24 hours.',
+        body: 'We rub in food-safe oil, in a few coats, letting each one soak into the wood before the next. This protects your board, feeds the wood, and makes it look better with age.',
+        bodyCompact: 'We rub in food-safe oil, in a few coats, letting each one soak into the wood.',
         placeholder: 'oil rag · finished board · low light',
       },
     ],
@@ -265,20 +268,21 @@ const en: AboutContent = {
   },
   philosophy: {
     eyebrow: 'Our philosophy',
-    h2Line1: 'A small workshop.',
-    h2Line2Em: 'A single tree.',
+    h2Line1: 'Our own workshop.',
+    h2Line2Em: 'Wood chosen piece by piece.',
     paragraphs: [
-      'In our workshop, every board begins as a piece of Romanian oak — dried slowly, over years, until the wood is stable and ready for a human hand. We cut, glue and finish each board ourselves, with no production line, no rush. It means we can’t make thousands a month. It means, instead, that every board that leaves our workshop carries the marks of a single pair of hands and a single tree.',
-      'Romanian oak is dense, dark, with beautiful grain wherever you cut it. It’s the right wood for something you’ll use every day for the next ten, twenty, thirty years. That’s what we make — objects that last as long as the kitchen.',
-      'We are not a factory. We are a small Romanian workshop that believes a wooden cutting board can be an object worth keeping.',
+      'In our workshop, every board begins as a piece of Romanian oak — dried slowly, until the wood is stable and ready for a human hand. We cut, glue and finish each board ourselves, with no rush. The designs are CNC-carved; the cutting, gluing, sanding and oiling we do ourselves, in the workshop. It means we can’t make thousands a month. It means, instead, that every board that leaves our workshop carries the marks of our hands and of the wood it was made from.',
+      'Oak is dense and hard, with beautiful grain wherever you cut it. It’s the right wood for something you’ll use every day for the next ten, twenty, thirty years. That’s what we make — objects that last as long as the kitchen.',
+      'We are not a factory. We are a Romanian workshop that believes a wooden cutting board can be an object worth keeping.',
     ],
   },
   workshop: {
     eyebrow: 'The workshop',
     h2: 'Sawdust on the floor, oil on our fingers.',
     paragraph:
-      'We work in a small workshop in western Romania, where the light is good in the morning and quiet in the evening. Here we cut, sand and pack every board. Here we also receive your messages. It’s not a showroom — it’s a workshop.',
+      'We work in a workshop in western Romania, where the light is good in the morning and quiet in the evening. Here we cut, sand and pack every board. Here we also receive your messages. It’s not a showroom — it’s a workshop.',
     imageAlt: 'Workbench with wood and a lit lamp, in warm light',
+    photoNote: 'Illustrative photo.',
     crossLinkLabel: 'See the workshop in detail',
   },
   values: {
@@ -291,7 +295,7 @@ const en: AboutContent = {
         body: 'Wood doesn’t rush, and neither do we. Every board gets the time it needs.',
       },
       {
-        title: 'Local wood',
+        title: 'Solid wood',
         body: 'We work with Romanian oak: solid wood, worked by hand, no compromise.',
       },
       {
@@ -300,7 +304,7 @@ const en: AboutContent = {
       },
       {
         title: 'By hand',
-        body: 'No production line. Just hands, tools, and attention.',
+        body: 'Our own workshop, not a factory: hands, tools, and attention.',
       },
     ],
   },
