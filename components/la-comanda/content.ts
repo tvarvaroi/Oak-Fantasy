@@ -113,7 +113,7 @@ export const CUSTOM_ORDER_CONTENT: Record<Locale, CustomOrderCopy> = {
       items: [
         {
           title: 'Tocătoare cu forma ta',
-          body: 'Rotund, lung, cu mâner sau după un contur pe care ni-l desenezi. Alegem împreună lemnul și grosimea.',
+          body: 'Rotund, lung, cu mâner sau după un contur pe care ni-l desenezi. Alegem împreună forma și grosimea.',
         },
         {
           title: 'Gravuri personalizate',
@@ -144,7 +144,7 @@ export const CUSTOM_ORDER_CONTENT: Record<Locale, CustomOrderCopy> = {
         {
           n: 'ii.',
           title: 'Te contactăm pe WhatsApp',
-          body: 'Îți scriem la numărul lăsat și stabilim împreună lemnul, mărimea, gravura și prețul. Acolo ne poți trimite și o schiță sau o poză de inspirație. Nu tăiem nimic până nu ești de acord.',
+          body: 'Îți scriem la numărul lăsat și stabilim împreună mărimea, gravura și prețul. Acolo ne poți trimite și o schiță sau o poză de inspirație. Nu tăiem nimic până nu ești de acord.',
         },
         {
           n: 'iii.',
@@ -230,7 +230,7 @@ export const CUSTOM_ORDER_CONTENT: Record<Locale, CustomOrderCopy> = {
       items: [
         {
           title: 'Boards in your shape',
-          body: 'Round, long, with a handle, or cut to an outline you sketch for us. We choose the wood and thickness together.',
+          body: 'Round, long, with a handle, or cut to an outline you sketch for us. We choose the shape and thickness together.',
         },
         {
           title: 'Personal engravings',
@@ -261,7 +261,7 @@ export const CUSTOM_ORDER_CONTENT: Record<Locale, CustomOrderCopy> = {
         {
           n: 'ii.',
           title: 'We message you on WhatsApp',
-          body: 'We write to the number you left and agree on wood, size, engraving and price together. You can send a sketch or an inspiration photo there too. Nothing gets cut until you say yes.',
+          body: 'We write to the number you left and agree on size, engraving and price together. You can send a sketch or an inspiration photo there too. Nothing gets cut until you say yes.',
         },
         {
           n: 'iii.',

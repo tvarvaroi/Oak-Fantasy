@@ -42,10 +42,10 @@ export const TOCATOARE_CONTENT: Record<Locale, TocatoareContent> = {
     meta: {
       title: 'Tocătoare din Stejar Românesc — Oak Fantasy',
       description:
-        'Zece modele de tocătoare din stejar masiv românesc, lucrate manual. De la tocătorul de zi cu zi până la blocul de moștenire.',
+        'Tocătoare din lemn masiv, lucrate manual. De la tocătorul de zi cu zi până la platoul de servire.',
       ogTitle: 'Tocătoare din Stejar Românesc — Oak Fantasy',
       ogDescription:
-        'Catalog complet: zece modele lucrate manual din stejar românesc, de la 180 la 1.800 RON.',
+        'Catalog complet: tocătoare și platouri din lemn masiv, lucrate manual în vestul României.',
     },
     hero: {
       eyebrow: 'Catalog · Toate modelele',
@@ -53,7 +53,7 @@ export const TOCATOARE_CONTENT: Record<Locale, TocatoareContent> = {
       titleEm: 'noastre.',
       note: {
         strong: 'Fiecare tocător pleacă din atelier gata de folosit.',
-        rest: 'Comanzi azi, îl lucrăm și îl trimitem în 5–10 zile lucrătoare.',
+        rest: 'Ce vezi în catalog e în stoc. Lucrăm comanda în 5–10 zile lucrătoare de la confirmare, apoi curierul o livrează de regulă în 1–3 zile lucrătoare.',
       },
     },
     filters: {
@@ -99,10 +99,10 @@ export const TOCATOARE_CONTENT: Record<Locale, TocatoareContent> = {
     meta: {
       title: 'Romanian Oak Cutting Boards — Oak Fantasy',
       description:
-        'Ten models of solid Romanian oak cutting boards, handcrafted. From the everyday board to the heirloom block.',
+        'Solid wood cutting boards, handcrafted. From the everyday board to the serving platter.',
       ogTitle: 'Romanian Oak Cutting Boards — Oak Fantasy',
       ogDescription:
-        'Full catalogue: ten handcrafted Romanian oak boards, from 180 to 1,800 RON.',
+        'Full catalogue: solid wood cutting boards and serving platters, handcrafted in western Romania.',
     },
     hero: {
       eyebrow: 'Catalogue · All models',
@@ -110,7 +110,7 @@ export const TOCATOARE_CONTENT: Record<Locale, TocatoareContent> = {
       titleEm: 'boards.',
       note: {
         strong: 'Every board leaves the workshop ready to use.',
-        rest: 'Order today — we craft and ship it in 5–10 business days.',
+        rest: 'What you see in the catalogue is in stock. We make your order in 5–10 business days from confirmation; the courier then usually delivers it in 1–3 business days.',
       },
     },
     filters: {
