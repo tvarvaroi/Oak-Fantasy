@@ -153,7 +153,7 @@ async function main() {
     await ap.goto(`${origin}/ro/login`, { waitUntil: 'networkidle' });
     await ap.fill('#login-email', email);
     await ap.fill('#login-password', password);
-    await ap.locator('form button[type="submit"]').click();
+    await ap.locator('main form button[type="submit"]').click();
     await ap.waitForURL((u) => u.pathname === '/ro', { timeout: 20000 });
     const cookies = await actx.cookies();
     const authCookie = cookies.find((c) => /^sb-.*-auth-token/.test(c.name));
@@ -161,10 +161,10 @@ async function main() {
 
     // reset-password page with a session → set a new password
     await ap.goto(`${origin}/ro/reset-parola`, { waitUntil: 'networkidle' });
-    const pw = ap.locator('input[type="password"]');
+    const pw = ap.locator('main input[type="password"]');
     await pw.nth(0).fill(newPassword);
     await pw.nth(1).fill(newPassword);
-    await ap.locator('form button[type="submit"]').click();
+    await ap.locator('main form button[type="submit"]').click();
     await ap.waitForTimeout(2500);
     const { data: relog, error: relogErr } = await createClient(
       env.NEXT_PUBLIC_SUPABASE_URL,
@@ -186,12 +186,12 @@ async function main() {
     });
     const recoverRes = fp.waitForResponse((r) => r.url().includes('/auth/v1/recover'), { timeout: 20000 });
     await fp.goto(`${origin}/ro/parola-uitata`, { waitUntil: 'networkidle' });
-    await fp.fill('input[type="email"]', email);
-    await fp.locator('form button[type="submit"]').click();
+    await fp.fill('main input[type="email"]', email);
+    await fp.locator('main form button[type="submit"]').click();
     const rr = await recoverRes;
     const rrBody = (await rr.text()).slice(0, 200);
     const redirectTo = recover ? new URL(recover.url).searchParams.get('redirect_to') : null;
-    check('forgot-password sends redirect_to on the serving host', redirectTo === `${origin}/auth/callback?next=/ro/reset-parola`, redirectTo ?? 'no request');
+    check('forgot-password sends redirect_to on the serving host', redirectTo != null && decodeURIComponent(redirectTo) === `${origin}/auth/callback?next=/ro/reset-parola`, redirectTo ?? 'no request');
     check('Supabase accepted the recover request', rr.status() === 200, `${rr.status()} ${rrBody}`);
 
     // Supabase allow-list: where does the emailed link actually send people?

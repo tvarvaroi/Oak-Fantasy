@@ -1273,3 +1273,13 @@ atunci a trecut pe același server stricat. Rulările noi randează corect (Lora
 **Fix:** baseline-uri regenerate + confirmate 78/78; comparat vizual vechi vs nou (login mobil).
 **Regulă:** după `test:e2e:update`, deschide 1–2 capturi și verifică fonturile brandului
 (Caudex titluri, Lora text) înainte de commit — un update „verde” poate îngheța o randare stricată.
+
+## 2026-11-19 — Supabase Site URL era `http://localhost:3000` (link de resetare → localhost)
+
+**Simptom:** `scripts/smoke-domain.mjs` → `admin.generateLink({type:'recovery', redirectTo})` →
+linkul din email face 303 spre `http://localhost:3000`, atât pentru apex cât și pentru www.
+**Cauză:** Authentication → URL Configuration: Site URL = localhost și niciun domeniu public în
+Redirect URLs; Supabase ignoră `redirect_to` nepermis și cade pe Site URL.
+**Fix (dashboard, founder):** Site URL = `https://oakfantasy.ro`; Redirect URLs =
+`https://oakfantasy.ro/**`, `http://localhost:3000/**` (+ temporar `https://www.oakfantasy.ro/**`).
+**Verificare fără inbox:** generateLink + `fetch(action_link, {redirect:'manual'})` → header Location.

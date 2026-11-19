@@ -569,3 +569,17 @@ ascunde celula în loc să afișeze o cifră falsă.
 llms.txt, 5 produse din DB; garda tests/e2e/fact-check.spec.ts.
 **De ce contează:** site-ul nu mai conține afirmații pe care founder-ul nu le-a confirmat;
 testul împiedică revenirea lor.
+
+## 2026-11-19 — Trecerea pe oakfantasy.ro: originea din cod, configurările din dashboard
+
+**Pattern descoperit:** la o schimbare de domeniu, codul e partea ușoară (o singură constantă
+`SITE_URL`, fără env care poate rămâne vechi); riscurile reale stau în dashboard-uri: Vercel
+servea www ca primar (invers față de canonical), Supabase avea Site URL = localhost (linkul de
+resetare ducea pe localhost). Ambele le-a prins un smoke LIVE (`scripts/smoke-domain.mjs`), nu
+testele locale. Allow-list-ul Supabase se verifică fără inbox: `admin.generateLink` + fetch cu
+`redirect: 'manual'`. Un `test:e2e:update` „verde” poate îngheța o randare stricată (baseline-uri
+fără Lora) — deschide capturile înainte de commit.
+**Aplicat la:** lib/site-url.ts, lib/email/resend-config.ts, next.config.js (alias vechi → 308),
+tests/e2e/domain.spec.ts, scripts/smoke-domain.mjs, branch local `launch/robots-allow`.
+**De ce contează:** lansarea depinde de 3 setări externe (Vercel primar, Supabase URL, Resend
+domeniu) pe care codul nu le poate repara — sunt în raport ca pași ai founder-ului.
