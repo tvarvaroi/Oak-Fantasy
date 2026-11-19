@@ -520,3 +520,16 @@ ele acolo prin rewrite-ul `afterFiles` din next.config.js. `app/not-found.tsx` e
 (signout `redirectTo`, callback `next`): fără `\` și caractere de control, origine neschimbată.
 **Comenzi de test:** OF-2026-0001…0009 șterse definitiv (cu items/history/stock_movements) la cererea
 founder-ului; stocul verificat identic. Backup JSON în scratchpad-ul sesiunii (temporar).
+
+## 2026-11-20 — Stoc mixt: „gata făcute sau lucrate după comandă”, 5–10 zile = maxim până la expediere
+
+**Decizie (founder):** unele piese sunt gata făcute, altele se lucrează după comandă. Peste tot
+(/tocatoare, /despre, pagina de produs, checkout, emailul de confirmare, Termeni RO/EN, banda de cifre,
+llms.txt) 5–10 zile lucrătoare e TERMENUL MAXIM PÂNĂ LA EXPEDIERE, nu o promisiune că fiecare piesă se
+face de la zero. Eticheta de pe pagina produsului: „Disponibil” (nu „În stoc”). Formulări interzise
+(gardă în tests/e2e/fact-check.spec.ts): „Ce vezi în catalog e în stoc / gata de trimis”,
+„Lucrăm comanda în 5–10…”, „Cât lucrăm o comandă”, EN „is in stock / ready to ship / We make your order in”.
+**Tot azi:** fonturi locale (`next/font/local`, assets/fonts), filtrele de nivel cu 0 produse ascunse,
+cantitatea pe rând separat („Cantitate: 1”) în checkout/mulțumim/emailuri/admin, `keepUnits()`
+(lib/typography.ts) lipește numărul de unitate în numele/descrierile de produs, EN „Company ID (CUI)”,
+token-ul `{companyName}` nu mai dublează punctul, linkurile din footer ≥ 44px pe mobil.

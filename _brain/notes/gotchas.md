@@ -1307,7 +1307,8 @@ nicio schimbare de cod. Fișierul indicat varia (admin/layout, lib/fonts).
 răspunsul conține un URL fără extensie, regex-ul din loader întoarce null. Extern, nu din cod.
 Prima mea ipoteză (declarații duplicate) era greșită — build-ul a picat și după centralizare.
 **Fix:** rulează build-ul din nou (pe Vercel: Redeploy). Pentru a elimina dependența de rețea:
-fonturile ca fișiere locale (`next/font/local`, OFL) — propus founder-ului, neaplicat.
+fonturile ca fișiere locale — APLICAT 2026-11-20: `lib/fonts.ts` folosește `next/font/local` cu
+`assets/fonts/*.woff2` (rețeta în assets/fonts/README.md); build-ul nu mai descarcă nimic.
 `lib/fonts.ts` a rămas (o singură declarație, igienă), dar NU e fix-ul.
 
 ## 2026-11-19 — 404-ul root (notFound() din layout) se servește fără niciun CSS
