@@ -489,3 +489,17 @@ de la founder.
 
 **Gardă:** tests/e2e/fact-check.spec.ts (afirmațiile scoase nu revin pe 10 pagini RO/EN +
 llms.txt; mențiunea foto; CNC pe /despre; stoc pe /tocatoare; cifra live).
+
+## 2026-11-19 — Domeniul oakfantasy.ro: o singură sursă pentru origine, fără env
+
+**Decizie:** toate URL-urile absolute (canonical, hreflang, OG, JSON-LD, sitemap, linkurile din
+emailuri, Stripe success/cancel) vin din `lib/site-url.ts` → `SITE_URL = https://${LEGAL_INFO.brandDomain}`
+(apex, fără www). `NEXT_PUBLIC_APP_URL` și fallback-ul `oak-fantasy.vercel.app` au fost scoase.
+Excepție intenționată: resetarea parolei folosește `window.location.origin` (cookie-ul PKCE și
+callback-ul trebuie să fie pe același host). `oak-fantasy.vercel.app` face 308 spre apex
+(next.config.js, potrivire exactă de host — preview-urile nu sunt afectate).
+Emailurile: config comun `lib/email/resend-config.ts`; emailurile către client au
+Reply-To = `LEGAL_INFO.contactEmail` (domeniul nu are căsuță); cele către admin au Reply-To = clientul.
+**Motiv:** un env uitat pe Vercel ar fi trimis clienții pe domeniul vechi fără niciun semnal.
+**robots:** rămâne Disallow până la „lansăm”; Variant B e pregătită pe branch-ul local
+`launch/robots-allow`. **Gardă:** tests/e2e/domain.spec.ts; live: scripts/smoke-domain.mjs.

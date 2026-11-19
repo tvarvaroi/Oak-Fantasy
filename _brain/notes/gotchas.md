@@ -1235,3 +1235,30 @@ build curat.
 'export'”. Pentru verificări statice ale conținutului: citește fișierul ca text
 (`fs.readFileSync`) și filtrează liniile relevante (atenție la comentarii care conțin
 același token).
+
+## 2026-11-19 — `next dev` scrie og:image pe localhost, deși metadataBase = oakfantasy.ro
+
+**Simptom:** testul de domeniu (dev server) găsea `og:image = http://localhost:3000/og/...` pe
+toate paginile, deși `metadataBase: new URL(SITE_URL)`.
+**Cauză:** Next 14 în dev rezolvă imaginile OG relative față de serverul local (ca preview-ul
+să meargă); în producție folosește metadataBase — live era corect (`https://oakfantasy.ro/og/...`).
+**Fix:** testul acceptă, DOAR pentru imagini, originea locală; restul URL-urilor (canonical,
+hreflang, og:url, JSON-LD) trebuie să fie pe apex. Imaginile se verifică live cu
+`scripts/smoke-domain.mjs`.
+
+## 2026-11-19 — `npx playwright test` fără filtru: testele vizuale pică în paralel
+
+**Simptom:** 66 de eșecuri `toHaveScreenshot` (7–14% pixeli) la o rulare completă cu 3 workeri.
+**Cauză:** baseline-urile vizuale se compară doar cu `--workers=1` (scriptul `test:e2e:visual`);
+în paralel, serverul dev compilează pagini în timpul capturii.
+**Fix:** rulează `npm run test:e2e` (exclude vizualele) + `npm run test:e2e:visual` separat,
+niciodată `npx playwright test` simplu ca gate.
+
+## 2026-11-19 — Vercel: apex-ul făcea 308 spre www, invers față de canonical
+
+**Simptom:** după conectarea oakfantasy.ro, `https://oakfantasy.ro/*` → 308 → `https://www.oakfantasy.ro/*`,
+deși tot site-ul (canonical, sitemap, emailuri) folosește apex-ul.
+**Cauză:** setarea implicită din Vercel → Domains (www primar). Nu se repară din cod: un redirect
+www→apex în next.config ar face buclă cu setarea Vercel.
+**Fix:** în Vercel → Domains: `oakfantasy.ro` conectat la Production fără redirect,
+`www.oakfantasy.ro` → „Redirect to oakfantasy.ro” (308). Verifică cu `curl -sI`.

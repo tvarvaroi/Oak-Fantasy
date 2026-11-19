@@ -136,9 +136,10 @@ SUPABASE_SERVICE_ROLE_KEY=eyJ... (SECRET, server-side only)
 
 # Email
 RESEND_API_KEY=re_... (production key, rotated)
-RESEND_FROM_EMAIL=noreply@oakfantasy.ro
-RESEND_ADMIN_EMAIL=info@oakfantasy.ro
-RESEND_REPLY_TO=info@oakfantasy.ro
+RESEND_FROM_EMAIL=comenzi@oakfantasy.ro   # adresă simplă, domeniu verificat în Resend (2026-11-19)
+RESEND_ADMIN_EMAIL=<o singură adresă>     # fără listă; unset → gmail founder
+# Reply-To pe emailurile către client = LEGAL_INFO.contactEmail (nu e env separat;
+# domeniul nu are căsuță). Vezi lib/email/resend-config.ts.
 
 # Stripe
 STRIPE_PUBLISHABLE_KEY=pk_live_... (public-safe, browser-side)
@@ -157,7 +158,7 @@ SMARTBILL_CIF=... (firma CIF)
 SENTRY_DSN=... (public-safe pentru client, dar private pentru server)
 
 # App config
-NEXT_PUBLIC_APP_URL=https://oakfantasy.ro
+# NEXT_PUBLIC_APP_URL — ELIMINAT 2026-11-19: originea vine din lib/site-url.ts (nu din env)
 NEXT_PUBLIC_DEFAULT_LOCALE=ro
 ```
 
@@ -566,8 +567,9 @@ provider în Supabase Dashboard + redirect URL deja whitelistabil.
       provider** + **"Allow new users to sign up" ON**. Fără asta `signUp()`
       eșuează cu "Email signups are disabled" (setare separată de Confirm
       email — vezi gotcha 2026-06-18). Blochează acceptanța Task 2.2.
-- [ ] **Auth → URL Configuration → Redirect URLs:** adaugă
-      `http://localhost:3000/auth/callback` + `<vercel-url>/auth/callback`
+- [ ] **Auth → URL Configuration (2026-11-19, domeniu):** Site URL = `https://oakfantasy.ro`;
+      Redirect URLs = `https://oakfantasy.ro/**`, `http://localhost:3000/**`
+      (+ temporar `https://www.oakfantasy.ro/**` până când Vercel servește apex-ul ca primar).
       (necesar pentru reset password + Google OAuth Task 2.3).
 - [ ] DUPĂ ce founder face signup (Task 2.2): promovare admin via SQL editor:
       `UPDATE profiles SET role='admin' WHERE email='tvarvaroi@gmail.com';`
