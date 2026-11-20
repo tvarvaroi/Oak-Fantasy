@@ -619,3 +619,16 @@ noindex) și noindex pe paginile private.
 **Aplicat la:** app/robots.ts, tests/e2e/domain.spec.ts, _brain/notes/SECURITY_CHECKLIST.md, journal.
 **De ce contează:** orice schimbare ireversibilă „la comanda founder-ului” se pregătește ca un commit
 izolat și testat, care se aplică doar la confirmare.
+
+## 2026-11-20 — JSON-LD Product: cauza „Missing field 'image'”
+
+**Pattern descoperit:** „câmpul X lipsește” în Google nu înseamnă neapărat că lipsește din markup —
+verifică și dacă resursa e indexabilă (antete `X-Robots-Tag`). Supabase Storage trimite
+`x-robots-tag: none` pe orice obiect public. Un test „200 + content-type” e verde fals; testul trebuie
+să verifice exact condiția din documentație („crawlable AND indexable”). Revizia adversarială
+independentă (workflow cu 3 unghiuri + verificatori) a prins cauza reală și `minValue` obligatoriu
+la handlingTime, pe care documentația rezumată le ratase.
+**Aplicat la:** lib/product-jsonld.ts, lib/config/{shipping,returns}.ts, lib/db/products.ts (isInStock),
+app/[locale]/tocatoare/{page,[slug]/page}.tsx, tests/e2e/product-jsonld.spec.ts, scripts/validate-schema.mjs.
+**De ce contează:** datele structurate se generează dintr-un singur loc, din aceleași surse ca textul
+vizibil, și se validează pe toate produsele, RO + EN, nu pe un exemplu.

@@ -533,3 +533,21 @@ face de la zero. Eticheta de pe pagina produsului: „Disponibil” (nu „În s
 cantitatea pe rând separat („Cantitate: 1”) în checkout/mulțumim/emailuri/admin, `keepUnits()`
 (lib/typography.ts) lipește numărul de unitate în numele/descrierile de produs, EN „Company ID (CUI)”,
 token-ul `{companyName}` nu mai dublează punctul, linkurile din footer ≥ 44px pe mobil.
+
+## 2026-11-20 — JSON-LD Product complet: brand, livrare, retur; un singur builder
+
+**Decizie:** `lib/product-jsonld.ts` construiește `Product` pentru pagina de produs ȘI pentru
+`ItemList`-ul din catalog (catalogul repetă exact nodul paginii; gardă deep-equal în
+tests/e2e/product-jsonld.spec.ts). Câmpuri: `image` (hero + galerie, prin `/_next/image`, absolute),
+`brand` = Brand „Oak Fantasy” (fără GTIN — lucrate de noi), `offers` cu `itemCondition` New,
+`shippingDetails` și `hasMerchantReturnPolicy`.
+**Livrare** (din lib/config/shipping.ts): RO; tarif pentru produsul cumpărat singur = `shippingCost(preț)`
+(25 RON sub 500 RON, 0 de la 500 RON — pragul pe valoarea comenzii se poate declara doar pe
+Organization în modelul Google); handling 5–10 zile lucrătoare (Google cere min ȘI max; min = „5”-ul
+afișat pe site), transit 1–3, zile lucrătoare L–V.
+**Retur** (lib/config/returns.ts, în acord cu /retur): RO, fereastră 14 zile, `ReturnByMail`,
+`ReturnFeesCustomerResponsibility`. Produsele personalizate: gravura e o OPȚIUNE adăugată la comandă,
+iar lucrările „La comandă” nu sunt în catalog — `Offer`-ul descrie produsul standard, care are drept
+de retragere. Schema.org/Google nu au un mod de a exclude o opțiune; excepția rămâne în /retur și Termeni.
+**Stoc:** `fetchStockMap` întoarce `null` la eroare (fail-open doar atunci); fără rând în inventar =
+0 disponibile, la fel pe catalog și pe pagina produsului (`isInStock`).

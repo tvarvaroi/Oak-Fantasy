@@ -1325,3 +1325,20 @@ a rămas „last resort” cu stiluri inline (hex = tokenii din globals.css).
 `/en/about` să fie rescris → 404 pe toată engleza. Corect: `(?!(?:ro|en|…)(?:/|$))`.
 (2) În `next dev`, robots.txt/sitemap.xml (metadata routes) se potrivesc DUPĂ afterFiles → excluse
 explicit. Gardă: tests/e2e/mobile-polish.spec.ts („rewrite leaves real routes and files alone”).
+
+## 2026-11-20 — Pozele din Supabase Storage vin cu `X-Robots-Tag: none` (Google nu le poate indexa)
+
+**Simptom:** Google Rich Results: „Missing field 'image'” (critic) pe /ro/tocatoare/ceas-custom-cerb,
+deși JSON-LD-ul paginii conținea `image` cu 3 URL-uri absolute.
+**Cauză:** orice obiect public din Supabase Storage (`*.supabase.co/storage/v1/object/public/…`) se
+servește cu `x-robots-tag: none` (= noindex, nofollow), inclusiv pentru Googlebot-Image. Google cere
+ca imaginile din datele structurate să fie „crawlable and indexable” → nicio poză utilizabilă, la
+toate cele 10 produse. Separat, catalogul (`ItemList`) își construia propriile noduri `Product` fără
+`image`/`brand` (20 de noduri: 10 × RO/EN).
+**Fix:** `lib/product-jsonld.ts` — un singur builder pentru pagina de produs și catalog; pozele merg
+prin `/_next/image?url=…&w=1200&q=75` de pe domeniul nostru (200, fără antetul robots). `w` trebuie
+să fie în deviceSizes/imageSizes, altfel 400. og:image a rămas URL-ul Supabase (rețelele sociale
+ignoră X-Robots-Tag).
+**Capcană:** testul „imaginea răspunde 200 + image/*” trecea cu antetul noindex — verifică și
+`x-robots-tag` (tests/e2e/product-jsonld.spec.ts). Validare cu validator.schema.org:
+`node scripts/validate-schema.mjs` (live) sau `BASE_URL=… node scripts/validate-schema.mjs`.
