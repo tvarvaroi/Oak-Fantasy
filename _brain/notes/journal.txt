@@ -1665,3 +1665,45 @@ SECURITY_CHECKLIST: §9.2 bifat, §10.1 + §10.1.b (banner obligatoriu doar pent
 stocare pe dispozitiv), §10.5 punct nou pentru avocat.
 Design-qa pe build de producție: pagina nouă la 375/768/1024/1440, RO + EN + reduced motion — fără
 overflow, link 44px, focus vizibil. Neatins: OF-2026-0010, CSP, baza de date.
+
+## 2026-11-20 — Actualizare auditată: claude-seo v2.6.2 + marketingskills v2.14.25
+
+Faza 1 (doar citire): surse identificate din fișierele instalate (manifestul nu le nota). Trei repo-uri,
+nu două: AgriciDaniel/claude-seo (v2.2.0 → v2.6.2, 468ed5b), coreyhaines31/marketingskills (v2.8.1 →
+v2.14.25, 5b2b400, tag sub 24 de ore), alirezarezvani/claude-skills (marketing-skill, structură nouă de
+plugin cu hook UserPromptSubmit → neactualizat). Descărcate la tag în C:\Users\tvarv\skills-staging\,
+nimic rulat din ele. Versiunile instalate erau identice cu originalele (fără modificări locale), în afara
+terminatorilor de linie și a unei linii din marketing-skill (plugin.json: versiunea 1.1.0, la commit 1.0.0).
+Audit: workflow de 39 de loturi oprit de limita de utilizare la 13; terminat țintit. La poartă am raportat
+ce era citit și ce nu. După „da”, o revizuire independentă a prins că fraza cerută pentru manifest
+(„citit integral ce s-a instalat”) nu era încă adevărată: 117 fișiere SEO fără cod fuseseră văzute
+doar ca diff sau deloc → citite integral (10.496 de linii, cu al doilea cititor) înainte de instalare.
+Rezultat audit: nimic malițios în ce s-a instalat. De știut: scripturile SEO merg doar prin lansator după
+setup; dependențe doar cu intervale de versiuni; subsol publicitar în seo/SKILL.md; /seo flow sync aduce
+prompturi din alt repo; comenzi de instalare în câteva fișiere (seo-visual, npx lighthouse).
+Faza 2 (scriptul nostru _audit/phase2.py, revizuit din 3 unghiuri înainte de rulare):
+- 48 de mutări: 23 skilluri SEO + 8 marketing + 16 agenți → ~/.claude/_backup-2026-11-20;
+  marketing-skill → ~/.claude/_disabled-2026-11-20/skills.
+- Copiat manual: SEO 242 de fișiere (24 skilluri, 17 agenți, 67 scripturi, schema, data), marketing 32 .md.
+  Adăugat doar seo-agentic + agentul lui. Fără seo-bing/shopify/posthog/dataforseo/image-gen, fără
+  extensii, fără hooks, fără cele două scripturi unlighthouse.
+- Modificări locale: cele 4 înlocuiri ale instalatorului în 50 de .md (0 căi cu ${CLAUDE_PLUGIN_ROOT};
+  1 mențiune în proză rămasă în seo/SKILL.md:20, ca la instalatorul original); 18 linkuri marketing
+  fixate la commit în 4 fișiere.
+- Verificare automată: 274 comparate cu sursa, 220 identice, 54 diferă doar prin modificările documentate.
+- /seo setup rulat ca pas separat (runtime.py setup), în sesiune ELEVATĂ, la alegerea explicită a
+  founder-ului după ce i-am spus: .venv + ms-playwright în ~/.claude/skills/seo, 66 de wheel-uri doar de
+  pe pypi.org/files.pythonhosted.org, fără compilări din surse. settings.json, MCP, hooks, pachete globale,
+  PATH, servicii, sarcini programate: neschimbate. Nicio cheie API. Lock: _brain/skills-locks/claude-seo-2.6.2.txt.
+- Test: claude-seo doctor → ready/manual/2.6.2/browser_ready; page_checks.py --url https://oakfantasy.ro/ro
+  → cod 0, status 200 (2 observații: imagini fără width/height, salt de nivel la headinguri).
+SKILLS-MANIFEST.md: secțiune nouă (versiuni, commituri, „auditat de”, modificări locale, reguli de
+folosire, referințe moarte, comenzi de revenire). Regulile de folosire sunt și în memoria Claude Code.
+Neatins: codul site-ului, OF-2026-0010, settings.json. skills-staging păstrat până confirmă founder-ul
+după /skill-doctor. De decis: seo-visual.md 13–17 (pip install global în promptul unui subagent).
+Verificarea finală (3 verificatori, doar citire) a mai scos: folderul de profil C:\Users\tvarv permite
+scrierea doar grupului Administrators (de aceea sesiunea e elevată și comenzile de revenire cer PowerShell
+elevat); blocul de revenire rescris ca reluabil, cu skills\seo mutat primul (verificat sintactic, nerulat);
+scripts/ conține și scripturile skillurilor neinstalate (bing, shopify, dataforseo, matomo), inerte fără chei;
+după o revenire la v2.2.0, Playwright-ul global nu are Chromium-ul potrivit (1228 cerut, 1208/1223 pe disc).
+Rețeta și lista fișierelor modificate sunt copiate în _brain/skills-locks/.

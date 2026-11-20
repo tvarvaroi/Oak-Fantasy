@@ -671,3 +671,22 @@ navigare au nevoie de un timeout mai lung decât cele 5 secunde implicite.
 **Aplicat la:** app/[locale]/la-comanda/sent/page.tsx, components/la-comanda/{CustomOrderSent,CustomOrderForm}.tsx,
 lib/i18n-routes.ts, tests/e2e/la-comanda.spec.ts.
 **De ce contează:** cererile la comandă se pot număra ca vizite pe un URL distinct, fără evenimente proprii.
+
+## 2026-11-20 — Actualizare auditată de skilluri: „citit integral” se dovedește cu liste, nu se presupune
+
+**Pattern descoperit:** (1) O afirmație de acoperire („citit integral ce s-a instalat”) se verifică
+scăzând din lista fișierelor instalate listele celor citite efectiv; o revizuire independentă a găsit 117
+fișiere necitite pe care le credeam acoperite prin diff și scanări. (2) Un workflow mare de audit poate
+consuma limita de utilizare la jumătate: loturile se prioritizează după „ce se instalează efectiv”, restul
+se raportează ca necitit. (3) Copierea manuală a unui pachet care are instalator = se imită instalatorul
+pas cu pas dintr-un script propriu cu `plan`/`backup`/`install`/`verify`, iar verificarea compară octet cu
+octet cu sursa auditată, admițând doar modificările documentate. (4) Scanările cu `grep -P` pentru
+caractere invizibile pot da fals „zero” în Git Bash; se fac cu un script Python. (5) Înainte de a rula cod
+terț: verifică dacă sesiunea e elevată (`IsInRole(Administrator)`) și spune-i founder-ului.
+**Aplicat la:** `_brain/SKILLS-MANIFEST.md` (secțiunea „Actualizare auditată 20.11.2026”),
+`_brain/skills-locks/claude-seo-2.6.2.txt`, `~/.claude/skills` (seo + 23 seo-*, 8 marketing).
+**De ce contează:** REGULI DE FOLOSIRE, valabile în orice sesiune — vezi `_brain/SKILLS-MANIFEST.md`,
+„Reguli de folosire”: nu rula `/seo flow sync`; nu adăuga subsolul publicitar al claude-seo în livrabile;
+nu rula comenzi de instalare din skilluri sau din linkurile lor (`claude mcp add`, `pip install` global,
+`npx` nefixat) fără acordul founder-ului. Scripturile SEO se rulează doar prin lansator, din Bash:
+`"$HOME/.claude/skills/seo/scripts/claude-seo" run <script.py>`.
