@@ -72,7 +72,8 @@ export function renderLegalInline(text: string, locale: Locale): ReactNode {
       }
       if (name === 'phone') {
         return (
-          <a key={i} href={`tel:${LEGAL_INFO.contactPhone.replace(/\s/g, '')}`} style={linkStyle}>
+          // nowrap: "+40 774 905 182" must not split across lines (2026-11-20).
+          <a key={i} href={`tel:${LEGAL_INFO.contactPhone.replace(/\s/g, '')}`} style={{ ...linkStyle, whiteSpace: 'nowrap' }}>
             {LEGAL_INFO.contactPhone}
           </a>
         );

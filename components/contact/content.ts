@@ -67,7 +67,7 @@ export const CONTACT_CONTENT: Record<Locale, ContactCopy> = {
         email: { label: 'Email', placeholder: 'adresa ta de email' },
         phone: {
           label: 'Telefon',
-          placeholder: 'opțional, pentru detalii rapide',
+          placeholder: '0712 345 678',
           optional: 'opțional',
         },
         subject: { label: 'Subiect', placeholder: 'alege un subiect' },
@@ -128,7 +128,7 @@ export const CONTACT_CONTENT: Record<Locale, ContactCopy> = {
         email: { label: 'Email', placeholder: 'your email address' },
         phone: {
           label: 'Phone',
-          placeholder: 'optional, for quick follow-up',
+          placeholder: '0712 345 678',
           optional: 'optional',
         },
         subject: { label: 'Subject', placeholder: 'pick a subject' },

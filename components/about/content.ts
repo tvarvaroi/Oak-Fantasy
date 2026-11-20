@@ -126,8 +126,8 @@ const ro: AboutContent = {
         num: '03',
         tick: 'Pas trei',
         title: 'Tăierea și asamblarea',
-        body: 'Tăiem la dimensiunile fiecărui SKU, apoi lipim cu adeziv alimentar. Presăm și lăsăm să se odihnească 24 de ore.',
-        bodyCompact: 'Tăiem la dimensiunile fiecărui SKU, apoi lipim cu adeziv alimentar. Presăm 24 de ore.',
+        body: 'Tăiem fiecare tocător la dimensiunea lui, apoi lipim cu adeziv alimentar. Presăm și lăsăm să se odihnească 24 de ore.',
+        bodyCompact: 'Tăiem fiecare tocător la dimensiunea lui, apoi lipim cu adeziv alimentar. Presăm 24 de ore.',
         placeholder: 'clamps · glue-up · workbench',
       },
       {
@@ -243,8 +243,8 @@ const en: AboutContent = {
         num: '03',
         tick: 'Step three',
         title: 'Cutting and assembly',
-        body: 'We cut to each SKU’s dimensions, then glue with food-safe adhesive. We press and let it rest for 24 hours.',
-        bodyCompact: 'We cut to each SKU’s dimensions, then glue with food-safe adhesive. We press for 24 hours.',
+        body: 'We cut each board to its own size, then glue with food-safe adhesive. We press and let it rest for 24 hours.',
+        bodyCompact: 'We cut each board to its own size, then glue with food-safe adhesive. We press for 24 hours.',
         placeholder: 'clamps · glue-up · workbench',
       },
       {

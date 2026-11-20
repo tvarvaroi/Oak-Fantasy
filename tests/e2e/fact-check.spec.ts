@@ -35,6 +35,7 @@ const REMOVED_RO = [
   /Ce vezi în catalog e (în stoc|gata de trimis)/,
   /Lucrăm (fiecare )?comanda în 5–10/i,
   /Cât lucrăm o comandă/,
+  /SKU/,
 ];
 const REMOVED_EN = [
   /Bucegi|Apuseni/,
@@ -62,6 +63,7 @@ const REMOVED_EN = [
   /We make (your|each) order in/,
   /orders are made in 5–10/,
   /To make an order/,
+  /SKU/,
 ];
 
 // Visible text AND the head: the fact-check also changed <title>, meta

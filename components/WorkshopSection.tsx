@@ -137,7 +137,7 @@ const copy = {
     ],
     photoNote: 'Fotografie ilustrativă.',
     quote:
-      '"Un obiect bun nu se termină când iese din atelier — începe."',
+      '„Un obiect bun nu se termină când iese din atelier — începe.”',
     signature: '— familia noastră',
   },
   en: {
@@ -156,7 +156,7 @@ const copy = {
     ],
     photoNote: 'Illustrative photo.',
     quote:
-      '"A good object doesn\'t end when it leaves the workshop — it begins."',
+      '“A good object doesn’t end when it leaves the workshop — it begins.”',
     signature: '— our family',
   },
 };

@@ -208,3 +208,42 @@ test.describe('Pre-launch touches', () => {
     expect(await main.innerText()).not.toMatch(/ × \d/);
   });
 });
+
+// 2026-11-20 — small touches before launch.
+test.describe('Small touches', () => {
+  test('homepage quote uses „ ” in RO and “ ” in EN, no straight quotes', async ({ page }) => {
+    await page.goto('/ro');
+    const ro = await page.locator('main').innerText();
+    expect(ro).toContain('„Un obiect bun nu se termină când iese din atelier — începe.”');
+    expect(ro).not.toContain('"Un obiect bun');
+    await page.goto('/en');
+    const en = await page.locator('main').innerText();
+    expect(en).toContain('“A good object doesn’t end when it leaves the workshop — it begins.”');
+  });
+
+  test('legal pages: the phone link never wraps', async ({ page }) => {
+    for (const path of ['/en/privacy', '/en/returns', '/ro/confidentialitate']) {
+      await page.goto(path);
+      const link = page.locator('main a[href^="tel:"]').first();
+      expect(await link.evaluate((el) => getComputedStyle(el).whiteSpace), path).toBe('nowrap');
+      const rects = await link.evaluate((el) => el.getClientRects().length);
+      expect(rects, `${path}: one line box`).toBe(1);
+    }
+  });
+
+  test('phone fields: the hint fits inside the input', async ({ page }) => {
+    for (const [path, sel] of [['/ro/inregistrare', '#reg-phone'], ['/ro/contact', 'input[type="tel"]']] as const) {
+      await page.goto(path);
+      const input = page.locator(sel).first();
+      await expect(input).toHaveAttribute('placeholder', '0712 345 678');
+      const fits = await input.evaluate((el: HTMLInputElement) => {
+        const cs = getComputedStyle(el);
+        const ctx = document.createElement('canvas').getContext('2d')!;
+        ctx.font = `${cs.fontSize} ${cs.fontFamily}`;
+        const inner = el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+        return ctx.measureText(el.placeholder).width <= inner;
+      });
+      expect(fits, path).toBe(true);
+    }
+  });
+});
