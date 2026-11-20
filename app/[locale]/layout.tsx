@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { fontVariables } from '@/lib/fonts';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import PageTransition from '@/components/PageTransition';
+import WebAnalytics from '@/components/analytics/WebAnalytics';
 import { isLocale, type Locale } from '@/lib/i18n-routes';
 import { LEGAL_INFO, hasPlaceholder } from '@/lib/legal-info';
 import '../globals.css';
@@ -144,6 +145,9 @@ export default function LocaleLayout({
             every page. Its useEffect injector dedupes by script src, so the
             locale-switch remount never double-loads. */}
         <SpeedInsights />
+        {/* Web Analytics: same placement rule (it also renders a <Suspense>).
+            Privacy filter + production-only gate live in the wrapper. */}
+        <WebAnalytics />
       </body>
     </html>
   );

@@ -203,6 +203,10 @@ export const PRIVACY_CONTENT: Record<Locale, LegalContent> = {
           },
           {
             kind: 'p',
+            text: 'Statistici de trafic. Folosim Vercel Web Analytics pentru a număra vizitele și paginile vizualizate. Serviciul nu folosește cookie-uri și nu ne permite să identificăm vizitatorii; datele sunt agregate.',
+          },
+          {
+            kind: 'p',
             text: 'Newsletter: în acest moment nu colectăm adrese de email pentru newsletter. Dacă îl vom reporni, actualizăm întâi această politică.',
           },
         ],
@@ -564,6 +568,10 @@ export const PRIVACY_CONTENT: Record<Locale, LegalContent> = {
                 text: 'As long as the provider keeps them, in aggregate form.',
               },
             ],
+          },
+          {
+            kind: 'p',
+            text: 'Traffic statistics. We use Vercel Web Analytics to count visits and page views. The service does not use cookies and does not allow us to identify visitors; the data is aggregated.',
           },
           {
             kind: 'p',

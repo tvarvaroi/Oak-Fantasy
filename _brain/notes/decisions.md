@@ -551,3 +551,15 @@ iar lucrările „La comandă” nu sunt în catalog — `Offer`-ul descrie prod
 de retragere. Schema.org/Google nu au un mod de a exclude o opțiune; excepția rămâne în /retur și Termeni.
 **Stoc:** `fetchStockMap` întoarce `null` la eroare (fail-open doar atunci); fără rând în inventar =
 0 disponibile, la fel pe catalog și pe pagina produsului (`isInStock`).
+
+## 2026-11-20 — Vercel Web Analytics: doar afișări de pagină, fără cookie-uri, filtru de URL
+
+**Decizie:** Vercel Web Analytics pe planul Hobby, montat doar în build-ul de producție, cu un
+`beforeSend` care nu trimite nimic din `/admin` și scoate orice identificator din URL (listă de
+permisiuni pe `PATHNAMES`). CSP neschimbat: scriptul și cererile sunt pe aceeași origine.
+**De ce:** vrem numărul de vizite și paginile văzute fără să identificăm pe nimeni și fără banner de
+cookie-uri; Vercel găzduiește deja site-ul, deci nu apare un furnizor nou.
+**Evenimente proprii** (add_to_cart, order_placed, custom_request_sent): amânate până la planul Pro —
+documentația nu spune ce pățesc apelurile `track()` pe Hobby. Planul lor e în [[web-analytics]].
+**Urmare:** o rută publică nouă trebuie adăugată în `PATHNAMES`, altfel apare în cifre ca `[other]`.
+Detalii și citirea cifrelor: [[web-analytics]].

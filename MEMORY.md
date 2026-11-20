@@ -642,3 +642,17 @@ expiră stă într-un fișier cu dată (`~/.claude/skills-audit.json`, limită 3
 **De ce contează:** lista de skilluri a scăzut de la 228 la 73 fără să se șteargă nimic; rezerva e în
 `C:\Users\tvarv\.claude\_disabled-2026-11-20\` (+ `settings.json.bak`), comenzile de readucere în manifest.
 După fiecare audit se actualizează `lastAudit`.
+
+## 2026-11-20 — Vercel Web Analytics: verifică în scriptul real, nu doar în documentație
+
+**Pattern descoperit:** documentația Vercel nu spune nimic despre CSP și nici ce conține cererea trimisă.
+Răspunsul a venit din sursa pachetului (`node_modules/@vercel/analytics/dist/next`) și din scriptul servit
+pe site (`/_vercel/insights/script.js`): gazdele, câmpurile din cerere (`o`, `dp`, `r`), faptul că nu
+scrie cookie-uri și că ignoră browserele automate (`navigator.webdriver`, „Headless” în user agent — un
+smoke Playwright are nevoie de un user agent obișnuit). O funcție (`beforeSend`) nu trece dintr-un layout
+server într-o componentă client → wrapper `'use client'`. Filtrul de URL e listă de permisiuni, nu listă
+de interdicții: ce nu e cunoscut se raportează ca `[other]`.
+**Aplicat la:** components/analytics/WebAnalytics.tsx, lib/analytics/redact-url.ts, app/[locale]/layout.tsx,
+scripts/smoke-analytics.mjs, tests/e2e/analytics-redact.spec.ts, _brain/notes/web-analytics.md.
+**De ce contează:** politica de confidențialitate promite că nu identificăm vizitatorii; testul și
+smoke-ul țin promisiunea legată de cod. O rută publică nouă intră în `PATHNAMES`, altfel apare ca `[other]`.

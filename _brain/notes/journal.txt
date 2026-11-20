@@ -1626,3 +1626,21 @@ fișier redenumit → doar textul fix; în plus JSON trunchiat → doar textul f
 la data de azi (hash identic cu originalul). settings.json neatins.
 SKILLS-MANIFEST.md: secțiunea „Cum se ține la zi” în locul „Pas următor”. Hook-ul nou se vede abia
 într-o sesiune nouă. Neatins: codul site-ului, OF-2026-0010; nimic instalat sau actualizat.
+
+## 2026-11-20 — Vercel Web Analytics instalat
+
+Documentația verificată pe vercel.com/docs/analytics (context7 nu era autentificat în sesiune) + sursa
+pachetului și scriptul servit pe oakfantasy.ro. Instalat @vercel/analytics 2.0.1 (--legacy-peer-deps).
+components/analytics/WebAnalytics.tsx (wrapper client, doar în producție) montat în app/[locale]/layout.tsx
+lângă SpeedInsights. lib/analytics/redact-url.ts = beforeSend: nimic din /admin, /auth, /api; fără query
+și hash; /multumim/<uuid> → /multumim; identificatori → [id]; necunoscute → [other].
+CSP: neschimbat (script /_vercel/insights/script.js + cereri /_vercel/insights/view, aceeași origine).
+Verificat pe `next start` cu scripts/smoke-analytics.mjs (copie a scriptului real, cereri prinse):
+7 afișări, 0 din /admin, 0 identificatori, 0 încălcări CSP.
+Conversii: comanda duce pe /multumim/<id> (se numără ca /ro/multumim, /en/thank-you). /la-comanda
+afișează mesajul pe aceeași pagină → nu se poate număra; soluție propusă founder-ului, neimplementată.
+Evenimente proprii: neimplementate (documentația nu spune ce face track() pe Hobby); planul e în
+_brain/notes/web-analytics.md.
+Politica de confidențialitate: paragraf „Statistici de trafic” RO + EN. Trei formulări vecine arătate
+founder-ului, neschimbate (lista de furnizori, două fraze despre cookie-uri de analiză).
+Neatins: OF-2026-0010, CSP, baza de date.

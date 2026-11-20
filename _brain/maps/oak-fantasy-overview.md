@@ -23,6 +23,7 @@
 - [[gotchas]] — istoric debugging, citește ÎNAINTE de a atinge cod
 - [[decisions]] — decizii arhitecturale + motivul lor
 - [[seo-strategy]] — cuvinte cheie, structură URL, articole prioritare
+- [[web-analytics]] — Vercel Web Analytics: filtru de URL, cum se citesc cifrele, evenimente pentru Pro
 
 ## Resources
 - [[resources-index]] — docs externe descărcate cu webfetch
