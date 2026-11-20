@@ -172,8 +172,23 @@ skillului într-un `C:\Users\tvarv\.claude\skills\<nume>\`, de exemplu:
 - proiect: testing, ui-ux-pro-max (2)
 - încorporate: 17
 
-### Pas următor (neatins aici)
+---
 
-`C:\Users\tvarv\.claude\hooks\skills-reminder.js` (hook **SessionStart**, singurul hook rămas) le spune
-în continuare sesiunilor să folosească GSD, `engineering/`, `c-level-advisor/` și locații care nu mai
-sunt valabile. Trebuie rescris după noua listă.
+## Cum se ține la zi
+
+- **Hook-ul** `C:\Users\tvarv\.claude\hooks\skills-reminder.js` (SessionStart, singurul hook rămas),
+  rescris pe 20.11.2026. Pune în fiecare sesiune un text fix, „SKILLS CHECK”: uită-te la skillurile
+  disponibile, încarcă-le pe cele potrivite task-ului, spune într-un rând ce ai încărcat. Nu mai conține
+  numere, căi de foldere sau nume de pluginuri, deci nu se învechește când se schimbă setup-ul.
+- **Fișierul** `C:\Users\tvarv\.claude\skills-audit.json`:
+  `{ "lastAudit": "AAAA-LL-ZZ", "maxAgeDays": 30, "manifest": "<calea către acest fișier>" }`.
+- **Regula de 30 de zile:** dacă de la `lastAudit` au trecut mai mult de `maxAgeDays` zile, hook-ul
+  adaugă „SKILLS AUDIT OVERDUE”, iar sesiunea îți spune asta la primul răspuns și propune
+  `/skill-doctor` + actualizarea acestui manifest.
+- **După fiecare audit:** rulezi `/skill-doctor`, actualizezi manifestul, apoi pui data zilei în
+  `lastAudit`. Fără acest ultim pas, avertismentul rămâne.
+- Dacă `skills-audit.json` lipsește sau e stricat, hook-ul afișează doar textul fix și nu dă eroare
+  (testat: dată de azi, dată veche, fișier lipsă, JSON trunchiat; cod de ieșire 0 de fiecare dată).
+  Atenție: în acest caz nici avertismentul de audit nu mai apare.
+- Versiunea veche a hook-ului: `C:\Users\tvarv\.claude\_disabled-2026-11-20\hooks\skills-reminder.js`.
+  Readucere: `Copy-Item "$B\hooks\skills-reminder.js" "$C\hooks\skills-reminder.js" -Force`.

@@ -1613,3 +1613,16 @@ Rezultat: 228 → 73 în listă (56 fără cele încorporate). Comenzile de read
 Neatins: superpowers, frontend-design, context7, design-qa, seo*, marketing, git:*, review,
 security-scan, tot ce e la nivel de proiect, codul site-ului, OF-2026-0010.
 Pas următor: rescrierea ~/.claude/hooks/skills-reminder.js (SessionStart), care descrie setup-ul vechi.
+
+## 2026-11-20 — Hook-ul skills-reminder rescris + audit la 30 de zile
+
+Versiunea veche copiată întâi în ~/.claude/_disabled-2026-11-20/hooks/skills-reminder.js (SHA1 identic).
+Hook nou (tot SessionStart, tot additionalContext): text fix „SKILLS CHECK”, fără numere de skilluri,
+căi de foldere sau nume de pluginuri. Citește ~/.claude/skills-audit.json (lastAudit 2026-11-20,
+maxAgeDays 30, calea manifestului); peste limită adaugă „SKILLS AUDIT OVERDUE” cu numărul de zile.
+Orice problemă cu fișierul (lipsă, JSON stricat, dată imposibilă) = doar textul fix, cod de ieșire 0.
+Testat rulând scriptul direct: azi → doar textul fix; lastAudit 2026-10-01 → „50 days ago (limit 30)”;
+fișier redenumit → doar textul fix; în plus JSON trunchiat → doar textul fix. skills-audit.json readus
+la data de azi (hash identic cu originalul). settings.json neatins.
+SKILLS-MANIFEST.md: secțiunea „Cum se ține la zi” în locul „Pas următor”. Hook-ul nou se vede abia
+într-o sesiune nouă. Neatins: codul site-ului, OF-2026-0010; nimic instalat sau actualizat.

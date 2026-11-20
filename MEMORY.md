@@ -632,3 +632,13 @@ la handlingTime, pe care documentația rezumată le ratase.
 app/[locale]/tocatoare/{page,[slug]/page}.tsx, tests/e2e/product-jsonld.spec.ts, scripts/validate-schema.mjs.
 **De ce contează:** datele structurate se generează dintr-un singur loc, din aceleași surse ca textul
 vizibil, și se validează pe toate produsele, RO + EN, nu pe un exemplu.
+
+## 2026-11-20 — Curățenie setup Claude Code + hook de skilluri
+
+**Pattern descoperit:** un memento scris de mână cu numere, căi și nume de pluginuri se învechește
+și trimite sesiunile la skilluri care nu mai există. Textul fix rămâne generic, iar partea care
+expiră stă într-un fișier cu dată (`~/.claude/skills-audit.json`, limită 30 de zile).
+**Aplicat la:** `~/.claude/hooks/skills-reminder.js`, `~/.claude/skills-audit.json`, `_brain/SKILLS-MANIFEST.md`.
+**De ce contează:** lista de skilluri a scăzut de la 228 la 73 fără să se șteargă nimic; rezerva e în
+`C:\Users\tvarv\.claude\_disabled-2026-11-20\` (+ `settings.json.bak`), comenzile de readucere în manifest.
+După fiecare audit se actualizează `lastAudit`.
