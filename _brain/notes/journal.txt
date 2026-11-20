@@ -1726,3 +1726,4 @@ Deciziile founder-ului după raportul Fazei 2:
   imagini fără width/height (de verificat întâi dacă e CLS real, din cauza next/image cu fill) și un
   salt de nivel la headinguri. page_checks.py rulat din nou pentru detalii (cod 0, status 200).
 Neatins: codul site-ului, OF-2026-0010, settings.json, permisiunile.
+21.11, după /skill-doctor: skills-staging NU s-a șters; mutat întreg în C:\Users\tvarv\.claude\_audit-2026-11-20\ (9884 de fișiere înainte și după), STAGING actualizat în _brain/skills-locks/phase2.py, verify pe noua cale → 274 comparate, PROBLEMS: 0; folderul nu e sursă de skilluri; manifest actualizat.

@@ -181,8 +181,21 @@ skillului într-un `C:\Users\tvarv\.claude\skills\<nume>\`, de exemplu:
 
 Făcută în două faze: audit pe o copie descărcată în `C:\Users\tvarv\skills-staging\` (fără a rula nimic
 din repo-uri), apoi copiere manuală după „da”-ul founder-ului. Instalatoarele originale NU au fost rulate.
-Jurnalul complet al auditului: `C:\Users\tvarv\skills-staging\_audit\` (se păstrează până confirmă
-founder-ul după `/skill-doctor`).
+
+**Mutat pe 21.11.2026, se păstrează.** După `/skill-doctor`, founder-ul a hotărât ca folderul să nu fie
+șters. A fost mutat întreg (redenumire pe același volum, nu copiere și ștergere) în
+`C:\Users\tvarv\.claude\_audit-2026-11-20\`, lângă `_backup-2026-11-20` și `_disabled-2026-11-20`.
+`C:\Users\tvarv\skills-staging\` nu mai există. Ce conține noua locație:
+
+- `_audit\` — jurnalul complet al auditului (rezultatele verificatorilor, capturile de stare dinainte și
+  după, `setup-pip.log`, versiunea rețetei rulată efectiv pe 20.11);
+- `_baseline\` — versiunile vechi folosite la comparație;
+- `claude-seo-v2.6.2\`, `claude-skills-v2.14.14\`, `marketingskills-v2.14.25\` — sursele auditate,
+  descărcate la tag.
+
+Numărat înainte și după mutare: 9884 de fișiere, ≈149 MB. Folderul nu e sursă de skilluri: e în afara
+`~/.claude/skills`, `agents`, `commands` și `plugins`, iar `settings.json`, `.claude.json` și registrele
+de pluginuri nu trimit spre el (verificat pe 21.11.2026). Cele 886 de fișiere `SKILL.md` din el sunt inerte.
 
 | Pachet | Sursă | Versiune veche → nouă | Commit instalat | Instalat |
 |--------|-------|-----------------------|-----------------|----------|
@@ -270,13 +283,16 @@ automat: 220 identice, 50 + 4 diferă doar prin ce e scris aici):
 
 Rețeta completă: `_brain/skills-locks/phase2.py` (`plan`, `backup`, `install`, `verify`). Copia din repo
 conține din 21.11.2026 și modificarea 5 (`LOCAL_PATCHES`: textul vechi trebuie să se potrivească exact o
-dată, altfel scriptul se oprește și cere revizuirea ei). Copia din `C:\Users\tvarv\skills-staging\_audit\`
-e versiunea rulată efectiv pe 20.11, fără modificarea 5; fișierul instalat a fost editat de mână, iar
-`verify` din copia din repo confirmă că e identic cu ce ar produce rețeta (274 comparate, 0 probleme).
-Lista fișierelor modificate: `_brain/skills-locks/phase2-modified-files.json` (50 + 4, plus
-`seo_local_patches`). `python -I phase2.py verify` reface comparația doar cât timp există sursele auditate
-din `C:\Users\tvarv\skills-staging\`. `plan` e pentru starea dinaintea instalării: rulat acum se oprește
-la primul pas, pentru că rezerva există deja.
+dată, altfel scriptul se oprește și cere revizuirea ei). Copia din
+`C:\Users\tvarv\.claude\_audit-2026-11-20\_audit\` e versiunea rulată efectiv pe 20.11, fără modificarea 5
+și cu vechea cale `skills-staging` în ea (lăsată neatinsă, ca document); fișierul instalat a fost editat
+de mână, iar `verify` din copia din repo confirmă că e identic cu ce ar produce rețeta (274 comparate,
+0 probleme). Lista fișierelor modificate: `_brain/skills-locks/phase2-modified-files.json` (50 + 4, plus
+`seo_local_patches`). `python -I phase2.py verify` reface comparația cât timp există sursele auditate din
+`C:\Users\tvarv\.claude\_audit-2026-11-20\`: constanta `STAGING` din copia din repo arată din 21.11.2026
+spre noua locație, iar `verify` rulat după mutare a dat același rezultat (274 comparate, 220 identice,
+50 + 4 cu modificări documentate, `PROBLEMS: 0`). `plan` e pentru starea dinaintea instalării: rulat acum
+se oprește la primul pas, pentru că rezerva există deja.
 
 ### Mediul izolat al scripturilor SEO (`/seo setup`)
 
@@ -290,7 +306,7 @@ De la v2.2.4 scripturile pornesc doar prin lansator și doar după setup. Rulat 
   `requirements.txt` are doar intervale de versiuni, deci un setup refăcut altă dată poate aduce alte versiuni.
 - Restricții puse de noi la rulare (variabile de mediu, nu modificări în script): `PIP_ONLY_BINARY=:all:`,
   `PIP_NO_CACHE_DIR=1`, `PIP_REQUIRE_VIRTUALENV=1`, `PIP_INDEX_URL=https://pypi.org/simple`,
-  `PIP_CONFIG_FILE=nul`, `PIP_NO_INPUT=1`, `PIP_LOG` (jurnalul e în staging, `setup-pip.log`).
+  `PIP_CONFIG_FILE=nul`, `PIP_NO_INPUT=1`, `PIP_LOG` (jurnalul e în `_audit-2026-11-20\_audit\setup-pip.log`).
 - Verificat înainte/după: `settings.json`, serverele MCP și hook-urile, pachetele Python globale (68,
   neschimbate), npm global, PATH și variabilele de mediu (utilizator și mașină), servicii, sarcini
   programate, cheile Run, Program Files/ProgramData — toate neschimbate. Singura scriere în afara folderului:
@@ -301,8 +317,8 @@ De la v2.2.4 scripturile pornesc doar prin lansator și doar după setup. Rulat 
 - **Sesiunea a rulat cu drepturi de administrator** (VS Code pornit elevat); founder-ul a ales explicit
   rularea așa. Recomandare: VS Code pornit normal, altfel orice `/seo` rulează pachetele ca administrator.
   Azi însă asta nu merge fără o reparație de permisiuni: `C:\Users\tvarv` nu are intrare de acces pentru
-  utilizatorul `tvarv` (scriu doar Administrators și SYSTEM, proprietar SYSTEM), deci `.claude`,
-  `.claude.json` și `skills-staging` pot fi modificate doar dintr-un proces elevat. Constatat din
+  utilizatorul `tvarv` (scriu doar Administrators și SYSTEM, proprietar SYSTEM), deci `.claude`
+  (cu tot cu `_audit-2026-11-20`) și `.claude.json` pot fi modificate doar dintr-un proces elevat. Constatat din
   permisiuni (`Get-Acl`), nu printr-o rulare neelevată. Nu am schimbat nicio permisiune.
 - Test: `claude-seo doctor --json` → `ready: true`, `mode: manual`, `plugin_version: 2.6.2`,
   `browser_ready: true`; `claude-seo run page_checks.py --url https://oakfantasy.ro/ro` → cod 0, status 200.
@@ -450,14 +466,16 @@ randarea și capturile (`render_page.py`, `capture_screenshot.py`) nu pornesc f�
 - `agents/seo-visual.md`: blocul de instalare a fost înlocuit (modificarea locală 5, mai sus).
 - `skills/seo/SKILL.md:20`: mențiunea în proză a `${CLAUDE_PLUGIN_ROOT}` rămâne ca în original.
 - Permisiunile folderului de profil: nu se schimbă deocamdată; vezi „De știut”.
+- Folderul de audit (`skills-staging`): nu se șterge. Mutat întreg în
+  `C:\Users\tvarv\.claude\_audit-2026-11-20\`; jurnalul auditului și sursele auditate se păstrează.
 
 ### Rămase de decis
 
 - Skillurile noi din marketingskills, extensiile SEO și `marketing-skill` v2.14.14 (plugin cu hook
   `UserPromptSubmit`) cer audit separat înainte de orice instalare și intră sub restricția din „De știut”.
 - Lămurirea rulării elevate (permisiunile folderului de profil `C:\Users\tvarv`): decizia founder-ului.
-- Ștergerea `C:\Users\tvarv\skills-staging\` (≈150 MB) și, mai târziu, a rezervelor: doar la confirmarea
-  founder-ului. Staging-ul rămâne până confirmă el după `/skill-doctor`.
+- Ștergerea rezervelor (`_backup-2026-11-20`, `_disabled-2026-11-20`), mai târziu: doar la confirmarea
+  founder-ului.
 
 ---
 

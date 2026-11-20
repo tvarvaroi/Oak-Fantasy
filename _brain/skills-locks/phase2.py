@@ -14,8 +14,12 @@ Nothing is ever deleted. Moves are same-volume renames that refuse to overwrite.
 (Revised after the three-lens pre-flight review of 2026-11-20.)
 
 2026-11-21: LOCAL_PATCHES added (fifth documented local edit, agents/seo-visual.md). The copy
-in skills-staging/_audit is the version that actually ran on 2026-11-20, without this patch;
+in <staging>/_audit is the version that actually ran on 2026-11-20, without this patch;
 the installed file was edited by hand and `verify` from THIS copy proves both agree.
+
+2026-11-21: the staging folder was moved whole (same-volume rename, nothing deleted) from
+C:\\Users\\tvarv\\skills-staging to C:\\Users\\tvarv\\.claude\\_audit-2026-11-20. STAGING below
+points at the new location. The historical copy in <staging>/_audit still carries the old path.
 """
 import hashlib
 import io
@@ -28,7 +32,7 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 HOME = r'C:\Users\tvarv'
 CLAUDE = os.path.join(HOME, '.claude')
-STAGING = os.path.join(HOME, 'skills-staging')
+STAGING = os.path.join(CLAUDE, '_audit-2026-11-20')  # until 2026-11-21: HOME\skills-staging
 AUD = os.path.join(STAGING, '_audit')
 BACKUP = os.path.join(CLAUDE, '_backup-2026-11-20')
 DISABLED = os.path.join(CLAUDE, '_disabled-2026-11-20')
