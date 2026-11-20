@@ -50,6 +50,7 @@ Filtrul (`beforeSend`):
 | orice `?query` și `#hash` | eliminate |
 | `/ro/multumim/<uuid>` | `/ro/multumim` |
 | `/ro/tocatoare/<slug>` | neschimbat (slug public) |
+| `/ro/la-comanda/sent`, `/en/custom-orders/sent` | neschimbat (confirmarea cererii) |
 | al doilea segment care arată a identificator (uuid, OF-2026-…, email, cifre, hex lung) | `/ro/<pagină>/[id]` |
 | pagină necunoscută, 404, cale mai adâncă | `/ro/[other]` sau `/[other]` |
 
@@ -66,8 +67,12 @@ Vercel → proiect → Analytics.
 - **Page Views** = afișări de pagină, inclusiv navigările interne (fără reîncărcare).
 - **Comenzi plasate** ≈ afișările paginilor `/ro/multumim` + `/en/thank-you`. Un client care
   reîncarcă pagina se numără de două ori; cifra exactă rămâne în admin → Comenzi.
-- **Cereri la comandă**: deocamdată nu se pot număra (mesajul de succes apare pe aceeași
-  pagină). Cifra exactă e în admin → Comenzi custom.
+- **Cereri la comandă** ≈ afișările paginilor `/ro/la-comanda/sent` + `/en/custom-orders/sent`
+  (pagina de confirmare, din 2026-11-20). Formularul duce acolo doar după ce serverul răspunde
+  ok. Atenție la citire: pagina e publică și statică, deci o reîncărcare sau o vizită directă
+  se numără și ea; iar un bot prins de honeypot sau de verificarea de timp primește tot „ok”
+  (ca să nu afle de capcană) și ajunge pe pagină fără să se salveze nimic — de obicei boții nu
+  rulează scriptul de statistici, dar cifra exactă rămâne în admin → Comenzi custom.
 - `[other]` = 404-uri și adrese necunoscute; `[id]` = identificator ascuns.
 - Vizitele noastre pe paginile publice se numără; cele din `/admin` nu.
 - Boții care se declară (browser automat, „Headless”) nu sunt numărați; testele Playwright nici ele.

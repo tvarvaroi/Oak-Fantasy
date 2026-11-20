@@ -2,9 +2,11 @@ import { test, expect } from './fixtures';
 import type { Page } from '@playwright/test';
 
 // /la-comanda · /custom-orders (2026-11-18) + its navigation entry points.
-// These tests NEVER submit a valid slip: a real submit writes to the live
-// custom_orders table. The happy path (DB row, admin, delete) lives in
-// scripts/smoke-custom-orders.mjs, which cleans up after itself.
+// These tests NEVER let a valid slip reach the server: a real submit writes to
+// the live custom_orders table. Where the outcome of a submit matters, the
+// server action's response is mocked at the network level. The real happy path
+// (DB row, admin, delete) lives in scripts/smoke-custom-orders.mjs, which
+// cleans up after itself.
 
 const SITE = 'https://oakfantasy.ro';
 
@@ -179,6 +181,116 @@ test.describe('/la-comanda page', () => {
     const xml = await (await request.get('/sitemap.xml')).text();
     expect(xml).toContain(`${SITE}/ro/la-comanda`);
     expect(xml).toContain(`${SITE}/en/custom-orders`);
+  });
+});
+
+/**
+ * Answer the server action without reaching the server (nothing is written).
+ * The body is the React Flight encoding of the action's return value.
+ */
+async function mockSubmitAction(page: Page, result: Record<string, unknown> | 'network-error') {
+  let calls = 0;
+  await page.route('**/*', async (route) => {
+    const req = route.request();
+    if (req.method() !== 'POST' || !req.headers()['next-action']) return route.continue();
+    calls += 1;
+    if (result === 'network-error') return route.abort('failed');
+    return route.fulfill({
+      status: 200,
+      contentType: 'text/x-component',
+      body: `0:["$@1",["development",null]]\n1:${JSON.stringify(result)}\n`,
+    });
+  });
+  return () => calls;
+}
+
+async function fillValidSlip(page: Page) {
+  await page.waitForLoadState('networkidle');
+  await page.locator('#co-name').fill('Test Playwright');
+  await page.locator('#co-phone').fill('0712 345 678');
+  await page.locator('#co-idea').fill('Un tocător rotund cu un nume gravat, pentru un cadou de nuntă.');
+}
+
+test.describe('Custom order confirmation page (2026-11-20)', () => {
+  const SECRETS = /Test Playwright|0712 345 678|cadou de nuntă/;
+
+  test('RO: redirect to /ro/la-comanda/sent only after the server confirms', async ({ page }) => {
+    const calls = await mockSubmitAction(page, { ok: true });
+    await page.goto('/ro/la-comanda');
+    await fillValidSlip(page);
+    await page.getByTestId('custom-order-form').locator('button[type="submit"]').click();
+    // Generous wait: the dev server compiles the confirmation route on first visit.
+    await expect(page).toHaveURL(/\/ro\/la-comanda\/sent$/, { timeout: 30_000 });
+    expect(calls()).toBe(1);
+    const box = page.getByTestId('custom-order-success');
+    await expect(box).toContainText('Am primit ideea ta.');
+    await expect(box).toContainText('Te contactăm pe WhatsApp la numărul lăsat.');
+    // Nothing the visitor typed is shown or carried in the URL.
+    expect(page.url()).not.toMatch(/[?#]/);
+    expect(await page.locator('body').innerText()).not.toMatch(SECRETS);
+  });
+
+  test('EN: redirect to /en/custom-orders/sent', async ({ page }) => {
+    await mockSubmitAction(page, { ok: true });
+    await page.goto('/en/custom-orders');
+    await fillValidSlip(page);
+    await page.getByTestId('custom-order-form').locator('button[type="submit"]').click();
+    await expect(page).toHaveURL(/\/en\/custom-orders\/sent$/, { timeout: 30_000 });
+    await expect(page.getByTestId('custom-order-success')).toContainText("We've got your idea.");
+  });
+
+  for (const [name, result] of [
+    ['rate limit reached', { ok: false, error: 'rate_limited' }],
+    ['server error', { ok: false, error: 'server' }],
+    ['server-side validation error', { ok: false, error: 'validation', fieldErrors: { phone: 'phone_invalid' } }],
+    ['network failure', 'network-error'],
+  ] as const) {
+    test(`no redirect on ${name}: the visitor stays on the form with a message`, async ({ page }) => {
+      const calls = await mockSubmitAction(page, result as Record<string, unknown> | 'network-error');
+      await page.goto('/ro/la-comanda');
+      await fillValidSlip(page);
+      await page.getByTestId('custom-order-form').locator('button[type="submit"]').click();
+      await expect(page.getByTestId('custom-order-form').getByRole('alert').first()).toBeVisible();
+      expect(calls()).toBe(1);
+      await expect(page).toHaveURL(/\/ro\/la-comanda$/);
+      await expect(page.getByTestId('custom-order-success')).toHaveCount(0);
+    });
+  }
+
+  test('the page: one H1, noindex, no customer data, link back to the slip', async ({ page }) => {
+    await page.goto('/ro/la-comanda/sent');
+    await expect(page.locator('h1')).toHaveCount(1);
+    await expect(page.locator('h1')).toHaveText('Am primit ideea ta.');
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+    // Its own canonical and no hreflang (never the homepage's, inherited from the layout).
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `${SITE}/ro/la-comanda/sent`);
+    await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(0);
+    await expect(page.locator('main input, main textarea, main form')).toHaveCount(0);
+    const again = page.getByRole('link', { name: 'Trimite altă idee' });
+    await expect(again).toHaveAttribute('href', '/ro/la-comanda#formular');
+    const box = await again.boundingBox();
+    expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
+    await again.click();
+    await expect(page).toHaveURL(/\/ro\/la-comanda#formular$/, { timeout: 30_000 });
+    await expect(page.getByTestId('custom-order-form')).toBeVisible();
+  });
+
+  test('EN page renders in English; wrong-locale slugs redirect', async ({ page }) => {
+    await page.goto('/en/custom-orders/sent');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+    await expect(page.locator('h1')).toHaveText("We've got your idea.");
+    expect(await page.locator('main').innerText()).not.toMatch(/[ăâîșț]/i);
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+    await page.goto('/en/la-comanda/sent');
+    await expect(page).toHaveURL(/\/en\/custom-orders\/sent$/);
+    await page.goto('/ro/custom-orders/sent');
+    await expect(page).toHaveURL(/\/ro\/la-comanda\/sent$/);
+  });
+
+  test('not in the sitemap', async ({ request }) => {
+    const xml = await (await request.get('/sitemap.xml')).text();
+    expect(xml).not.toContain('/la-comanda/sent');
+    expect(xml).not.toContain('/custom-orders/sent');
   });
 });
 

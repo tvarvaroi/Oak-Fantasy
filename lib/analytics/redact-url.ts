@@ -23,7 +23,9 @@ const BLOCKED_PREFIXES = ['admin', 'auth', 'api'];
 
 // First path segments of every public page, RO + EN.
 const KNOWN_SEGMENTS: ReadonlySet<string> = new Set(
-  Object.values(PATHNAMES).flatMap((names) => [names.ro, names.en]),
+  Object.values(PATHNAMES)
+    .flatMap((names) => [names.ro, names.en])
+    .filter((segment) => !segment.includes('/')),
 );
 
 // Pages whose sub-path is always an identifier (order confirmation).

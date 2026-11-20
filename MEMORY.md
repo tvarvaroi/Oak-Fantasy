@@ -656,3 +656,18 @@ de interdicții: ce nu e cunoscut se raportează ca `[other]`.
 scripts/smoke-analytics.mjs, tests/e2e/analytics-redact.spec.ts, _brain/notes/web-analytics.md.
 **De ce contează:** politica de confidențialitate promite că nu identificăm vizitatorii; testul și
 smoke-ul țin promisiunea legată de cod. O rută publică nouă intră în `PATHNAMES`, altfel apare ca `[other]`.
+
+## 2026-11-20 — Pagină de confirmare pentru formular: canonical moștenit, server action simulat în teste
+
+**Pattern descoperit:** (1) O pagină nouă sub `app/[locale]` fără `alternates` proprii primește
+canonical-ul și hreflang-ul HOMEPAGE-ului din layout — un test pe `link[rel=canonical]` l-a prins.
+(2) Rezultatul unui server action se poate simula în Playwright fără să atingă DB-ul: `page.route` pe
+POST-urile cu antetul `next-action`, răspuns `text/x-component` cu corpul
+`0:["$@1",["development",null]]\n1:{json}\n` (Next 14.2, server de dev). Așa se testează și ramurile
+de eroare (limită, server, validare, rețea căzută). (3) `PATHNAMES` acceptă o intrare cu două segmente
+pentru `localizedPath`, dar middleware-ul traduce doar primul segment — al doilea rămâne același în
+ambele limbi. (4) În dev, prima vizită pe o rută nouă se compilează: așteptările pe URL după o
+navigare au nevoie de un timeout mai lung decât cele 5 secunde implicite.
+**Aplicat la:** app/[locale]/la-comanda/sent/page.tsx, components/la-comanda/{CustomOrderSent,CustomOrderForm}.tsx,
+lib/i18n-routes.ts, tests/e2e/la-comanda.spec.ts.
+**De ce contează:** cererile la comandă se pot număra ca vizite pe un URL distinct, fără evenimente proprii.

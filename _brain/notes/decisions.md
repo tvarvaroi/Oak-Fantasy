@@ -563,3 +563,18 @@ cookie-uri; Vercel găzduiește deja site-ul, deci nu apare un furnizor nou.
 documentația nu spune ce pățesc apelurile `track()` pe Hobby. Planul lor e în [[web-analytics]].
 **Urmare:** o rută publică nouă trebuie adăugată în `PATHNAMES`, altfel apare în cifre ca `[other]`.
 Detalii și citirea cifrelor: [[web-analytics]].
+
+## 2026-11-20 — Pagină de confirmare pentru „La comandă” (conversie numărabilă)
+
+**Decizie:** după o cerere salvată, formularul duce pe `/ro/la-comanda/sent` · `/en/custom-orders/sent`
+(`app/[locale]/la-comanda/sent`, componenta `CustomOrderSent`), în locul mesajului afișat pe aceeași
+pagină. Pagina e statică, noindex, cu canonical propriu, în afara sitemap-ului și nu afișează nimic
+din cerere. Protecțiile formularului (honeypot, timp, 5 pe oră) și acțiunea de server sunt neschimbate.
+**De ce:** fără evenimente proprii (plan Hobby), o conversie se poate număra doar ca vizită pe un URL
+distinct. Componenta Vercel numără doar schimbările de cale, nu de `?parametru`.
+**Segmentul „sent” în ambele limbi:** middleware-ul traduce doar PRIMUL segment; un al doilea segment
+tradus (`trimisa`) ar fi cerut logică nouă în middleware. În `PATHNAMES` intrarea `laComandaSent` are
+două segmente (`la-comanda/sent`), folosită doar prin `localizedPath`; `routeKeyForSlug` nu o întoarce
+niciodată, iar filtrul de statistici ia doar intrările cu un singur segment.
+**Capcană:** o pagină sub `[locale]` moștenește canonical-ul și hreflang-ul homepage-ului din layout
+dacă nu-și declară propriul `alternates`.

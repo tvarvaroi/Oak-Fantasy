@@ -54,7 +54,7 @@ export const PRIVACY_CONTENT: Record<Locale, LegalContent> = {
             items: [
               'Cerem doar datele de care avem nevoie pentru comandă, livrare și ca să-ți răspundem.',
               'Nu vindem și nu închiriem datele tale nimănui.',
-              'Nu folosim cookie-uri de analiză sau de reclamă și nu avem pixeli de urmărire.',
+              'Nu folosim cookie-uri de analiză sau de reclamă și nu avem pixeli de urmărire. Numărăm vizitele doar agregat, fără cookie-uri.',
               'Nu îți trimitem mesaje de marketing.',
               'Baza de date a site-ului e găzduită în Uniunea Europeană (Frankfurt, Germania).',
             ],
@@ -224,7 +224,7 @@ export const PRIVACY_CONTENT: Record<Locale, LegalContent> = {
             ordered: false,
             items: [
               '**Supabase** – baza de date și conturile de client, inclusiv emailurile de resetare a parolei. Serverele bazei de date sunt în Uniunea Europeană (Frankfurt).',
-              '**Vercel** – găzduirea site-ului și măsurarea vitezei lui.',
+              '**Vercel** – găzduirea site-ului, măsurarea vitezei lui și statistici de trafic fără cookie-uri.',
               '**Resend** – trimiterea emailurilor automate: emailul de primire a comenzii, răspunsul automat la mesajele trimise prin formularul de contact și notificările către noi despre comenzi, mesaje și cereri.',
               '**Google (Gmail)** – căsuța de email în care primim mesajele și notificările.',
               '**WhatsApp (Meta)** – canalul prin care discutăm lucrările la comandă și prin care putem confirma comenzile.',
@@ -263,7 +263,7 @@ export const PRIVACY_CONTENT: Record<Locale, LegalContent> = {
           },
           {
             kind: 'p',
-            text: 'Nu folosim cookie-uri de analiză, de reclamă sau de la terți. Măsurarea vitezei site-ului nu folosește cookie-uri. De aceea nu îți cerem acordul printr-un banner de cookie-uri.',
+            text: 'Nu folosim cookie-uri de analiză, de reclamă sau de la terți. Măsurarea vitezei și statisticile de trafic nu folosesc cookie-uri. De aceea nu îți cerem acordul printr-un banner de cookie-uri.',
           },
           {
             kind: 'p',
@@ -422,7 +422,7 @@ export const PRIVACY_CONTENT: Record<Locale, LegalContent> = {
             items: [
               'We only ask for the data we need for your order, its delivery and to answer you.',
               'We do not sell or rent your data to anyone.',
-              'We do not use analytics or advertising cookies and we have no tracking pixels.',
+              'We do not use analytics or advertising cookies and we have no tracking pixels. We count visits in aggregate only, without cookies.',
               'We do not send you marketing messages.',
               'The site’s database is hosted in the European Union (Frankfurt, Germany).',
             ],
@@ -592,7 +592,7 @@ export const PRIVACY_CONTENT: Record<Locale, LegalContent> = {
             ordered: false,
             items: [
               '**Supabase** – the database and customer accounts, including password reset emails. The database servers are in the European Union (Frankfurt).',
-              '**Vercel** – hosting the site and measuring its speed.',
+              '**Vercel** – hosting the site, measuring its speed and cookie-free traffic statistics.',
               '**Resend** – sending automatic emails: the order receipt email, the automatic reply to messages sent through the contact form and the notifications to us about orders, messages and requests.',
               '**Google (Gmail)** – the mailbox in which we receive messages and notifications.',
               '**WhatsApp (Meta)** – the channel through which we discuss custom work and may confirm orders.',
@@ -631,7 +631,7 @@ export const PRIVACY_CONTENT: Record<Locale, LegalContent> = {
           },
           {
             kind: 'p',
-            text: 'We do not use analytics, advertising or third-party cookies. Measuring site speed uses no cookies. That is why we do not ask for your consent through a cookie banner.',
+            text: 'We do not use analytics, advertising or third-party cookies. Speed measurement and traffic statistics do not use cookies. That is why we do not ask for your consent through a cookie banner.',
           },
           {
             kind: 'p',

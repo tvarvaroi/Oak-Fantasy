@@ -27,6 +27,9 @@ test.describe('Web Analytics URL redaction', () => {
       `${O}/en/cutting-boards/board-35x25-end-grain`,
     );
     expect(redactAnalyticsUrl(`${O}/ro/la-comanda`)).toBe(`${O}/ro/la-comanda`);
+    // Confirmation page of the custom-order form = the countable conversion.
+    expect(redactAnalyticsUrl(`${O}/ro/la-comanda/sent`)).toBe(`${O}/ro/la-comanda/sent`);
+    expect(redactAnalyticsUrl(`${O}/en/custom-orders/sent`)).toBe(`${O}/en/custom-orders/sent`);
   });
 
   test('removes query strings and hashes', () => {

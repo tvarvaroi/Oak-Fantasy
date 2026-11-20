@@ -23,6 +23,12 @@ export const PATHNAMES = {
   tocatoare: { ro: 'tocatoare', en: 'cutting-boards' },
   // Custom work requests (2026-11-18). RO /la-comanda, EN /custom-orders.
   laComanda: { ro: 'la-comanda', en: 'custom-orders' },
+  // Confirmation page shown after a saved request (2026-11-20). A two-segment
+  // path on purpose: the middleware localizes only the FIRST segment, so the
+  // second one is the same word in both locales and the folder is
+  // app/[locale]/la-comanda/sent. Must stay AFTER `laComanda`
+  // (routeKeyForSlug matches single segments and never returns this key).
+  laComandaSent: { ro: 'la-comanda/sent', en: 'custom-orders/sent' },
   // `contact` slug intentionally identical across locales — same word
   // in RO and EN. Codified explicitly so the route is registered with
   // the middleware audit and shows up in localizedPath().

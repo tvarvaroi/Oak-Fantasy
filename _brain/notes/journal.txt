@@ -1644,3 +1644,24 @@ _brain/notes/web-analytics.md.
 Politica de confidențialitate: paragraf „Statistici de trafic” RO + EN. Trei formulări vecine arătate
 founder-ului, neschimbate (lista de furnizori, două fraze despre cookie-uri de analiză).
 Neatins: OF-2026-0010, CSP, baza de date.
+
+## 2026-11-20 — Pagină de confirmare /la-comanda/sent + politica și checklist-ul aliniate
+
+Aprobat de founder după raportul de analytics. Pagină nouă app/[locale]/la-comanda/sent (RO
+/ro/la-comanda/sent, EN /en/custom-orders/sent; „sent” în ambele limbi, fiindcă middleware-ul traduce
+doar primul segment). CustomOrderForm: la res.ok → reset + router.push pe pagina de confirmare; mesajul
+inline și butonul „Trimite altă idee” s-au mutat pe pagina nouă (link înapoi la #formular). Acțiunea de
+server, honeypot-ul, verificarea de timp și limita de 5 pe oră: neatinse. Pagina: noindex, canonical
+propriu (altfel moștenea canonical-ul homepage-ului din layout), fără hreflang, în afara sitemap-ului,
+fără date ale clientului. PATHNAMES: laComandaSent.
+Teste: tests/e2e/la-comanda.spec.ts — răspunsul acțiunii de server e simulat la nivel de rețea
+(nimic nu ajunge în DB): redirecționare RO + EN doar la ok; fără redirecționare la limită, eroare de
+server, validare, rețea căzută; pagina (H1, noindex, canonical, link înapoi, 44px), EN, slug-uri greșite,
+sitemap. scripts/smoke-custom-orders.mjs merge neschimbat (același data-testid), dar NU a fost rulat
+(scrie în DB-ul live).
+Politica de confidențialitate RO + EN: lista de furnizori, fraza din secțiunea cookie-uri și rezumatul
+(„Numărăm vizitele doar agregat, fără cookie-uri.”), cu textele date de founder.
+SECURITY_CHECKLIST: §9.2 bifat, §10.1 + §10.1.b (banner obligatoriu doar pentru unelte cu cookie-uri sau
+stocare pe dispozitiv), §10.5 punct nou pentru avocat.
+Design-qa pe build de producție: pagina nouă la 375/768/1024/1440, RO + EN + reduced motion — fără
+overflow, link 44px, focus vizibil. Neatins: OF-2026-0010, CSP, baza de date.

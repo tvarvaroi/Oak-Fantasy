@@ -32,7 +32,8 @@ export interface CustomOrderCopy {
     errorRateLimited: string;
     consent: { lead: string; link: string; tail: string };
     returns: { lead: string; link: string; tail: string };
-    success: { title: string; body: string; again: string };
+    /** Shown on the confirmation page (/la-comanda/sent) after a saved request. */
+    success: { metaTitle: string; title: string; body: string; again: string };
   };
   make: {
     heading: string;
@@ -102,6 +103,7 @@ export const CUSTOM_ORDER_CONTENT: Record<Locale, CustomOrderCopy> = {
         tail: '.',
       },
       success: {
+        metaTitle: 'Am primit ideea ta — Oak Fantasy',
         title: 'Am primit ideea ta.',
         body: 'Te contactăm pe WhatsApp la numărul lăsat.',
         again: 'Trimite altă idee',
@@ -219,6 +221,7 @@ export const CUSTOM_ORDER_CONTENT: Record<Locale, CustomOrderCopy> = {
         tail: '.',
       },
       success: {
+        metaTitle: "We've got your idea — Oak Fantasy",
         title: "We've got your idea.",
         body: "We'll message you on WhatsApp at the number you left.",
         again: 'Send another idea',

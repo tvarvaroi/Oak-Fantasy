@@ -339,6 +339,31 @@
   text-underline-offset: 3px;
 }
 
+/* Confirmation page (/la-comanda/sent): the same slip, alone on the table. */
+.sentHero {
+  min-height: min(78vh, 760px);
+  display: flex;
+  align-items: center;
+}
+.sentWrap {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.sentSlip {
+  width: 100%;
+  max-width: 520px;
+}
+.againLink {
+  display: inline-flex;
+  align-items: center;
+}
+.againLink:focus-visible {
+  outline: 2px solid var(--copper);
+  outline-offset: 3px;
+}
+
 /* ─── What we can make ───────────────────────────────────────────────── */
 .make {
   background: var(--paper-aged);

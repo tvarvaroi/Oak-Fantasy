@@ -3,7 +3,7 @@
 > **Document scop:** Audit complet de securitate înainte de lansare publică  
 > **Status:** Living document, actualizat la fiecare sprint  
 > **Owner:** Theodor + Claude Code (auto-update după task-uri sensibile)  
-> **Ultima actualizare:** 2026-11-19 (texte legale finale: blocante noi #12–14 în TL;DR — domeniu Resend, revizuire avocat, env COMPANY_NAME; §10.3.c condiții newsletter; §10.4 SOL scos; §10.5 lista pentru avocat.)
+> **Ultima actualizare:** 2026-11-20 (Web Analytics: §9.2, §10.1, §10.5) · 2026-11-19 (texte legale finale: blocante noi #12–14 în TL;DR — domeniu Resend, revizuire avocat, env COMPANY_NAME; §10.3.c condiții newsletter; §10.4 SOL scos; §10.5 lista pentru avocat.)
 
 ---
 
@@ -669,7 +669,9 @@ Vezi `scripts/smoke-canonical.mjs` ca referinţă. Gotcha complet în
 ### 9.2 Vercel Analytics & Speed Insights
 
 - [x] Speed Insights activ (configured în Sprint pre-acestui document)
-- [ ] Vercel Analytics activ (pageviews + basic metrics)
+- [x] Vercel Web Analytics activ din 2026-11-20 (doar afișări de pagină, fără cookie-uri,
+      cu filtru de URL: nimic din /admin, fără identificatori). Detalii: `_brain/notes/web-analytics.md`.
+      Evenimentele proprii rămân pentru planul Pro.
 - [ ] Custom alerts pentru: deploy failed, response time > 3s
 
 ### 9.3 Uptime monitoring
@@ -691,8 +693,13 @@ Vezi `scripts/smoke-canonical.mjs` ca referinţă. Gotcha complet în
 
 ### 10.1 Cookie consent banner
 
-- [ ] Implementează banner cu opt-in pentru Analytics + Marketing cookies
-- [ ] Speed Insights = "necessary" (poate funcționa fără consent, dar de discutat cu juristul)
+> **Actualizat 2026-11-20:** bannerul NU e necesar cât timp folosim doar unelte fără cookie-uri și
+> fără stocare pe dispozitiv (Vercel Speed Insights, Vercel Web Analytics). Devine OBLIGATORIU
+> înainte de a adăuga orice unealtă care folosește cookie-uri sau stocare pe dispozitiv
+> (Google Analytics, pixel Meta etc.). Confirmarea avocatului: §10.5.
+
+- [ ] Dacă adăugăm o astfel de unealtă: banner cu opt-in, ÎNAINTE de a o porni
+- [x] Speed Insights + Web Analytics rulează fără banner (fără cookie-uri) — de confirmat cu avocatul, §10.5
 - [ ] User poate revoca consent oricând
 - [ ] Cookie policy linkată în banner
 
@@ -703,11 +710,12 @@ preferințele de locale și (eventual post-Sprint 2) sesiunea de auth.
 Atât. Deci pagină dedicată `/cookie-policy` ar fi prematur acum.
 
 - [ ] Adaugă `cookie` la PATHNAMES + skeleton page când:
-  - Vercel Analytics / Google Analytics / Plausible activat (orice
-    analytics non-essential)
+  - o unealtă de analiză sau marketing care folosește cookie-uri sau stocare pe
+    dispozitiv (Google Analytics, pixel Meta etc.). Vercel Web Analytics, activ din
+    2026-11-20, NU intră aici: nu folosește cookie-uri
   - Banner Cookie Consent intră în UI
   - Sub-procesatori cu cookies third-party (Stripe checkout iframe etc.)
-- [ ] Întâi banner consent + analytics, APOI pagină — invers degeaba
+- [ ] Întâi banner de consimțământ + unealta cu cookie-uri, APOI pagină — invers degeaba
 - [ ] Foloseşte aceeași `LegalLayout` infrastructure ca termeni/privacy/retur
 
 ### 10.2 Data Processing Agreement (DPA)
@@ -840,6 +848,10 @@ DUPĂ lansare. Puncte de verificat, cu ce am scris și de ce:
 - [ ] **Transferuri în afara SEE**: Vercel (funcțiile rulează probabil în SUA — regiunea nu e
       configurată în repo), Resend (SUA), Google/Gmail, Meta/WhatsApp — DPF / SCC.
 - [ ] **Vercel Speed Insights fără consimțământ** (fără cookie-uri; Legea 506/2004 art. 4).
+- [ ] **Confirmare că statisticile fără cookie-uri (Vercel Web Analytics) nu cer consimțământ.**
+      Politica descrie serviciul (paragraful „Statistici de trafic”), dar nu numește un temei
+      pentru el — de stabilit cu avocatul (la Speed Insights am scris interes legitim, lit. f).
+      URL-urile sunt curățate de identificatori înainte de trimitere.
 - [ ] **localStorage „oak-cart”** tratat ca stocare strict necesară (fără banner).
 - [ ] **Jurnalele Vercel**: IP-ul apare la respingerile anti-spam; retenția e a furnizorului.
 - [ ] **Pagina de mulțumire** `/multumim/<uuid>` arată numele, adresa și telefonul oricui are
