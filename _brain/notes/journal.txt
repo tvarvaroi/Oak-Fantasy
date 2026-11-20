@@ -1595,3 +1595,21 @@ robots.txt = Allow / + Disallow admin/api/auth/coș/checkout/mulțumim/cont (RO+
 sitemap.xml 200 application/xml, 38 URL-uri cu hreflang, toate 200, niciunul cu noindex; coș, checkout,
 login, admin au noindex. Următorul pas (founder): Google Search Console — verificare domeniu
 oakfantasy.ro + trimiterea sitemap-ului.
+
+## 2026-11-20 — Curățenie setup Claude Code (reversibilă)
+
+Pe baza raportului /skill-doctor (18 folosite din ~215). Inventar scris întâi în
+_brain/SKILLS-MANIFEST.md (228 în listă, inclusiv 17 încorporate), apoi lista exactă aprobată de founder.
+settings.json (copie: ~/.claude/settings.json.bak): syncClaudeAiSkills=false; dezactivate (nu
+dezinstalate) engineering-skills, pm-skills, c-level-skills, business-growth-skills, code-review;
+scoase hook-urile GSD (SessionStart gsd-check-update, PostToolUse gsd-context-monitor) și statusLine.
+Mutate în ~/.claude/_disabled-2026-11-20/ (54 de elemente, structură păstrată): 14 copii superpowers
+(junction-uri NTFS către ~/.agents/skills, mutate cu [IO.Directory]::Move: s-a mutat doar legătura;
+~/.agents/skills are 132 de fișiere cu SHA1 identic înainte/după), tot GSD (32 comenzi, 12 agenți,
+get-shit-done/, manifest, 3 hooks, cache), design-md, enhance-prompt, react-components, c-level-advisor,
+commands/README.md, bucket-ul claude.ai sync (73 de skilluri) și cele 14 intrări din skills/.trash
+(altfel s-ar fi șters automat în jur de 18.12).
+Rezultat: 228 → 73 în listă (56 fără cele încorporate). Comenzile de readucere sunt în manifest.
+Neatins: superpowers, frontend-design, context7, design-qa, seo*, marketing, git:*, review,
+security-scan, tot ce e la nivel de proiect, codul site-ului, OF-2026-0010.
+Pas următor: rescrierea ~/.claude/hooks/skills-reminder.js (SessionStart), care descrie setup-ul vechi.
