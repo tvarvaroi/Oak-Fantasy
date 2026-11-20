@@ -2,9 +2,10 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { isLocale, localizedPath, type Locale } from '@/lib/i18n-routes';
 import { fetchActiveProducts, fetchOutOfStockIds } from '@/lib/db/products';
-import { TOCATOARE_CONTENT, formatPriceRon } from '@/components/tocatoare/content';
+import { TOCATOARE_CONTENT } from '@/components/tocatoare/content';
 import TocatoareContent from '@/components/tocatoare/TocatoareContent';
 import { SITE_URL } from '@/lib/site-url';
+import { buildProductLd } from '@/lib/product-jsonld';
 
 // ISR per D6: catalog rarely changes; activations from Studio reflect within
 // ~60s without a redeploy. fetchActiveProducts returns [] gracefully on any
@@ -98,26 +99,18 @@ export default async function TocatoarePage({ params }: PageProps) {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     numberOfItems: products.length,
+    // 2026-11-20: the nested Product items come from the same builder as the
+    // product page (lib/product-jsonld.ts). They used to be built here without
+    // `image` and `brand` (10 products x RO/EN), and could drift from the PDP.
     itemListElement: products.map((p, i) => ({
       '@type': 'ListItem',
       position: i + 1,
-      item: {
-        '@type': 'Product',
-        name: locale === 'ro' ? p.name_ro : p.name_en,
-        description:
-          (locale === 'ro' ? p.short_description_ro : p.short_description_en) ?? '',
-        sku: p.sku,
+      item: buildProductLd({
+        product: p,
+        locale,
+        inStock: !outOfStock.has(p.id),
         url: `${canonicalUrl}/${p.slug}`,
-        offers: {
-          '@type': 'Offer',
-          priceCurrency: 'RON',
-          price: formatPriceRon(p.price_ron, 'en').replace(/[.,]/g, ''),
-          availability: outOfStock.has(p.id)
-            ? 'https://schema.org/OutOfStock'
-            : 'https://schema.org/InStock',
-          url: `${canonicalUrl}/${p.slug}`,
-        },
-      },
+      }),
     })),
   };
 

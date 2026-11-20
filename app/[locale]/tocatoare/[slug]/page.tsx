@@ -2,12 +2,13 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { isLocale, localizedPath, LOCALES, type Locale } from '@/lib/i18n-routes';
-import { fetchProductBySlug, fetchActiveProducts, fetchStockMap } from '@/lib/db/products';
+import { fetchProductBySlug, fetchActiveProducts, fetchStockMap, isInStock } from '@/lib/db/products';
 import { PRODUCT_DETAIL_CONTENT } from '@/components/product/content';
 import ProductDetailContent from '@/components/product/ProductDetailContent';
 import ProductGallery from '@/components/product/ProductGallery';
 import ProductInfo from '@/components/product/ProductInfo';
 import { SITE_URL } from '@/lib/site-url';
+import { buildProductLd, productImageUrls } from '@/lib/product-jsonld';
 
 // ISR (D2): pre-render active products at build, revalidate every 60s so admin
 // activations/edits reflect without a redeploy; dynamicParams lets products
@@ -77,39 +78,26 @@ export default async function ProductPage({ params }: PageProps) {
   const product = await fetchProductBySlug(params.slug);
   if (!product) notFound();
 
-  // Stock (boolean only). Fail-open: empty map (fetch failed) → treat as in stock.
-  const stock = await fetchStockMap([product.id]);
-  const inStock = stock.size === 0 ? true : (stock.get(product.id) ?? 0) > 0;
+  // Stock (boolean only), same rule as the catalog: fail-open only when the
+  // stock can't be read; no inventory row = out of stock.
+  const inStock = isInStock(await fetchStockMap([product.id]), product.id);
 
   const c = PRODUCT_DETAIL_CONTENT[locale];
   const name = locale === 'ro' ? product.name_ro : product.name_en;
-  const shortDesc = locale === 'ro' ? product.short_description_ro : product.short_description_en;
   const longDesc = locale === 'ro' ? product.long_description_ro : product.long_description_en;
 
-  // hero first, then gallery; drop nulls; dedupe.
-  const images = Array.from(
-    new Set([product.hero_image_url, ...(product.gallery_image_urls ?? [])].filter((x): x is string => !!x)),
-  );
+  // hero first, then gallery; drop nulls; dedupe (same list as the JSON-LD).
+  const images = productImageUrls(product);
 
   const origin = SITE_URL;
   const canonicalUrl = `${origin}${localizedPath('tocatoare', locale)}/${product.slug}`;
   const homeUrl = `${origin}/${locale}`;
   const catalogUrl = `${origin}${localizedPath('tocatoare', locale)}`;
 
+  // One builder for the product page and the catalog ItemList (lib/product-jsonld.ts).
   const productLd = {
     '@context': 'https://schema.org',
-    '@type': 'Product',
-    name,
-    description: shortDesc ?? '',
-    sku: product.sku,
-    ...(images.length ? { image: images } : {}),
-    offers: {
-      '@type': 'Offer',
-      priceCurrency: 'RON',
-      price: (product.price_ron / 100).toString(),
-      availability: inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-      url: canonicalUrl,
-    },
+    ...buildProductLd({ product, locale, inStock, url: canonicalUrl }),
   };
 
   const breadcrumbLd = {

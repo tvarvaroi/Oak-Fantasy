@@ -49,15 +49,21 @@ export async function countActiveProducts(): Promise<number | null> {
 // Stock availability for a set of products. inventory RLS is admin-only, so the
 // public catalog can't read it with the anon client — we use the service-role
 // key SERVER-SIDE and expose ONLY a boolean (inStock) to the client; the exact
-// count never leaves the server (Task 4.1). Fails OPEN: on any error / missing
-// key it returns an empty map and callers treat everything as in stock, so a
-// transient inventory hiccup never hides the whole catalog.
-export async function fetchStockMap(productIds: string[]): Promise<Map<string, number>> {
-  const empty = new Map<string, number>();
-  if (productIds.length === 0) return empty;
+// count never leaves the server (Task 4.1).
+//
+// Returns null when the stock could not be read (missing key, network, RLS
+// error) — callers then FAIL OPEN and treat everything as in stock, so a
+// transient inventory hiccup never hides the whole catalog. A product with
+// no inventory row is simply absent from the map = 0 available: it cannot be
+// ordered (reserve_stock needs the row), so it reads "out of stock" on the
+// catalog AND on its product page alike (2026-11-20; before, an empty map
+// meant both "fetch failed" and "no row", so the product page said in stock
+// while the catalog said sold out).
+export async function fetchStockMap(productIds: string[]): Promise<Map<string, number> | null> {
+  if (productIds.length === 0) return new Map();
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !serviceKey) return empty;
+  if (!url || !serviceKey) return null;
   try {
     const sb = createClient<Database>(url, serviceKey, {
       auth: { persistSession: false, autoRefreshToken: false },
@@ -66,19 +72,24 @@ export async function fetchStockMap(productIds: string[]): Promise<Map<string, n
       .from('inventory')
       .select('product_id, quantity_available')
       .in('product_id', productIds);
-    if (error || !data) return empty;
+    if (error || !data) return null;
     return new Map(data.map((r) => [r.product_id, r.quantity_available ?? 0]));
   } catch {
-    return empty;
+    return null;
   }
 }
 
-// Derives the set of out-of-stock product ids (available <= 0). Fail-open: an
-// empty stock map (fetch failed) yields an empty set — nothing marked sold out.
+/** In stock = at least one available. Fail-open when the stock is unknown (null). */
+export function isInStock(stock: Map<string, number> | null, productId: string): boolean {
+  if (stock === null) return true;
+  return (stock.get(productId) ?? 0) > 0;
+}
+
+// Derives the set of out-of-stock product ids (available <= 0, or no row).
+// Fail-open: stock unreadable (null) yields an empty set — nothing marked sold out.
 export async function fetchOutOfStockIds(productIds: string[]): Promise<string[]> {
   const stock = await fetchStockMap(productIds);
-  if (stock.size === 0) return [];
-  return productIds.filter((id) => (stock.get(id) ?? 0) <= 0);
+  return productIds.filter((id) => !isInStock(stock, id));
 }
 
 // Single active product by slug, for the detail page. Returns null if the slug
