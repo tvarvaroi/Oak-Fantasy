@@ -597,3 +597,15 @@ orice încălcare, inclusiv în admin.
 components/cart|checkout|tocatoare, app/globals.css, tests/e2e/{auth-redirect,mobile-polish}.spec.ts.
 **De ce contează:** verificarea trebuie să ruleze pe forma în care rulează și clienții (build de
 producție, domeniul live), nu doar pe serverul de dezvoltare.
+
+## 2026-11-20 — Retușuri pre-lansare: stoc mixt, fonturi locale
+
+**Pattern descoperit:** o schimbare de fapt („stocul e mixt”) atinge mai multe suprafețe decât pare:
+pagini, eticheta de pe produs, checkout, email, Termeni (+ data lor), banda de cifre, llms.txt. Inventarul
+făcut întâi cu grep pe formularea veche + scanarea DB, apoi o gardă e2e cu formulările interzise.
+Fonturi: `next/font/local` + subset fontTools (rețeta în assets/fonts/README.md) a eliminat ultima
+dependență de rețea a build-ului. La ținte de 44px în blocuri de text dens: `min-h-[44px]` + margine
+negativă egală (sau padding + `-mx`) ca să nu strici ritmul vizual — design-qa a prins diferența.
+**Aplicat la:** lib/fonts.ts, assets/fonts, lib/typography.ts (keepUnits), lib/no-break-ranges.tsx,
+components/Footer.tsx, Terms/checkout/PDP/emails, tests/e2e/fact-check + mobile-polish.
+**De ce contează:** textul de pe site rămâne adevărat și consecvent după fiecare decizie a founder-ului.
