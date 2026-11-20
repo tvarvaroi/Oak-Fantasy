@@ -78,11 +78,12 @@ const nextConfig = {
         {
           // Non-dotted paths never get here: middleware already redirected them
           // to /ro/…; this catches dotted ones at any depth (/wp-admin/x.php).
-          // robots.txt/sitemap.xml are app metadata routes: `next dev` matches them
+          // robots.txt/sitemap.xml/favicon/icons/manifest are app metadata routes:
+          // `next dev` matches them
           // AFTER afterFiles rewrites, so they are excluded explicitly.
           // The lookahead sees the REST of the path, so each excluded segment
           // must be followed by "/" or the end (`en$` alone let /en/about through).
-          source: '/:first((?!(?:ro|en|_next|api|auth|admin|robots\.txt|sitemap\.xml)(?:/|$))[^/]+)/:rest*',
+          source: '/:first((?!(?:ro|en|_next|api|auth|admin|robots\.txt|sitemap\.xml|favicon\.ico|icon\.png|apple-icon\.png|manifest\.webmanifest)(?:/|$))[^/]+)/:rest*',
           destination: '/ro/:first/:rest*',
         },
       ],
