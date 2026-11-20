@@ -79,6 +79,27 @@
 - Core Web Vitals: LCP <2.5s, FID/INP <100ms, CLS <0.1
 - Mobile-first (deja respectat)
 
+## De făcut — mărunte
+
+### Homepage: imagini fără `width`/`height` și un salt de nivel la headinguri (notat 21.11.2026)
+
+Sursa: `page_checks.py` din claude-seo v2.6.2, rulat pe `https://oakfantasy.ro/ro` pe 20 și 21.11.2026
+(status 200, 47 de verificări, 0 critice, 0 mari). Două observații, nerezolvate:
+
+1. **Imagini fără atributele `width` și `height`** (severitate medie): 11 din 13 imagini, printre care
+   `/3D_Cutting_Board_Model_Design.svg`, imaginea `WhatsApp_Image_2026-05-14…` și
+   `/stock/workshop-hands-plane.webp` (servite prin `/_next/image`). Riscul semnalat e deplasarea
+   layoutului la încărcare (CLS). De verificat întâi dacă e o problemă reală: unealta numără doar
+   atributele din HTML, iar o imagine `next/image` cu `fill` nu le are, deși containerul ei poate rezerva
+   deja spațiul. Se măsoară CLS pe pagină înainte de a schimba ceva.
+2. **Salt de nivel la headinguri** (severitate mică): un singur salt în conținutul principal (de tipul
+   H2 → H4). Nu contează pentru Google, contează pentru cititoarele de ecran, care navighează pe niveluri.
+   Unealta nu spune care heading; se găsește parcurgând ordinea headingurilor de pe homepage.
+
+Tot de acolo, fără observație: 1 H1, canonical propriu, 3 hreflang, 0 imagini fără alt, 1 bloc JSON-LD valid.
+Cum se reface verificarea (din unealta Bash):
+`"$HOME/.claude/skills/seo/scripts/claude-seo" run page_checks.py --url https://oakfantasy.ro/ro`
+
 ## Note de implementare
 
 - i18n curent = custom prin `middleware.ts` → la SEO multilingv, generează `alternates.languages` în `generateMetadata` și `hreflang` corect pentru `/ro` și `/en`.

@@ -51,6 +51,9 @@
   "agents/seo-visual.md",
   "agents/seo-agentic.md"
  ],
+ "seo_local_patches": [
+  "agents/seo-visual.md"
+ ],
  "mkt_pinned": [
   "skills/cro/SKILL.md",
   "skills/analytics/SKILL.md",

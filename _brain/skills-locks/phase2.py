@@ -12,6 +12,10 @@ Usage (run with `python -I`):
 Nothing is ever deleted. Moves are same-volume renames that refuse to overwrite.
 `backup` and `install` can be re-run after an interruption: finished items are skipped.
 (Revised after the three-lens pre-flight review of 2026-11-20.)
+
+2026-11-21: LOCAL_PATCHES added (fifth documented local edit, agents/seo-visual.md). The copy
+in skills-staging/_audit is the version that actually ran on 2026-11-20, without this patch;
+the installed file was edited by hand and `verify` from THIS copy proves both agree.
 """
 import hashlib
 import io
@@ -66,6 +70,23 @@ REWRITES = [
     (b'"${CLAUDE_PLUGIN_ROOT}/scripts/claude-seo" doctor', b'"$HOME/.claude/skills/seo/scripts/claude-seo" doctor'),
     (b'${CLAUDE_PLUGIN_ROOT}/skills/', (HOME_FWD + '/.claude/skills/').encode()),
 ]
+# Local patches applied AFTER the four replacements (owner's decision 2026-11-21). Key: path
+# relative to ~/.claude. Each old text must match exactly once; if it does not, upstream changed
+# that passage and the patch has to be reviewed again before the next update.
+LOCAL_PATCHES = {
+    # The sub-agent prompt told the model to run a global install. Sub-agents do not see the
+    # usage rules in the manifest, so the instruction itself is replaced.
+    'agents/seo-visual.md': [(
+        b'Before capturing screenshots, ensure Playwright and Chromium are installed:\n'
+        b'\n'
+        b'```bash\n'
+        b'pip install playwright && playwright install chromium\n'
+        b'```\n',
+        b'Playwright and Chromium come from the managed runtime that `/seo setup` creates. Do not install\n'
+        b'anything yourself: no `pip install`, no `playwright install`, no `npx`. If a command below fails\n'
+        b'because the runtime or the browser is missing, stop and report that the user has to run `/seo setup`.\n',
+    )],
+}
 TOKEN = b'CLAUDE_PLUGIN_ROOT'
 # After the four replacements exactly ONE mention remains in instruction files: a sentence of
 # prose that explains the mechanism (the upstream installer leaves it too). Reviewed by hand.
@@ -168,6 +189,32 @@ def rewrite_seo(data):
     return data
 
 
+def seo_transform(dst):
+    """Transform for one SEO .md file: the four replacements, then its local patches (if any)."""
+    rel = rel_claude(dst)
+    patches = LOCAL_PATCHES.get(rel, [])
+
+    def transform(data):
+        data = rewrite_seo(data)
+        for old, new in patches:
+            if data.count(old) != 1:
+                raise SystemExit('STOP: local patch for %s matches %d times (expected 1); '
+                                 'upstream text changed, review the patch' % (rel, data.count(old)))
+            data = data.replace(old, new)
+        return data
+    return transform
+
+
+def check_local_patches(seo_plan):
+    """Every patched file must be in the plan and every patch must apply. Returns the list."""
+    by_rel = {rel_claude(dst): src for src, dst, kind in seo_plan if kind == 'md'}
+    for rel in LOCAL_PATCHES:
+        if rel not in by_rel:
+            raise SystemExit('STOP: local patch targets a file that is not installed: %s' % rel)
+        seo_transform(os.path.join(CLAUDE, rel))(open(by_rel[rel], 'rb').read())
+    return sorted(LOCAL_PATCHES)
+
+
 def pin_mkt(data):
     return data.replace(MKT_LINK_OLD, MKT_LINK_NEW)
 
@@ -256,9 +303,12 @@ def cmd_install():
         for orig, bak in backup_items():
             if not os.path.exists(bak):
                 raise SystemExit('STOP: backup has not completed (missing %s). Run `backup` first.' % bak)
+    patched = check_local_patches(seo_plan)
     log('== INSTALL claude-seo v2.6.2 (%s) ==' % SEO_COMMIT[:7])
-    modified = [rel_claude(dst) for src, dst, kind in seo_plan if copy_file(src, dst, rewrite_seo if kind == 'md' else None)]
-    log('  files copied: %d ; rewritten (plugin-root placeholder): %d' % (len(seo_plan), len(modified)))
+    modified = [rel_claude(dst) for src, dst, kind in seo_plan
+                if copy_file(src, dst, seo_transform(dst) if kind == 'md' else None)]
+    log('  files copied: %d ; rewritten (plugin-root placeholder): %d ; with a local patch: %d'
+        % (len(seo_plan), len(modified), len(patched)))
     log('== INSTALL marketingskills v2.14.25 (%s), 8 skills, markdown only ==' % MKT_COMMIT[:7])
     pinned = [rel_claude(dst) for src, dst, kind in mkt_plan if copy_file(src, dst, pin_mkt)]
     log('  files copied: %d ; files with pinned links: %d ; links pinned: %d' % (len(mkt_plan), len(pinned), links))
@@ -268,6 +318,8 @@ def cmd_install():
                 'installed-skills: %s\ninstalled-agents: %s\n'
                 'not-installed: skills %s; agents %s; scripts %s; hooks/; extensions/\n'
                 'local-edits: the 4 plugin-root placeholder replacements from install.ps1 in %d .md files\n'
+                'local-edits-2: agents/seo-visual.md, Prerequisites block (global pip/playwright install) '
+                'replaced with a pointer to /seo setup (owner\'s decision 2026-11-21)\n'
                 % (SEO_COMMIT, ' '.join(SEO_SKILLS_NEW), ' '.join(SEO_AGENTS_NEW), ' '.join(SEO_SKILLS_SKIPPED),
                    ' '.join(SEO_AGENTS_SKIPPED), ' '.join(SEO_SCRIPTS_EXCLUDED), len(modified)))
     prov_mkt = ('source: https://github.com/coreyhaines31/marketingskills\n'
@@ -284,7 +336,7 @@ def cmd_install():
             with open(path, 'w', encoding='utf-8', newline='\n') as fh:
                 fh.write(text)
     if not DRY:
-        json.dump({'seo_rewritten': modified, 'mkt_pinned': pinned},
+        json.dump({'seo_rewritten': modified, 'seo_local_patches': patched, 'mkt_pinned': pinned},
                   open(os.path.join(AUD, 'phase2-modified-files.json'), 'w', encoding='utf-8'), indent=1)
 
 
@@ -292,20 +344,27 @@ def cmd_verify():
     """Installed == audited staging, except exactly the documented edits. Read-only."""
     problems, checked, rewritten, pinned = [], 0, [], []
     expected_paths = set()
-    for plan, transform in ((seo_copy_plan(), rewrite_seo), (mkt_copy_plan(), pin_mkt)):
+    seo_plan = list(seo_copy_plan())
+    locally_patched = check_local_patches(seo_plan)
+    for plan, is_seo in ((seo_plan, True), (mkt_copy_plan(), False)):
         for src, dst, kind in plan:
             expected_paths.add(os.path.normcase(dst))
             if not os.path.isfile(dst):
                 problems.append('MISSING ' + dst)
                 continue
             src_bytes = open(src, 'rb').read()
-            want = transform(src_bytes) if kind == 'md' else src_bytes
+            if kind != 'md':
+                want = src_bytes
+            elif is_seo:
+                want = seo_transform(dst)(src_bytes)
+            else:
+                want = pin_mkt(src_bytes)
             got = open(dst, 'rb').read()
             checked += 1
             if got != want:
                 problems.append('DIFFERS ' + dst)
             elif want != src_bytes:
-                (rewritten if transform is rewrite_seo else pinned).append(dst)
+                (rewritten if is_seo else pinned).append(dst)
 
     # Nothing extra inside the installed skill folders. The runtime created by setup is
     # tolerated ONLY at the root of skills/seo; bytecode only under skills/seo/scripts.
@@ -392,6 +451,7 @@ def cmd_verify():
     print('files compared with staging: %d' % checked)
     print('  identical to audited source: %d' % (checked - len(rewritten) - len(pinned)))
     print('  differ only by the 4 documented placeholder replacements: %d' % len(rewritten))
+    print('    of which also carry a documented local patch: %d (%s)' % (len(locally_patched), ', '.join(locally_patched)))
     print('  differ only by the pinned GitHub links: %d files, %d links at commit %s' % (len(pinned), pinned_links, MKT_COMMIT[:7]))
     print('placeholder name in instruction files: %d reviewed prose line(s), %d UNREVIEWED' % (len(md_ok), len(md_bad)))
     for rel, i, text in md_ok:
@@ -431,6 +491,7 @@ def cmd_plan():
     log('== INSTALL plan ==')
     log('  claude-seo: %d files (%d .md, %d would be rewritten); skills %d, agents %d'
         % (len(seo), len(md), len(would_rewrite), len(SEO_SKILLS_NEW), len(SEO_AGENTS_NEW)))
+    log('  local patches that apply cleanly: %s' % ', '.join(check_local_patches(seo)))
     log('  files that still contain the placeholder name after the 4 replacements: %d' % len(left))
     for s, n in left:
         log('     %s (%d)' % (os.path.relpath(s, SEO_SRC), n))

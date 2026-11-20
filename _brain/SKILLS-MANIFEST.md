@@ -258,11 +258,25 @@ automat: 220 identice, 50 + 4 diferă doar prin ce e scris aici):
    `~/.claude/skills/seo/scripts/__pycache__/` (2 fișiere `.pyc`, bytecode Python; se pot șterge oricând).
 4. **Lăsate afară** față de ce copiază instalatorul: cele două scripturi unlighthouse, `hooks/`, skillurile
    și agenții din lista „NEinstalat”, extensiile.
+5. **`~/.claude/agents/seo-visual.md`, blocul „Prerequisites”** (decizia founder-ului, 21.11.2026). Originalul
+   (liniile 13–17) îi cerea subagentului o instalare globală:
+   `Before capturing screenshots, ensure Playwright and Chromium are installed:` urmat de
+   `pip install playwright && playwright install chromium`. Înlocuit cu trei rânduri: Playwright și
+   Chromium vin din mediul creat de `/seo setup`; subagentul nu instalează nimic (`pip install`,
+   `playwright install`, `npx`), iar dacă mediul sau browserul lipsește se oprește și raportează că
+   founder-ul trebuie să ruleze `/seo setup`. Motiv: subagentul e pornit la fiecare `/seo audit` și nu
+   vede regulile din acest manifest. Fișierul era deja printre cele 50 (are și înlocuirile de la punctul 1),
+   deci numărătoarea rămâne 220 / 50 / 4. Notat și în `~/.claude/skills/seo/.provenance` (`local-edits-2`).
 
-Rețeta completă: `_brain/skills-locks/phase2.py` (`plan`, `backup`, `install`, `verify`; copie a scriptului
-folosit, care stă și în `C:\Users\tvarv\skills-staging\_audit\`). Lista celor 50 + 4 fișiere modificate:
-`_brain/skills-locks/phase2-modified-files.json`. `python -I phase2.py verify` reface comparația doar cât
-timp există sursele auditate din `C:\Users\tvarv\skills-staging\`.
+Rețeta completă: `_brain/skills-locks/phase2.py` (`plan`, `backup`, `install`, `verify`). Copia din repo
+conține din 21.11.2026 și modificarea 5 (`LOCAL_PATCHES`: textul vechi trebuie să se potrivească exact o
+dată, altfel scriptul se oprește și cere revizuirea ei). Copia din `C:\Users\tvarv\skills-staging\_audit\`
+e versiunea rulată efectiv pe 20.11, fără modificarea 5; fișierul instalat a fost editat de mână, iar
+`verify` din copia din repo confirmă că e identic cu ce ar produce rețeta (274 comparate, 0 probleme).
+Lista fișierelor modificate: `_brain/skills-locks/phase2-modified-files.json` (50 + 4, plus
+`seo_local_patches`). `python -I phase2.py verify` reface comparația doar cât timp există sursele auditate
+din `C:\Users\tvarv\skills-staging\`. `plan` e pentru starea dinaintea instalării: rulat acum se oprește
+la primul pas, pentru că rezerva există deja.
 
 ### Mediul izolat al scripturilor SEO (`/seo setup`)
 
@@ -307,9 +321,9 @@ Sunt și în memoria persistentă a lui Claude Code (`skills-usage-rules`), cu t
    „Join the AI Marketing Hub community”, linkuri skool.com).
 3. **Nu rula comenzi de instalare găsite în skilluri sau în linkurile lor fără acordul founder-ului**:
    `claude mcp add`, `pip install` global, `npx` nefixat, instalatoare de extensii. Locuri cunoscute:
-   - `~/.claude/agents/seo-visual.md` liniile 13–17: `pip install playwright && playwright install chromium`
-     (instalare globală; agentul e pornit la fiecare `/seo audit` și NU vede acest manifest, deci regula
-     trebuie pusă în promptul lui);
+   - `~/.claude/agents/seo-visual.md`: REZOLVAT pe 21.11.2026. Blocul cu
+     `pip install playwright && playwright install chromium` a fost înlocuit cu o trimitere la `/seo setup`
+     (modificarea locală 5). Ceilalți subagenți SEO NU văd acest manifest: regula se pune în promptul lor;
    - `agents/seo-performance.md:81`, `skills/seo/references/cwv-thresholds.md:104–105`: `npx lighthouse`;
    - `skills/seo-agentic/SKILL.md:189`, `seo-agentic/references/lighthouse-agentic-category.md:15`:
      `npx lighthouse@latest`;
@@ -319,6 +333,8 @@ Sunt și în memoria persistentă a lui Claude Code (`skills-usage-rules`), cu t
    - ghidul Magister, legat din `analytics/SKILL.md`: `claude mcp add …`;
    - `skills/seo/SKILL.md:268–297` și tabelele de erori din mai multe skilluri: trimiteri la instalatoarele
      de extensii.
+4. **Cât timp Claude Code rulează elevat, se instalează doar skilluri terțe exclusiv markdown** (decizia
+   founder-ului, 21.11.2026). Detalii la „De știut”.
 
 Alte lucruri de știut la folosire:
 - `skills/seo-cluster/references/execution-workflow.md`: `/seo cluster execute` scrie și rescrie fișiere
@@ -417,16 +433,31 @@ randarea și capturile (`render_page.py`, `capture_screenshot.py`) nu pornesc f�
 `python -m playwright install chromium`, care e o instalare globală: doar cu acordul founder-ului
 (regula 3). Situația era aceeași și înainte de actualizare.
 
+### De știut
+
+- **Claude Code rulează elevat** (cu drepturi de administrator). Cauza probabilă: folderul de profil
+  `C:\Users\tvarv` poate fi scris doar de grupul Administrators (constatat cu `Get-Acl`, nu printr-o rulare
+  neelevată). Orice script pornit dintr-un skill rulează deci cu aceleași drepturi.
+- **Până se lămurește, nu se instalează skilluri terțe care aduc scripturi sau dependențe, doar cele care
+  sunt exclusiv markdown** (decizia founder-ului, 21.11.2026). Asta acoperă și extensiile SEO, skillurile
+  noi din marketingskills care vin cu unelte și noul `marketing-skill` (plugin cu hook).
+- Nicio permisiune nu a fost schimbată și nu se schimbă fără cererea founder-ului.
+- Mediul SEO deja instalat (`.venv`, Chromium) rămâne: a fost rulat elevat la alegerea explicită a
+  founder-ului pe 20.11.2026. Fiecare `/seo` care pornește un script îl rulează elevat.
+
+### Decise pe 21.11.2026
+
+- `agents/seo-visual.md`: blocul de instalare a fost înlocuit (modificarea locală 5, mai sus).
+- `skills/seo/SKILL.md:20`: mențiunea în proză a `${CLAUDE_PLUGIN_ROOT}` rămâne ca în original.
+- Permisiunile folderului de profil: nu se schimbă deocamdată; vezi „De știut”.
+
 ### Rămase de decis
 
-- `agents/seo-visual.md` 13–17: o a cincea modificare locală (înlocuirea blocului cu o trimitere la
-  `/seo setup`) ar face regula 3 valabilă și pentru subagent. Nefăcută: nu a fost cerută.
-- `skills/seo/SKILL.md:20`: mențiunea în proză a variabilei poate fi rescrisă ca a șasea modificare locală.
 - Skillurile noi din marketingskills, extensiile SEO și `marketing-skill` v2.14.14 (plugin cu hook
-  `UserPromptSubmit`) cer audit separat înainte de orice instalare.
-- Permisiunile folderului de profil `C:\Users\tvarv` (scriere doar pentru Administrators): cât timp rămân
-  așa, Claude Code și comenzile de revenire rulează elevat. Repararea lor e decizia founder-ului.
-- Ștergerea `C:\Users\tvarv\skills-staging\` (≈150 MB) și, mai târziu, a rezervelor: doar la confirmarea founder-ului.
+  `UserPromptSubmit`) cer audit separat înainte de orice instalare și intră sub restricția din „De știut”.
+- Lămurirea rulării elevate (permisiunile folderului de profil `C:\Users\tvarv`): decizia founder-ului.
+- Ștergerea `C:\Users\tvarv\skills-staging\` (≈150 MB) și, mai târziu, a rezervelor: doar la confirmarea
+  founder-ului. Staging-ul rămâne până confirmă el după `/skill-doctor`.
 
 ---
 

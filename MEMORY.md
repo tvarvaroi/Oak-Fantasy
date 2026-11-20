@@ -690,3 +690,17 @@ terț: verifică dacă sesiunea e elevată (`IsInRole(Administrator)`) și spune
 nu rula comenzi de instalare din skilluri sau din linkurile lor (`claude mcp add`, `pip install` global,
 `npx` nefixat) fără acordul founder-ului. Scripturile SEO se rulează doar prin lansator, din Bash:
 `"$HOME/.claude/skills/seo/scripts/claude-seo" run <script.py>`.
+
+## 2026-11-21 — O modificare locală într-un skill terț intră în rețetă, nu doar în fișier
+
+**Pattern descoperit:** Când schimbăm de mână un fișier instalat dintr-un pachet auditat (aici promptul
+subagentului `seo-visual`), modificarea se scrie și în rețeta de instalare ca înlocuire care trebuie să se
+potrivească exact o dată (`LOCAL_PATCHES` în `_brain/skills-locks/phase2.py`), apoi `verify` dovedește că
+fișierul editat de mână e identic cu ce produce rețeta. Altfel următoarea actualizare o pierde în tăcere.
+Regulile din manifest nu ajung la subagenți: o instrucțiune periculoasă dintr-un prompt de subagent se
+repară în prompt, nu printr-o regulă scrisă în altă parte.
+**Aplicat la:** `~/.claude/agents/seo-visual.md`, `_brain/skills-locks/phase2.py`,
+`_brain/SKILLS-MANIFEST.md` („Modificări locale” punctul 5, „De știut”).
+**De ce contează:** REGULĂ NOUĂ a founder-ului: Claude Code rulează elevat; până se lămurește, se
+instalează doar skilluri terțe exclusiv markdown (fără scripturi, dependențe, hook-uri, servere MCP).
+Nu se schimbă permisiuni ca ocolire. Vezi „De știut” în `_brain/SKILLS-MANIFEST.md`.

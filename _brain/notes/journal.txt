@@ -1707,3 +1707,22 @@ elevat); blocul de revenire rescris ca reluabil, cu skills\seo mutat primul (ver
 scripts/ conține și scripturile skillurilor neinstalate (bing, shopify, dataforseo, matomo), inerte fără chei;
 după o revenire la v2.2.0, Playwright-ul global nu are Chromium-ul potrivit (1228 cerut, 1208/1223 pe disc).
 Rețeta și lista fișierelor modificate sunt copiate în _brain/skills-locks/.
+
+## 2026-11-21 — Urmări la actualizarea de skilluri: a cincea modificare locală + restricția „doar markdown”
+
+Deciziile founder-ului după raportul Fazei 2:
+- agents/seo-visual.md: blocul „Prerequisites” (pip install playwright && playwright install chromium,
+  instalare globală în promptul unui subagent) înlocuit cu o trimitere la /seo setup. Documentat ca
+  modificarea locală 5 în SKILLS-MANIFEST.md și în ~/.claude/skills/seo/.provenance; adăugat în rețetă
+  (_brain/skills-locks/phase2.py, LOCAL_PATCHES, potrivire exact o dată) și în phase2-modified-files.json.
+  Verificat: phase2.py verify din repo → 274 comparate, 220 identice, 50 + 4 cu modificări documentate
+  (1 cu modificarea 5), PROBLEMS: 0, settings.json cu același hash.
+- seo/SKILL.md linia 20: rămâne ca în original.
+- Permisiuni: neschimbate. Notat în manifest („De știut”) și în memoria Claude Code: Claude Code rulează
+  elevat; până se lămurește, se instalează doar skilluri terțe exclusiv markdown, nu cele cu scripturi
+  sau dependențe.
+- skills-staging rămâne până confirmă founder-ul după /skill-doctor.
+- Task SEO mic notat în _brain/notes/seo-strategy.md („De făcut — mărunte”): pe homepage, 11 din 13
+  imagini fără width/height (de verificat întâi dacă e CLS real, din cauza next/image cu fill) și un
+  salt de nivel la headinguri. page_checks.py rulat din nou pentru detalii (cod 0, status 200).
+Neatins: codul site-ului, OF-2026-0010, settings.json, permisiunile.
