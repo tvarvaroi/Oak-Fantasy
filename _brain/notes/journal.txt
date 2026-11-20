@@ -1584,3 +1584,14 @@ text-wrap: balance. Pre-existente raportate, nereparate: umbra drawer-ului coș 
 dreaptă, placeholder gri rece în formulare, touch targets (filtre, coș, checkbox termeni),
 404 fără fonturi + RO/EN amestecat, ProductTease în reduced-motion, gradient cream între
 ProductTease și NumbersStrip, navbar sticky peste câmpuri la erori, rând produs în checkout.
+
+## 2026-11-20 — LANSARE: robots deschis pe oakfantasy.ro
+
+Înainte (commit 3f71249): fără „SKU” pe /despre, citatul de pe homepage cu „ ” / “ ”, telefonul din
+paginile legale pe un singur rând (nowrap), hint-ul câmpului de telefon = „0712 345 678” (înregistrare,
+contact). Gates: build ok, e2e țintit 288/0, vizual 78/78 (3 baseline-uri).
+Lansare (commit 51e1032, cherry-pick din launch/robots-allow): robots Variant B. Verificat live:
+robots.txt = Allow / + Disallow admin/api/auth/coș/checkout/mulțumim/cont (RO+EN) + Host + Sitemap;
+sitemap.xml 200 application/xml, 38 URL-uri cu hreflang, toate 200, niciunul cu noindex; coș, checkout,
+login, admin au noindex. Următorul pas (founder): Google Search Console — verificare domeniu
+oakfantasy.ro + trimiterea sitemap-ului.

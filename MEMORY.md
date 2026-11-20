@@ -609,3 +609,13 @@ negativă egală (sau padding + `-mx`) ca să nu strici ritmul vizual — design
 **Aplicat la:** lib/fonts.ts, assets/fonts, lib/typography.ts (keepUnits), lib/no-break-ranges.tsx,
 components/Footer.tsx, Terms/checkout/PDP/emails, tests/e2e/fact-check + mobile-polish.
 **De ce contează:** textul de pe site rămâne adevărat și consecvent după fiecare decizie a founder-ului.
+
+## 2026-11-20 — Lansare (robots deschis)
+
+**Pattern descoperit:** schimbarea „de lansare” pregătită din timp pe un branch separat (commit
+gata testat + testul de robots inversat în același commit) a făcut lansarea un cherry-pick fără
+conflicte, urmat de o verificare live completă: robots.txt, fiecare URL din sitemap (200 + fără
+noindex) și noindex pe paginile private.
+**Aplicat la:** app/robots.ts, tests/e2e/domain.spec.ts, _brain/notes/SECURITY_CHECKLIST.md, journal.
+**De ce contează:** orice schimbare ireversibilă „la comanda founder-ului” se pregătește ca un commit
+izolat și testat, care se aplică doar la confirmare.

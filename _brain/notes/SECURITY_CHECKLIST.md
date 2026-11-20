@@ -21,12 +21,12 @@
 8. ✅ HTTPS-only enforced (no HTTP fallback)
 9. ✅ Backup Supabase production database
 10. ✅ Monitoring + alerts setup (Sentry, Speed Insights, Vercel logs)
-11. ✅ **FLIPPED la lansare: `app/robots.ts` Variant A → Variant B** — acum e `Disallow: /`
-    (lockdown pre-launch pe vercel.app, SEO audit fix #2). În ACELAȘI PR cu
-    conectarea oakfantasy.ro: allow all + disallow /admin,/api,/auth + pagini
-    tranzacționale (cos/cart, checkout, multumim/thank-you, auth) + adaugă
-    `sitemap: 'https://oakfantasy.ro/sitemap.xml'`. Fără flip, site-ul lansat
-    rămâne INVIZIBIL pentru Google. Sitemap-ul (app/sitemap.ts) e deja construit.
+11. ✅ **LANSAT 2026-11-20 — robots deschis** (`app/robots.ts` Variant B, commit 51e1032):
+    `Allow: /`; `Disallow:` /admin, /api/, /auth/ + coș/cart, checkout, multumim/thank-you, login,
+    inregistrare/register, parola-uitata/forgot-password, reset-parola/reset-password (RO + EN, din
+    PATHNAMES); `Sitemap: https://oakfantasy.ro/sitemap.xml`. Verificat live: sitemap 38 URL-uri
+    (9 pagini publice × 2 limbi + 10 produse × 2), toate 200, fără noindex; paginile private au noindex.
+    Gardă: tests/e2e/domain.spec.ts (robots).
 12. 🚨 **Verificare domeniu în Resend + `RESEND_FROM_EMAIL`** (added 2026-11-19),
     altfel clientul nu primește emailul promis în Termeni (§5 pas 3: „Primești un
     email automat că am primit comanda”). În modul sandbox (`onboarding@resend.dev`),
