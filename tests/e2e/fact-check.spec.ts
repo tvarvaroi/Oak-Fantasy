@@ -4,8 +4,10 @@ import { test, expect } from './fixtures';
 // 2026-11-19 — founder fact-check of every factual claim on the site
 // (artifact „Verificarea afirmațiilor”, rounds 1 + 2). These claims were
 // marked false or "to correct" and removed; they must not come back.
-// The workshop location is never named; the registered HQ (legal data in the
-// Organization JSON-LD) is, so Arad is checked on visible text only.
+// The workshop location is never named. Since 2026-11-21 the Organization
+// JSON-LD carries only the locality and region of the registered HQ ("Arad",
+// no street, no postal code — tests/e2e/geo.spec.ts), so Arad is checked on
+// visible text only.
 const ARAD = /Arad/;
 const REMOVED_RO = [
   /Bucegi|Apuseni/,
@@ -133,6 +135,10 @@ test.describe('Fact-check: removed claims stay removed', () => {
   // 2026-11-19 (founder): mixed stock; 5–10 working days = maximum until
   // dispatch, said the same way on every surface.
   test('/tocatoare + /despre + product page: mixed stock, max 5–10 days to ship', async ({ page }) => {
+    // Five navigations in one test. On a cold dev server with 3 workers the
+    // first compile of each route pushed it past the default 30s (timed out on
+    // the untouched code too, 2026-11-21); every assertion passes once loaded.
+    test.setTimeout(90_000);
     await page.goto('/ro/tocatoare');
     const main = page.locator('main');
     await expect(main).toContainText('Unele piese sunt gata făcute, altele le lucrăm după comandă.');

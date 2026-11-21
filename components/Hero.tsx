@@ -132,7 +132,10 @@ function AnimatedHeadline({ language }: { language: 'ro' | 'en' }) {
             variants={wordVariants}
             className="inline-block mr-[0.25em]"
           >
-            {word}
+            {/* Trailing space: the served HTML reads "Tocătoare lucrate", not
+                "Tocătoarelucrate". It collapses at the end of the inline-block's
+                own line box, so the spacing (the margin) looks the same. */}
+            {word}{' '}
           </motion.span>
         ))}
       </span>

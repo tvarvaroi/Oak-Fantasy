@@ -7,6 +7,7 @@ import { PRODUCT_DETAIL_CONTENT } from '@/components/product/content';
 import ProductDetailContent from '@/components/product/ProductDetailContent';
 import ProductGallery from '@/components/product/ProductGallery';
 import ProductInfo from '@/components/product/ProductInfo';
+import BuyingInfo from '@/components/product/BuyingInfo';
 import { SITE_URL } from '@/lib/site-url';
 import { buildProductLd, productImageUrls } from '@/lib/product-jsonld';
 
@@ -128,6 +129,7 @@ export default async function ProductPage({ params }: PageProps) {
           />
         }
         info={<ProductInfo product={product} locale={locale} inStock={inStock} />}
+        buyingInfo={<BuyingInfo locale={locale} />}
       />
     </>
   );

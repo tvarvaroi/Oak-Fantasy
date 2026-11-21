@@ -13,8 +13,10 @@ import { SITE_URL } from '@/lib/site-url';
 // Sitewide entity graph (SEO audit fix #4). Organization + WebSite with stable
 // @id anchors — subpages (despre/atelier/contact/termeni) reference these ids
 // instead of re-declaring disconnected copies. sameAs = REAL social profiles
-// (live 2026-07-11). Address = registered HQ (public registry data, Arad);
-// the WORKSHOP address is permanently unlisted (founder decision) — never emit.
+// (live 2026-07-11). Address = locality + country of the registered HQ only
+// (founder, 2026-11-21: no streetAddress, no postalCode in any schema — the
+// full registered address stays in the visible legal text). The WORKSHOP
+// address is permanently unlisted (founder decision) — never emit.
 function entityGraph(locale: Locale) {
   return {
     '@context': 'https://schema.org',
@@ -45,7 +47,7 @@ function entityGraph(locale: Locale) {
           '@type': 'PostalAddress',
           ...(hasPlaceholder(LEGAL_INFO.hqAddress)
             ? {}
-            : { streetAddress: LEGAL_INFO.hqAddress, addressLocality: 'Arad' }),
+            : { addressLocality: 'Arad' }),
           addressCountry: 'RO',
           addressRegion: 'Arad',
         },

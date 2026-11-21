@@ -394,7 +394,9 @@ export default function ProductTease({ language }: { language: 'ro' | 'en' }) {
                   viewport={{ once: true }}
                   transition={{ duration: 0.7, delay: 0.1 + i * 0.1, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  {line}
+                  {/* Trailing space between the block lines (served HTML read
+                      "Fiecare bucată,unică."). No visual change. */}
+                  {line}{i < copy.title.length - 1 ? ' ' : ''}
                 </motion.span>
               ))}
             </h2>

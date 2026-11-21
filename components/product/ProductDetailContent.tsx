@@ -8,11 +8,13 @@ import Footer from '@/components/Footer';
 import { localizedPath, type Locale } from '@/lib/i18n-routes';
 import { PRODUCT_DETAIL_CONTENT } from './content';
 import { keepUnits } from '@/lib/typography';
+import ProductDescription from './ProductDescription';
 
 // Client wrapper for the product detail page (check #0: global Navbar + Footer +
 // language toggle that preserves the product slug). gallery + info are passed in
 // as elements from the Server Component page (server components rendered through
-// a client component via props — allowed).
+// a client component via props — allowed). Same for buyingInfo, the
+// "Livrare, plată și retur" block (GEO audit 2026-11-21).
 
 export default function ProductDetailContent({
   locale,
@@ -21,6 +23,7 @@ export default function ProductDetailContent({
   longDescription,
   gallery,
   info,
+  buyingInfo,
 }: {
   locale: Locale;
   slug: string;
@@ -28,6 +31,7 @@ export default function ProductDetailContent({
   longDescription: string | null;
   gallery: React.ReactNode;
   info: React.ReactNode;
+  buyingInfo: React.ReactNode;
 }) {
   const router = useRouter();
   const c = PRODUCT_DETAIL_CONTENT[locale];
@@ -58,9 +62,17 @@ export default function ProductDetailContent({
 
           {/* Gallery | Info */}
           <div className="grid gap-10 lg:gap-14" style={{ gridTemplateColumns: '1fr', alignItems: 'start' }}>
-            <div className="grid gap-10 lg:gap-14 lg:grid-cols-2">
-              <div>{gallery}</div>
-              <div>{info}</div>
+            {/* DOM order = phone order: gallery, info (ends with the buy
+                button), then the delivery/payment/returns block — so the block
+                never pushes the button down. From lg the block moves under the
+                gallery (left column), next to the info column, instead of
+                stretching the right column past a short gallery. Row 2 is 1fr
+                so the info column's extra height never opens a gap between the
+                gallery and the block. */}
+            <div className="grid gap-10 lg:gap-x-14 lg:grid-cols-2 lg:grid-rows-[auto_1fr]">
+              <div className="lg:col-start-1 lg:row-start-1">{gallery}</div>
+              <div className="lg:col-start-2 lg:row-start-1 lg:row-span-2">{info}</div>
+              <div className="lg:col-start-1 lg:row-start-2">{buyingInfo}</div>
             </div>
 
             {/* Long description */}
@@ -69,9 +81,7 @@ export default function ProductDetailContent({
                 <h2 className="font-caudex" style={{ fontSize: '1.4rem', color: 'var(--oak-deep)', fontWeight: 700, marginBottom: 16 }}>
                   {c.detailsHeading}
                 </h2>
-                <p className="font-lora" style={{ fontSize: '1.02rem', color: 'var(--ink-soft)', lineHeight: 1.8, whiteSpace: 'pre-line' }}>
-                  {keepUnits(longDescription)}
-                </p>
+                <ProductDescription text={longDescription} />
               </section>
             ) : null}
           </div>

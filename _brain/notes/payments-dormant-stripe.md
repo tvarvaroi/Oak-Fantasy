@@ -51,6 +51,10 @@ dashboard.
    reapare în admin; webhook-ul procesează din nou.
 5. Smoke: comandă test cu cardul `4242 4242 4242 4242` (chei de test întâi), verifică
    `confirmed` + `paid` + emailuri; apoi `expired` → `cancelled` + release.
+5b. Pagina de produs: blocul „Livrare, plată și retur” (`components/product/BuyingInfo.tsx`) ascunde
+   rândul „Plată” când flag-ul e pornit, dar titlul rămâne. Rescrie `buyingInfo.payment` din
+   `components/product/content.ts` (RO + EN) pentru ambele metode și scoate condiția
+   `CARD_PAYMENTS_ENABLED` din `BuyingInfo.tsx`. La fel rândul „Payment” din `public/llms.txt`.
 6. Termeni: scoate propoziția „Momentan nu acceptăm plata online cu cardul" din
    `TERMS_FINAL_FACTS.payment` (`app/[locale]/termeni/page.tsx`).
 7. `SECURITY_CHECKLIST.md` §1.4, §1.5, §7 redevin active.

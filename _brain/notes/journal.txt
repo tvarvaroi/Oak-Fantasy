@@ -1745,3 +1745,31 @@ De reconfirmat (R1 în raport): sediul social din Arad e în Organization JSON-L
 în decisions.md, iar o mașină citește câmpul ca adresa afacerii.
 Nu există articole, /ingrijire sau FAQ (404). Nimic implementat; se așteaptă aprobarea.
 Neatins: codul site-ului, OF-2026-0010, baza de date; niciun formular trimis.
+
+## 2026-11-21 — Reparațiile GEO (A1–A6 + R1), aprobate de founder
+
+Regula lotului: nicio cifră și nicio afirmație nouă; valorile din aceleași surse ca Termenii, /retur și
+checkout-ul. Skilluri: design-qa, frontend-design. Revizuire independentă: workflow cu 4 unghiuri
+(fapte și surse, React/SSR, parser și accesibilitate, teste și completitudine) + verificare adversarială
+a fiecărei constatări: 19 constatări, 13 confirmate și aplicate, 6 respinse ca în afara cerinței.
+1. Banda de cifre: HTML-ul servit are valorile reale (10 modele, 320); numărătoarea pornește doar în
+   browser. Sursa cifrelor: numărul de modele = `countActiveProducts()` (products.status='active', citit
+   din DB la fiecare regenerare, ISR 60 s; ascuns dacă citirea eșuează) — egal cu cele 10 produse din
+   catalogul servit; 320 = granulația finală din textul /atelier și /despre („de la 80 la 320”); 5–10 e
+   static (zile lucrătoare până la expediere, ca în Termeni și lib/config/shipping.ts).
+2. Pagina de produs: blocul „Livrare, plată și retur” (RO + EN), cifrele din lib/config. După buton pe
+   telefon și tabletă portret; sub galerie de la 1024 px. Butonul de cumpărare e la aceeași poziție ca pe
+   site-ul live la 375 / 768 / 1024 / 1440 (măsurat).
+3. Descrierea: „Dimensiuni și detalii” și „Îngrijire” sunt <h3> + <ul> pe toate cele 10 produse, RO + EN.
+4. Titluri: spații reale pe homepage (H1 + două H2, RO + EN) și La comandă (H1, RO + EN); geometrie
+   identică cu site-ul live la cele 4 viewporturi.
+5. „de la 500 RON” / „from 500 RON” peste tot (pagina de produs spunea „peste” / „over”).
+6. Organization JSON-LD: fără streetAddress; rămân localitatea, regiunea și țara. Textul vizibil cu datele
+   firmei e neschimbat. scripts/validate-schema.mjs pe build-ul local: 22/22 pagini, 0 erori, 0 avertismente.
+7. llms.txt: îngrijirea, telefonul și programul (toate afișate deja pe site); sloganul EN = cel de pe site.
+Verificări: typecheck, lint, check:i18n, build — curate. e2e: 836 trecute, 30 sărite, 1 picat prin
+timeout (test vechi, cinci navigări pe server de dev rece; pică la fel și pe codul neatins; limita lui
+ridicată la 90 s, apoi 3/3). Vizual: 78/78; regenerate doar cele 6 capturi de bază ale homepage-ului
+(arătau „0” la cifre și o legendă veche). Test nou: tests/e2e/geo.spec.ts.
+Capturi ale blocului: _brain/assets/geo-2026-11-21/. Nefăcute: A7–A11 din audit.
+Neatins: OF-2026-0010, baza de date; niciun formular trimis, nicio comandă plasată.

@@ -720,3 +720,22 @@ fiecare rând se etichetează: măsurat, judecată sau afirmație a skillului ne
 contrazic deciziile).
 **De ce contează:** nimic din audit nu e implementat; listele așteaptă aprobarea founder-ului. Înainte de
 orice task SEO/GEO, citește raportul și secțiunea 9 (ce NU se aplică din skilluri).
+
+## 2026-11-21 — Reparațiile GEO: verifică pe HTML-ul servit și măsoară „fără să schimbi aspectul”
+
+**Pattern descoperit:** (1) „Nu schimba aspectul” se dovedește cu cifre: dreptunghiurile elementului și
+ale fiecărui copil, comparate între site-ul live și build-ul local la cele 4 viewporturi. La fel „nu
+împinge butonul”: poziția butonului, înainte și după. (2) Un bloc nou în pagina de produs se pune în
+DOM DUPĂ coloana cu butonul și se mută cu grila de la `lg` (`lg:grid-rows-[auto_1fr]`, info pe două
+rânduri), nu se dublează în markup. (3) O revizuire pe mai multe unghiuri, cu verificare adversarială, a
+prins ce testele mele nu vedeau: un test care trecea și pe HTML-ul vechi (scotea tagurile punând spații),
+un salt 320 → 0 → 320 la reîncărcare, și capturi de bază care treceau sub pragul de 2% deși arătau „0”.
+(4) O captură de bază care „trece” nu e neapărat corectă: după o schimbare de conținut, regenerează
+capturile paginii atinse și deschide-le. (5) Un test care pică doar cu 3 workeri pe server rece: verifică
+pe codul neatins (`git stash -u`, rulează, `git stash pop`) înainte să-l atribui modificării tale.
+**Aplicat la:** components/NumbersStrip.tsx, components/product/{BuyingInfo,ProductDescription,ProductDetailContent}.tsx,
+lib/product-description.ts, Hero / WorkshopSection / ProductTease / CustomOrderHero, app/[locale]/layout.tsx,
+public/llms.txt, tests/e2e/geo.spec.ts.
+**De ce contează:** înlocuiește intrarea de mai sus de azi: adresa din JSON-LD NU mai conține strada
+(doar localitate, regiune, țară), iar A1–A6 și R1 din audit sunt implementate. Rămân A7–A11.
+Orice cifră despre livrare, plată sau retur se ia din lib/config, nu se scrie în text.

@@ -578,3 +578,44 @@ două segmente (`la-comanda/sent`), folosită doar prin `localizedPath`; `routeK
 niciodată, iar filtrul de statistici ia doar intrările cu un singur segment.
 **Capcană:** o pagină sub `[locale]` moștenește canonical-ul și hreflang-ul homepage-ului din layout
 dacă nu-și declară propriul `alternates`.
+
+## 2026-11-21 — Reparațiile GEO: ce citește un crawler e HTML-ul servit
+
+Aprobate de founder după [[geo-audit-2026-11-21]]. Regula lui pentru tot lotul: nicio cifră și nicio
+afirmație nouă; valorile vin din aceleași surse ca Termenii, /retur și codul de checkout.
+
+**Date structurate — fără stradă și fără cod poștal (înlocuiește nota din 19.11).** `Organization.address`
+are doar `addressLocality` „Arad”, `addressRegion` „Arad” și `addressCountry` „RO”. `streetAddress` a fost
+scos; `postalCode` nu exista în nicio schemă. Adresa completă a sediului social rămâne în
+textul vizibil (Termeni, Retur), neschimbat. Regula e valabilă pentru orice schemă
+nouă. Gardă: tests/e2e/geo.spec.ts (10 pagini).
+
+**Blocul „Livrare, plată și retur” pe pagina de produs** (`components/product/BuyingInfo.tsx`).
+- Conținut: plata ramburs, costul și pragul, expedierea și livrarea, returul de 14 zile cu excepția
+  pentru produsele gravate și lucrările la comandă, linkuri spre /retur și Termeni.
+- Nicio cifră nu e scrisă în text: `{fee}`, `{free}`, `{dispatch}`, `{transit}`, `{returnDays}` se
+  completează din `lib/config/shipping.ts` și `lib/config/returns.ts`. Un token greșit oprește build-ul.
+- Amplasare: în DOM vine după coloana cu butonul de cumpărare, deci pe telefon și pe tabletă portret nu
+  împinge butonul (măsurat: aceeași poziție ca înainte, la 375 și 768 px). De la 1024 px stă sub galerie,
+  în coloana stângă, ca să nu lungească coloana din dreapta peste o galerie scurtă.
+- Rândul „Plată” descrie ramburs ca singură metodă și e ascuns când `CARD_PAYMENTS_ENABLED` e pornit;
+  la reactivarea cardului textul trebuie rescris (pas adăugat în [[payments-dormant-stripe]]).
+
+**Pragul de transport gratuit se scrie „de la 500 RON” / „from 500 RON”**, niciodată „peste” / „over”:
+codul aplică gratuitatea de la exact 500 RON (`subtotal >= prag`).
+
+**Banda de cifre** se servește cu valorile reale (numărul de modele din DB, 320); numărătoarea pornește
+doar în browser. **Titlurile împărțite în `<span>`-uri** au un spațiu real între bucăți.
+
+**Descrierea produsului** rămâne text simplu în DB; `lib/product-description.ts` o împarte în paragrafe
+și în secțiuni „etichetă + buline” (Dimensiuni și detalii, Îngrijire), redate ca `<h3>` + `<ul>`.
+Regulile sunt înguste intenționat: bulină = „• ” sau „- ” la început de rând, minimum două buline,
+eticheta scurtă și fără punctuație de propoziție la final. Orice altceva rămâne paragraf, neschimbat.
+
+**llms.txt**: adăugate îngrijirea (cele trei rânduri de pe paginile de tocătoare), telefonul și
+programul (afișate deja în subsol). Traducerea EN a sloganului e acum cea de pe site
+(„Made with love in Romania.”).
+
+**Rămase din lista A, nefăcute în acest lot:** denumirea firmei și CUI-ul în `Organization`, `material`
+și dimensiuni în `Product`, adresa permanentă a paginii de Facebook în `sameAs` (o dă founder-ul),
+`lastmod` din sitemap, blocul de produse dublat în HTML-ul homepage-ului.

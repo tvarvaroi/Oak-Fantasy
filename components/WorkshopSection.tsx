@@ -335,7 +335,10 @@ export default function WorkshopSection({ language }: { language: 'ro' | 'en' })
                     ease: [0.16, 1, 0.3, 1],
                   }}
                 >
-                  {line}
+                  {/* Trailing space between the block lines: without it the
+                      served HTML glues them ("Un loc undelemnul"). Collapses
+                      at the end of each line — no visual change. */}
+                  {line}{i < c.title.length - 1 ? ' ' : ''}
                 </motion.span>
               ))}
             </h2>

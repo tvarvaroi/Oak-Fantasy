@@ -1342,3 +1342,40 @@ ignoră X-Robots-Tag).
 **Capcană:** testul „imaginea răspunde 200 + image/*” trecea cu antetul noindex — verifică și
 `x-robots-tag` (tests/e2e/product-jsonld.spec.ts). Validare cu validator.schema.org:
 `node scripts/validate-schema.mjs` (live) sau `BASE_URL=… node scripts/validate-schema.mjs`.
+
+## 2026-11-21 — Contor animat: `useState(from)` ajunge în HTML ca „0”
+
+**Simptom:** HTML-ul servit al homepage-ului spunea „0 modele” și „0 granulație finală”; valorile reale
+apăreau doar după ce rula animația în browser.
+**Cauză:** `Counter` pornea cu `useState(stat.from)`, iar randarea pe server ia starea inițială.
+**Fix:** `useState(stat.to)` (serverul scrie valoarea reală) + un efect care, doar în browser, dă înapoi
+la `from` cât timp cifra e în afara ecranului; numărătoarea pornește la intrarea în ecran. Fără acest
+ultim detaliu apare un salt vizibil 320 → 0 → 320 la reîncărcarea paginii cu banda deja pe ecran.
+**De ce nu e ascunsă cifra la încărcare:** `PageTransition` are `<AnimatePresence initial={false}>`, care
+blochează `initial` la prima randare pentru toți copiii `motion.*` de sub el. La o încărcare directă,
+elementele cu `initial={{ opacity: 0 }}` + `whileInView` sunt deci vizibile din HTML; `opacity: 0` apare
+doar după o navigare în client. Nu te baza pe „e ascuns până intră în ecran”.
+
+## 2026-11-21 — Cuvinte lipite în titluri: `<span>`-uri alăturate fără spațiu
+
+**Simptom:** în HTML-ul brut, „Tocătoarelucratecu mâinile noastre.”, „Un loc undelemnul capătăsuflet.”,
+„Ai o idee?O facem în lemn.” Vizual era corect: spațiul venea din `margin` sau din `display:block`.
+**Fix:** un spațiu real la SFÂRȘITUL fiecărei bucăți (`{word}{' '}`). La sfârșit de rând (într-un
+`inline-block` sau `block`) spațiul se comprimă, deci nu se mută nimic: dreptunghiurile titlurilor și ale
+fiecărui `<span>` sunt identice înainte și după, la 375 / 768 / 1024 / 1440 (comparat cu site-ul live).
+`<br/>` nu are problema. Gardă: tests/e2e/geo.spec.ts, pe 16 pagini.
+**Capcană în test:** dacă scoți tagurile înlocuindu-le cu spațiu, textul vechi pare corect și testul nu
+păzește nimic. Scoate tagurile fără să pui nimic în loc.
+
+## 2026-11-21 — Regex `<!--.*?-->` sare peste mai multe comentarii
+
+`[litera](?:<tag>|<!--.*?-->)+[litera]` raporta fals „cuvinte lipite” pe /atelier: după backtracking,
+`.*?` se întinde de la primul `<!-- -->` până la un `-->` de mai târziu și înghite tot ce e între ele.
+Pentru separatoarele de text ale lui React folosește `<!--\s*-->`.
+
+## 2026-11-21 — Editări din Bash cu heredoc: CRLF și ghilimele
+
+O parte din fișierele repo-ului au terminatori CRLF, altele LF. O înlocuire făcută cu un script (șir
+căutat cu `\n`) nu găsește nimic într-un fișier CRLF: citește fișierul cu `newline=''`, verifică dacă
+are `\r\n` și convertește șirurile înainte de înlocuire. Un heredoc `<<'EOF'` care conține backtick-uri
+și apostrofuri poate pica în unealta Bash cu „unexpected EOF”: scrie scriptul cu unealta Write și rulează-l.

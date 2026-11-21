@@ -19,8 +19,28 @@ function Counter({
   numberLocale: string;
 }) {
   const prefersReduced = useReducedMotion();
-  const [display, setDisplay] = useState(stat.from);
+  // The server renders the REAL value (stat.to), so the HTML a crawler or a
+  // no-JS reader gets says "10 modele" / "320", never the count-up's start
+  // value (GEO audit 2026-11-21: the served HTML read "0 modele").
+  const [display, setDisplay] = useState(stat.to);
   const hasPlayed = useRef(false);
+  const numberRef = useRef<HTMLDivElement>(null);
+
+  // Browser only: rewind to the start value so the count-up looks as before —
+  // but only while the stat is off screen. On a hard load its wrapper is NOT
+  // hidden (PageTransition's <AnimatePresence initial={false}> blocks
+  // `initial` on the first render), so a stat already on screen at hydration
+  // keeps its real value and skips the count-up instead of flipping
+  // 320 → 0 → 320. Skipped under reduced motion and for static stats.
+  useEffect(() => {
+    if (prefersReduced || hasPlayed.current || stat.from === stat.to) return;
+    const rect = numberRef.current?.getBoundingClientRect();
+    if (rect && rect.top < window.innerHeight && rect.bottom > 0) {
+      hasPlayed.current = true;
+      return;
+    }
+    setDisplay(stat.from);
+  }, [prefersReduced, stat.from, stat.to]);
 
   useEffect(() => {
     if (!play || hasPlayed.current) return;
@@ -73,6 +93,7 @@ function Counter({
 
   return (
     <div
+      ref={numberRef}
       className="font-caudex tabular-nums"
       style={{
         fontSize: 'clamp(2.8rem, 5.5vw, 5rem)',

@@ -1,5 +1,6 @@
 // Shipping config (D3). Money in bani. Single source of truth — change here.
-// 25 RON flat, free over 500 RON. (COD courier fee deferred — not added at MVP.)
+// 25 RON flat, free from 500 RON (subtotal >= threshold; the copy says "de la
+// 500 RON" / "from 500 RON"). (COD courier fee deferred — not added at MVP.)
 
 export const SHIPPING_FLAT_RON = 2500; // 25 RON in bani
 export const FREE_SHIPPING_THRESHOLD_RON = 50000; // 500 RON in bani

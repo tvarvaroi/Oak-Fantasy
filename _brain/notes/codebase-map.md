@@ -40,7 +40,7 @@ supabase/migrations/      # 1 migration: waitlist table
 | `StoryStrip.tsx` | `{ language }` | framer-motion, SVG ornamente | 3 coloane cu ornamente SVG animate (svg-draw) |
 | `WorkshopSection.tsx` | `{ language }` | framer-motion `useScroll`/`useTransform`, next/image | Layout asimetric cu parallax |
 | `ProductTease.tsx` | `{ language }` | gsap ScrollTrigger, next/image, framer-motion | Galerie orizontală scroll-driven |
-| `NumbersStrip.tsx` | `{ language: Locale }` | framer-motion `animate`, `./numbers-strip-content` | Countere animate (count-up). Conținut + sufixe + ariaLabel + `numberLocale` pentru `toLocaleString` în content map separat (Faza B refactor) |
+| `NumbersStrip.tsx` | `{ language: Locale; productCount: number \| null }` | framer-motion `animate`, `./numbers-strip-content` | Countere animate (count-up). Conținut + sufixe + ariaLabel + `numberLocale` pentru `toLocaleString` în content map separat (Faza B refactor) |
 | `CraftVideoTease.tsx` | `{ language }` | framer-motion, useRef video | Placeholder video proces atelier |
 | `WaitlistSection.tsx` | `{ language }` | framer-motion, SVG (`BranchProps`), `EmailForm` | Email capture (source `waitlist`) + ornament ramură |
 | `Footer.tsx` | `{ language }` (`FooterLinkProps` intern) | next/image, framer-motion | Footer dark, 3 coloane |
@@ -314,3 +314,16 @@ components/tocatoare/
 - `lib/db/products.ts#countActiveProducts` — count head-only, anon + RLS; null la eroare.
 - `NumbersStrip` primește `productCount`; stat-ul cu `live: 'productCount'` dispare când e null
   (grila lg trece pe 5 track-uri).
+
+## 2026-11-21 — Reparațiile GEO (vezi [[decisions]] și [[geo-audit-2026-11-21]])
+
+- `components/product/BuyingInfo.tsx` — blocul „Livrare, plată și retur” (componentă de server). Textul e în
+  `components/product/content.ts` (`buyingInfo`), cifrele vin din `lib/config/shipping.ts` și
+  `lib/config/returns.ts`. Montat din `app/[locale]/tocatoare/[slug]/page.tsx` prin proprietatea
+  `buyingInfo` a lui `ProductDetailContent`, care îl așază în grilă (după info pe mobil, sub galerie de la lg).
+- `lib/product-description.ts` + `components/product/ProductDescription.tsx` — descrierea lungă: paragrafe
+  și secțiuni „etichetă + buline” redate ca `<h3>` + `<ul>`.
+- `components/NumbersStrip.tsx` — `Counter` pornește de la valoarea reală (HTML servit) și numără doar în browser.
+- `tests/e2e/geo.spec.ts` — citește HTML-ul servit (fără JavaScript): cifre reale, titluri fără cuvinte
+  lipite, blocul de pe pagina de produs, titluri și liste în descriere, pragul „de la 500 RON”, nicio
+  stradă în scheme, llms.txt față de site, parserul descrierii.

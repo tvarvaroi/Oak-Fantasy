@@ -22,7 +22,10 @@ export default function CustomOrderHero({
         <div className={styles.heroText}>
           <p className={styles.eyebrow}>{hero.eyebrow}</p>
           <h1 className={styles.h1}>
-            <span className={styles.h1Line}>{hero.titleLine1}</span>
+            {/* Trailing space: the served HTML reads "Ai o idee? O facem…",
+                not "Ai o idee?O facem…". It collapses at the end of the block
+                line, so nothing moves. */}
+            <span className={styles.h1Line}>{hero.titleLine1}{' '}</span>
             <span className={styles.h1Line}>
               {/* A real space (not a margin) so a wrapped "in wood." starts flush left. */}
               {hero.titleLine2}{' '}
