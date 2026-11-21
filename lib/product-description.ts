@@ -30,6 +30,25 @@ const BULLET = /^[•-]\s+/;
 // "Îngrijire", "Dimensiuni și detalii", "Care:" — not a sentence.
 const isLabel = (line: string) => line.length <= 60 && !/[.!?;,]$/.test(line);
 
+/**
+ * The value of a "Label: value" bullet in the description's spec list, e.g.
+ * descriptionField(text, 'Material') → "stejar și frasin masiv". Exactly what
+ * is written after the label; null when the product has no such line.
+ */
+export function descriptionField(text: string | null | undefined, label: string): string | null {
+  const prefix = `${label.toLowerCase()}:`;
+  for (const block of parseProductDescription(text)) {
+    if (block.type !== 'list') continue;
+    for (const item of block.items) {
+      if (item.toLowerCase().startsWith(prefix)) {
+        const value = item.slice(prefix.length).trim();
+        if (value) return value;
+      }
+    }
+  }
+  return null;
+}
+
 export function parseProductDescription(text: string | null | undefined): DescriptionBlock[] {
   if (!text) return [];
   const blocks: DescriptionBlock[] = [];

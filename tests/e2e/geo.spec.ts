@@ -268,6 +268,8 @@ test.describe('GEO: the served HTML carries the answers', () => {
 
   // ── 6. Structured data ────────────────────────────────────────────
   test('no schema carries a street address or a postal code; locality + country stay', async ({ request }) => {
+    // Many pages in one test: on a cold dev server each route compiles first.
+    test.setTimeout(120_000);
     const product = await firstProductPath(request, '/ro/tocatoare');
     const paths = ['/ro', '/en', '/ro/tocatoare', '/ro/la-comanda', '/ro/despre', '/ro/atelier', '/ro/contact', '/ro/termeni', '/ro/retur'];
     if (product) paths.push(product);
@@ -288,6 +290,78 @@ test.describe('GEO: the served HTML carries the answers', () => {
   test('the visible legal text still shows the registered address', async ({ page }) => {
     await page.goto('/ro/termeni');
     await expect(page.locator('main')).toContainText('Str. Orion nr. 24, Arad, jud. Arad');
+  });
+
+  test('Organization schema names the company behind the brand, exactly as the footer does', async ({ page, request }) => {
+    const graph = (jsonLdBlocks(await html(request, '/ro'))[0] as { '@graph': Array<Record<string, unknown>> })['@graph'];
+    const org = graph.find((n) => n['@type'] === 'Organization') as Record<string, unknown>;
+    expect(typeof org.legalName).toBe('string');
+    expect(typeof org.taxID).toBe('string');
+    // The CUI is a fiscal code; the company is not a VAT payer.
+    expect(org.vatID).toBeUndefined();
+    // No person is named in the schema: no legal representative, founder or employee.
+    for (const key of ['founder', 'founders', 'employee', 'employees', 'member', 'contactPoint']) {
+      expect(org[key], key).toBeUndefined();
+    }
+    expect(JSON.stringify(org)).not.toContain('"Person"');
+
+    await page.goto('/ro');
+    const footer = page.locator('footer');
+    await expect(footer).toContainText(org.legalName as string);
+    await expect(footer).toContainText(org.taxID as string);
+  });
+
+  test('Product schema: material and dimensions are the product’s own data, or absent', async ({ request }) => {
+    // Many pages in one test: on a cold dev server each route compiles first.
+    test.setTimeout(120_000);
+    const decode = (s: string) =>
+      s.replace(/&amp;/g, '&').replace(/&#x27;/g, "'").replace(/&quot;/g, '"').replace(/&nbsp;| /g, ' ').trim();
+    const cases: Array<[string, string]> = [
+      ['/ro/tocatoare', 'Dimensiuni'],
+      ['/en/cutting-boards', 'Dimensions'],
+    ];
+    let withMaterial = 0;
+    let withDimensions = 0;
+    for (const [catalog, dimsLabel] of cases) {
+      const paths = await productPaths(request, catalog);
+      test.skip(paths.length === 0, 'no active product');
+      for (const path of paths) {
+        const markup = await html(request, path);
+        const node = jsonLdBlocks(markup).find((b) => (b as Record<string, unknown>)['@type'] === 'Product') as Record<string, unknown>;
+        expect(node, path).toBeTruthy();
+
+        // Material = the "Material: …" bullet of the description, word for word.
+        const written = markup.match(/<li[^>]*>Material:\s*(.*?)<\/li>/s)?.[1];
+        if (written) {
+          expect(node.material, path).toBe(decode(written.replace(/<[^>]+>/g, '')));
+          withMaterial += 1;
+        } else {
+          expect(node.material, path).toBeUndefined();
+        }
+
+        // Dimensions = the numbers of the spec row ("48 × 22 × 1,7 cm"), in order.
+        const row = markup.match(new RegExp(`${dimsLabel}</dt><dd[^>]*>([^<]+)</dd>`))?.[1];
+        const props = node.additionalProperty as Array<Record<string, unknown>> | undefined;
+        if (row) {
+          const shown = decode(row);
+          const numbers = shown.replace(/[Ø]/g, '').split('×').map((part) => parseFloat(part.replace(',', '.')));
+          expect(props?.map((p) => p.value), `${path}: ${shown}`).toEqual(numbers);
+          for (const p of props!) {
+            expect(p['@type']).toBe('PropertyValue');
+            expect(shown.endsWith(` ${p.unitText as string}`), `${path}: unit`).toBe(true);
+            expect(typeof p.name).toBe('string');
+          }
+          withDimensions += 1;
+        } else {
+          expect(props, path).toBeUndefined();
+        }
+        // Not mapped onto width/height/depth: that would be our guess.
+        for (const key of ['width', 'height', 'depth']) expect(node[key], `${path}: ${key}`).toBeUndefined();
+      }
+    }
+    // The check is not vacuous on this catalogue.
+    expect(withMaterial).toBeGreaterThan(0);
+    expect(withDimensions).toBeGreaterThan(0);
   });
 
   // ── 7. llms.txt ───────────────────────────────────────────────────

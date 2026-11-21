@@ -1773,3 +1773,29 @@ ridicată la 90 s, apoi 3/3). Vizual: 78/78; regenerate doar cele 6 capturi de b
 (arătau „0” la cifre și o legendă veche). Test nou: tests/e2e/geo.spec.ts.
 Capturi ale blocului: _brain/assets/geo-2026-11-21/. Nefăcute: A7–A11 din audit.
 Neatins: OF-2026-0010, baza de date; niciun formular trimis, nicio comandă plasată.
+
+## 2026-11-21 — Lotul 2 GEO: scheme, lastmod real, IndexNow
+
+Aprobat de founder; aceeași regulă (nicio cifră sau afirmație nouă). Documentația IndexNow citită de pe
+indexnow.org (documentation + faq), salvată în _brain/resources/indexnow.md.
+1. Organization: legalName + taxID din lib/legal-info.ts (valorile din subsol). Fără stradă, fără persoane.
+2. Product: material = rândul „Material: …” din descrierea produsului (10 din 10 produse îl au);
+   dimensiuni = additionalProperty din products.dimensions (8 din 10; piesa neregulată și ceasul nu au
+   dimensiuni în DB, deci câmpul lipsește). Nimic mapat pe width/height/depth.
+3. Facebook: NEFĂCUT. Linkul de partajare răspunde 400 la cereri automate; adresa permanentă o dă founder-ul.
+4. Sitemap: lastmod din lib/page-last-modified.ts pentru paginile statice (păzit de un test care citește
+   git), products.updated_at sau data șablonului pentru produse; regenerare la o oră și la fiecare
+   salvare din admin (înainte era înghețat la build).
+5. Blocul dublat de pe homepage: LĂSAT, cu motiv (galerie GSAP pe desktop, alt markup pe mobil; rescriere
+   cu risc vizual mare). Explicat în decisions.md.
+6. IndexNow: cheie + public/<cheie>.txt; trimitere doar de pe server și doar din producție, din acțiunile
+   de admin pentru produse, după salvare; nu aruncă niciodată; listă de permisiuni pentru URL-uri;
+   scripts/indexnow-submit-sitemap.mjs pentru trimiterea unică a sitemap-ului.
+   În plus: acțiunile de admin reîmprospătează paginile publice după tiparul rutei (înainte nu o făceau).
+Verificări: typecheck, lint, check:i18n, build — curate. e2e: 879 trecute, 30 sărite, 0 picate.
+Vizual: 78/78, nicio captură regenerată. validate-schema pe build-ul local: vocabular valid pe 22/22
+pagini; validatorul online al Google a răspuns cu limitare (0/22 verificate online) — de reluat.
+Revizuirea independentă (workflow, 3 unghiuri) NU s-a terminat: agenții s-au oprit la limita de
+utilizare, fără rezultate. Am recitit eu punctele de risc; singura schimbare: revalidările noi sunt
+într-un try/catch, ca o eroare de cache să nu apară ca salvare eșuată.
+Neatins: OF-2026-0010, baza de date (nicio scriere), niciun formular trimis.

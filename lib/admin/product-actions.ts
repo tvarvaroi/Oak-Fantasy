@@ -12,6 +12,7 @@ import { revalidatePath } from 'next/cache';
 import { requireAdminOrNotFound } from '@/lib/auth/require-admin';
 import { getServerSupabase } from '@/lib/supabase-server';
 import { productSchema, ronToBani, type ProductFormOutput } from '@/lib/schemas/product';
+import { productChangeUrls, submitToIndexNow, type ProductState } from '@/lib/indexnow';
 import type { Database } from '@/types/supabase';
 
 type ProductInsert = Database['public']['Tables']['products']['Insert'];
@@ -103,6 +104,48 @@ function uniqueError(message: string): { error: string; fieldErrors?: Record<str
 function revalidate() {
   revalidatePath('/admin/produse');
   revalidatePath('/tocatoare');
+  // The public pages a product change shows up on, by their route patterns
+  // (the bare '/tocatoare' above never matched a localized page). Without
+  // this, the first visitor after a save — often the crawler IndexNow just
+  // invited — is served the page from before the change.
+  // Guarded: the row is already saved at this point, and a cache refresh
+  // that fails must not be reported to the admin as a failed save (the pages
+  // still refresh on their own within the ISR window).
+  try {
+    revalidatePath('/[locale]/tocatoare', 'page');
+    revalidatePath('/[locale]/tocatoare/[slug]', 'page');
+    revalidatePath('/[locale]', 'page');
+    revalidatePath('/sitemap.xml');
+  } catch (err) {
+    console.warn('[products] public revalidation failed', err);
+  }
+}
+
+// Tell IndexNow which public URLs changed (lib/indexnow.ts). Runs AFTER the
+// row is saved and can never undo or block that: submitToIndexNow never
+// throws (it logs), and the extra try/catch covers even building the list.
+// It is awaited, bounded by its own 4 s timeout, because a serverless function
+// may be frozen as soon as the action returns.
+async function notifySearchEngines(before: ProductState | null, after: ProductState | null) {
+  try {
+    await submitToIndexNow(productChangeUrls(before, after));
+  } catch (err) {
+    console.warn('[indexnow] notify failed', err);
+  }
+}
+
+// The product's public state before a change. null when it cannot be read —
+// then only what is public AFTER the change is notified.
+async function readProductState(
+  sb: ReturnType<typeof getServerSupabase>,
+  id: string,
+): Promise<ProductState | null> {
+  try {
+    const { data } = await sb.from('products').select('slug, status').eq('id', id).maybeSingle();
+    return data ? { slug: data.slug, active: data.status === 'active' } : null;
+  } catch {
+    return null;
+  }
 }
 
 export async function createProduct(input: unknown): Promise<ActionResult> {
@@ -126,6 +169,7 @@ export async function createProduct(input: unknown): Promise<ActionResult> {
   }
 
   revalidate();
+  await notifySearchEngines(null, { slug: parsed.data.slug, active: parsed.data.status === 'active' });
   return { ok: true, id: data.id };
 }
 
@@ -138,6 +182,7 @@ export async function updateProduct(id: string, input: unknown): Promise<ActionR
   }
 
   const sb = getServerSupabase();
+  const before = await readProductState(sb, id);
   const { error } = await sb.from('products').update(toRow(parsed.data)).eq('id', id);
 
   if (error) {
@@ -147,6 +192,7 @@ export async function updateProduct(id: string, input: unknown): Promise<ActionR
 
   revalidate();
   revalidatePath(`/admin/produse/${id}/edit`);
+  await notifySearchEngines(before, { slug: parsed.data.slug, active: parsed.data.status === 'active' });
   return { ok: true, id };
 }
 
@@ -155,6 +201,7 @@ export async function toggleProductStatus(id: string, active: boolean): Promise<
   await requireAdminOrNotFound();
 
   const sb = getServerSupabase();
+  const before = await readProductState(sb, id);
   const { error } = await sb
     .from('products')
     .update({ status: active ? 'active' : 'archived' })
@@ -165,5 +212,6 @@ export async function toggleProductStatus(id: string, active: boolean): Promise<
   }
 
   revalidate();
+  if (before) await notifySearchEngines(before, { slug: before.slug, active });
   return { ok: true, id };
 }

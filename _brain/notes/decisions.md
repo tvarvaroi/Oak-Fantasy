@@ -619,3 +619,53 @@ programul (afișate deja în subsol). Traducerea EN a sloganului e acum cea de p
 **Rămase din lista A, nefăcute în acest lot:** denumirea firmei și CUI-ul în `Organization`, `material`
 și dimensiuni în `Product`, adresa permanentă a paginii de Facebook în `sameAs` (o dă founder-ul),
 `lastmod` din sitemap, blocul de produse dublat în HTML-ul homepage-ului.
+
+## 2026-11-21 — Lotul 2 GEO: scheme, lastmod real, IndexNow
+
+Aprobat de founder. Aceeași regulă: nicio cifră și nicio afirmație nouă.
+
+**Organization** are `legalName` și `taxID`, ambele din `lib/legal-info.ts` (aceleași valori ca în
+subsol). `taxID`, nu `vatID`: CUI-ul e cod fiscal, iar firma e neplătitoare de TVA. Fără stradă și fără
+nicio persoană (reprezentant legal, fondator, angajat).
+
+**Product** are `material` și dimensiuni doar din datele produsului:
+- `material` = rândul „Material: …” din descrierea lungă a produsului, cuvânt cu cuvânt, în limba
+  paginii (tabela nu are coloană de material). Fără acel rând, câmpul lipsește.
+- dimensiunile = câte un `PropertyValue` în `additionalProperty` pentru fiecare număr din
+  `products.dimensions` (Lungime, Lățime, Grosime sau Diametru, cu unitatea stocată). Nu le-am pus în
+  `width` / `height` / `depth`: care latură a unui tocător e „înălțimea” ar fi fost presupunerea noastră.
+  Produsele fără dimensiuni în DB (piesa neregulată, ceasul) nu au câmpul.
+
+**Sitemap: `lastmod` = data la care s-a schimbat conținutul**, nu data build-ului.
+- Pagini statice: data din `lib/page-last-modified.ts`. Nu se ține la zi din memorie: același fișier
+  listează, pe pagină, fișierele al căror commit înseamnă schimbare de conținut, iar
+  `tests/e2e/sitemap-lastmod.spec.ts` citește git și pică dacă unul a fost modificat după data notată.
+- Catalog: data lui sau ultima modificare a unui produs, dacă e mai nouă.
+- Produs: `products.updated_at` (trigger în DB) sau data șablonului paginii de produs, dacă e mai nouă.
+- Sitemap-ul se regenerează la o oră (`revalidate = 3600`) și la fiecare salvare din admin; înainte era
+  înghețat la build, deci un produs modificat în admin își schimba data abia la următorul deploy.
+
+**IndexNow** (protocolul: [[../resources/indexnow]]).
+- Cheia e în `lib/indexnow.ts`; fișierul `public/<cheie>.txt` e în rădăcina site-ului. Cheia e publică
+  prin definiție (oricine poate citi fișierul); nu e un secret.
+- Se trimite doar de pe server, din `lib/admin/product-actions.ts`, după ce rândul e salvat: la
+  publicare, modificare și scoatere din vânzare. Un produs scos din vânzare se trimite și el: pagina lui
+  răspunde 404, iar protocolul cere anunțarea URL-urilor șterse.
+- Ce URL-uri: pagina produsului RO + EN, catalogul RO + EN, iar homepage-ul doar când se schimbă numărul
+  de produse în vânzare. Editarea unei ciorne nu trimite nimic.
+- Doar din producție (`VERCEL_ENV === 'production'`); local, pe preview și în teste nu pleacă nimic.
+- O eroare nu oprește salvarea: funcția nu aruncă niciodată, notează în log și are limită de 4 secunde.
+- URL-uri private: imposibil prin construcție. `isSubmittable` e o listă de permisiuni (homepage,
+  paginile publice, paginile de produs), aceeași listă ca în sitemap (`lib/seo/public-routes.ts`).
+- `scripts/indexnow-submit-sitemap.mjs` trimite tot sitemap-ul și se rulează o singură dată după un
+  deploy care schimbă tot site-ul (FAQ-ul protocolului permite asta; în rest se trimit doar schimbările).
+- Tot aici: acțiunile de admin reîmprospătează acum paginile publice după tiparul lor de rută
+  (`/[locale]/tocatoare/[slug]` etc.). `revalidatePath('/tocatoare')` de dinainte nu se potrivea cu nicio
+  pagină localizată, deci un crawler chemat de IndexNow ar fi primit pagina veche.
+
+**Lăsate cum sunt, cu motiv:**
+- Blocul de produse dublat în HTML-ul homepage-ului: varianta de desktop e o galerie orizontală fixată
+  cu GSAP, cea de mobil are alt markup (alt raport de imagine, link întins, alte animații). O singură
+  variantă ar însemna rescrierea componentei, cu risc vizual mare pentru circa 100 de cuvinte dublate.
+- `sameAs` Facebook: linkul de partajare răspunde 400 la cereri automate, deci adresa permanentă nu se
+  poate determina sigur din afară. O dă founder-ul din pagină.

@@ -1379,3 +1379,29 @@ O parte din fișierele repo-ului au terminatori CRLF, altele LF. O înlocuire f�
 căutat cu `\n`) nu găsește nimic într-un fișier CRLF: citește fișierul cu `newline=''`, verifică dacă
 are `\r\n` și convertește șirurile înainte de înlocuire. Un heredoc `<<'EOF'` care conține backtick-uri
 și apostrofuri poate pica în unealta Bash cu „unexpected EOF”: scrie scriptul cu unealta Write și rulează-l.
+
+## 2026-11-21 — `revalidatePath('/tocatoare')` nu reîmprospăta nicio pagină publică
+
+Paginile sunt sub `app/[locale]/…`, deci ruta reală e `/[locale]/tocatoare`. Un `revalidatePath` cu
+calea fără locale nu se potrivește cu nimic; produsele modificate în admin apăreau doar după fereastra
+ISR de 60 s, iar primul vizitator de după primea pagina veche. Corect: tiparul rutei + tipul,
+`revalidatePath('/[locale]/tocatoare/[slug]', 'page')`.
+
+## 2026-11-21 — `app/sitemap.ts` e static dacă nu-i spui altfel
+
+Fără `export const revalidate`, sitemap-ul se generează o singură dată, la build: un produs adăugat sau
+modificat în admin nu apărea, respectiv nu-și schimba `lastmod`, până la următorul deploy. În tabelul de
+build ruta apare tot cu „○”; verifică `initialRevalidateSeconds` în `.next/prerender-manifest.json`.
+
+## 2026-11-21 — validator.schema.org limitează după câteva zeci de apeluri
+
+Două rulări `scripts/validate-schema.mjs` (22 de pagini fiecare) în aceeași zi: a doua a primit
+„SKIPPED” la toate (redirecționare spre captcha). Scriptul raportează corect „0/22 pages checked”, dar
+termină cu „ALL OK”, fiindcă verificarea de vocabular trece. Citește rândul cu numărul de pagini
+verificate, nu doar ultimul rând.
+
+## 2026-11-21 — Teste cu multe pagini pe serverul de dev rece
+
+Un test care cere 10–20 de pagini prin `request` depășește 30 s la prima rulare (fiecare rută se
+compilează) și a primit o dată 500 de la o rută aflată în compilare, cu 3 workeri porniți simultan.
+Aceleași teste trec cu serverul cald. Pentru testele cu multe pagini: `test.setTimeout(120_000)`.

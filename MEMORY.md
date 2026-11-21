@@ -739,3 +739,24 @@ public/llms.txt, tests/e2e/geo.spec.ts.
 **De ce contează:** înlocuiește intrarea de mai sus de azi: adresa din JSON-LD NU mai conține strada
 (doar localitate, regiune, țară), iar A1–A6 și R1 din audit sunt implementate. Rămân A7–A11.
 Orice cifră despre livrare, plată sau retur se ia din lib/config, nu se scrie în text.
+
+## 2026-11-21 — Lotul 2 GEO: o dată „reală” are nevoie de o gardă, iar un semnal extern nu are voie să strice salvarea
+
+**Pattern descoperit:** (1) O valoare ținută de mână (data ultimei modificări a unei pagini) rămâne
+adevărată doar dacă un test o compară cu o sursă obiectivă: aici, `git log` pe fișierele-sursă ale
+fiecărei pagini, listate lângă date. (2) Un apel către un serviciu extern dintr-un server action se pune
+DUPĂ salvare, într-o funcție care nu aruncă niciodată, cu limită de timp și cu `fetch` primit ca
+parametru, ca toate ramurile (rețea căzută, 403, timeout) să se poată testa fără serviciul real.
+(3) „Nu trimite URL-uri private” se rezolvă cu o listă de permisiuni construită din aceeași sursă ca
+sitemap-ul, nu cu o listă de interdicții. (4) Când founder-ul cere „doar din datele existente”, un câmp
+care ar cere o interpretare (width/height/depth pentru un tocător) se exprimă cu numele din date
+(`additionalProperty`), iar ce lipsește rămâne lipsă. (5) Înainte de a trimite ceva dintr-un cron sau
+dintr-un hook către crawlere, verifică dacă pagina chiar se reîmprospătează: `revalidatePath` cu o cale
+fără `[locale]` nu făcea nimic. (6) Un workflow de revizuire poate cădea la limita de utilizare fără
+niciun rezultat: spune asta în raport și fă revizuirea direct, nu o prezenta ca făcută.
+**Aplicat la:** lib/indexnow.ts, lib/admin/product-actions.ts, lib/page-last-modified.ts, app/sitemap.ts,
+lib/product-jsonld.ts, lib/seo/public-routes.ts, scripts/indexnow-submit-sitemap.mjs,
+tests/e2e/{indexnow,sitemap-lastmod,geo}.spec.ts.
+**De ce contează:** când modifici conținutul unei pagini, actualizează-i data în
+lib/page-last-modified.ts (testul îți spune care). IndexNow nu pleacă din local sau din preview.
+Scriptul de trimitere a întregului sitemap NU se rulează la fiecare deploy.

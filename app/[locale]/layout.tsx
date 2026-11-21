@@ -25,6 +25,11 @@ function entityGraph(locale: Locale) {
         '@type': 'Organization',
         '@id': `${SITE_URL}/#organization`,
         name: 'Oak Fantasy',
+        // The company behind the brand, as printed in the footer and the legal
+        // pages (lib/legal-info.ts). taxID = the CUI (fiscal code); not vatID —
+        // the company is not a VAT payer. No street, no legal representative.
+        ...(hasPlaceholder(LEGAL_INFO.companyName) ? {} : { legalName: LEGAL_INFO.companyName }),
+        ...(hasPlaceholder(LEGAL_INFO.cui) ? {} : { taxID: LEGAL_INFO.cui }),
         url: SITE_URL,
         logo: `${SITE_URL}/3D_Cutting_Board_Model_Design.svg`,
         description:

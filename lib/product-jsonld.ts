@@ -30,6 +30,7 @@ import {
   shippingCost,
 } from '@/lib/config/shipping';
 import { RETURN_COUNTRY, RETURN_WINDOW_DAYS } from '@/lib/config/returns';
+import { descriptionField } from '@/lib/product-description';
 
 const SCHEMA = 'https://schema.org';
 
@@ -122,6 +123,36 @@ const RETURN_POLICY = {
   returnFees: `${SCHEMA}/ReturnFeesCustomerResponsibility`,
 };
 
+// UN/CEFACT codes for the units the catalogue stores (products.dimensions.unit).
+const UNIT_CODES: Record<string, string> = { cm: 'CMT', mm: 'MMT' };
+
+const DIMENSION_NAMES: Record<Locale, Record<'length' | 'width' | 'thickness' | 'diameter', string>> = {
+  ro: { length: 'Lungime', width: 'Lățime', thickness: 'Grosime', diameter: 'Diametru' },
+  en: { length: 'Length', width: 'Width', thickness: 'Thickness', diameter: 'Diameter' },
+};
+
+/**
+ * The product's own measurements (products.dimensions), one PropertyValue per
+ * stored number, named as the catalogue names them. Deliberately NOT mapped to
+ * schema.org width/height/depth: which side of a board is its "height" would
+ * be our guess. A value the row does not have is simply not emitted.
+ */
+function dimensionProperties(dims: unknown, locale: Locale) {
+  if (!dims || typeof dims !== 'object') return [];
+  const d = dims as Record<string, unknown>;
+  const unit = typeof d.unit === 'string' && d.unit ? d.unit : 'cm';
+  const names = DIMENSION_NAMES[locale];
+  return (['length', 'width', 'diameter', 'thickness'] as const)
+    .filter((key) => typeof d[key] === 'number' && Number.isFinite(d[key]) && (d[key] as number) > 0)
+    .map((key) => ({
+      '@type': 'PropertyValue',
+      name: names[key],
+      value: d[key] as number,
+      ...(UNIT_CODES[unit] ? { unitCode: UNIT_CODES[unit] } : {}),
+      unitText: unit,
+    }));
+}
+
 export interface ProductLdInput {
   product: CatalogProduct;
   locale: Locale;
@@ -135,6 +166,13 @@ export function buildProductLd({ product, locale, inStock, url }: ProductLdInput
   const name = locale === 'ro' ? product.name_ro : product.name_en;
   const description = (locale === 'ro' ? product.short_description_ro : product.short_description_en) ?? '';
   const images = productImageUrls(product).map(indexableImageUrl);
+  // Material: the "Material: …" line of this product's own description, word
+  // for word, in the page's language. No such line → no `material`.
+  const material = descriptionField(
+    locale === 'ro' ? product.long_description_ro : product.long_description_en,
+    'Material',
+  );
+  const dimensions = dimensionProperties(product.dimensions, locale);
 
   return {
     '@type': 'Product',
@@ -146,6 +184,8 @@ export function buildProductLd({ product, locale, inStock, url }: ProductLdInput
     // (tests/e2e/product-jsonld.spec.ts) fails on it, so it can't ship silently.
     ...(images.length ? { image: images } : {}),
     brand: { '@type': 'Brand', name: LEGAL_INFO.brandName },
+    ...(material ? { material } : {}),
+    ...(dimensions.length ? { additionalProperty: dimensions } : {}),
     offers: {
       '@type': 'Offer',
       url,

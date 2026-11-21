@@ -327,3 +327,17 @@ components/tocatoare/
 - `tests/e2e/geo.spec.ts` — citește HTML-ul servit (fără JavaScript): cifre reale, titluri fără cuvinte
   lipite, blocul de pe pagina de produs, titluri și liste în descriere, pragul „de la 500 RON”, nicio
   stradă în scheme, llms.txt față de site, parserul descrierii.
+
+## 2026-11-21 — Lotul 2 GEO (vezi [[decisions]])
+
+- `lib/indexnow.ts` — cheia, `isSubmittable` (listă de permisiuni), `productChangeUrls`, `submitToIndexNow`
+  (nu aruncă niciodată). Apelat doar din `lib/admin/product-actions.ts`.
+- `public/<cheie>.txt` — fișierul de verificare IndexNow, în rădăcina site-ului.
+- `scripts/indexnow-submit-sitemap.mjs` — trimitere manuală a întregului sitemap (`--dry-run` întâi).
+- `lib/seo/public-routes.ts` — `PUBLIC_ROUTE_KEYS` și `PRIVATE_ROUTES`, o singură listă pentru sitemap,
+  robots.txt și IndexNow.
+- `lib/page-last-modified.ts` — data ultimei schimbări de conținut pe pagină + fișierele-sursă ale
+  fiecărei pagini; folosit de `app/sitemap.ts`.
+- `lib/product-description.ts` — și `descriptionField(text, 'Material')`.
+- Teste: `tests/e2e/indexnow.spec.ts`, `tests/e2e/sitemap-lastmod.spec.ts`, plus două teste de schemă
+  în `tests/e2e/geo.spec.ts`.
