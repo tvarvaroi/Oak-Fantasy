@@ -1799,3 +1799,12 @@ Revizuirea independentă (workflow, 3 unghiuri) NU s-a terminat: agenții s-au o
 utilizare, fără rezultate. Am recitit eu punctele de risc; singura schimbare: revalidările noi sunt
 într-un try/catch, ca o eroare de cache să nu apară ca salvare eșuată.
 Neatins: OF-2026-0010, baza de date (nicio scriere), niciun formular trimis.
+După deploy (bdc6a79), verificat live: fișierul cu cheia răspunde 200 text/plain și conține cheia; sitemap-ul
+are 38 de URL-uri cu date reale (26 din 21.11, 10 din 20.11, 2 din 19.11); Organization are legalName +
+taxID și niciun streetAddress; produsele au material și dimensiuni.
+Prima trimitere IndexNow, 21.11.2026 16:56 UTC, `node scripts/indexnow-submit-sitemap.mjs`: 38 de URL-uri
+(toate din sitemap, niciunul privat) → HTTP 202 Accepted, corp gol („URL received. IndexNow key
+validation pending”, conform documentației). Scriptul NU se mai rulează până la o altă schimbare a
+întregului site.
+validate-schema pe live: vocabular valid pe 22/22; validatorul online tot limitat (0/22). De reluat:
+`node scripts/validate-schema.mjs`. Validatorul local de reguli pentru comercianți: ok pe 2 produse.
