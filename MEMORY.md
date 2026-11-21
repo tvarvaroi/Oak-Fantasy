@@ -704,3 +704,19 @@ repară în prompt, nu printr-o regulă scrisă în altă parte.
 **De ce contează:** REGULĂ NOUĂ a founder-ului: Claude Code rulează elevat; până se lămurește, se
 instalează doar skilluri terțe exclusiv markdown (fără scripturi, dependențe, hook-uri, servere MCP).
 Nu se schimbă permisiuni ca ocolire. Vezi „De știut” în `_brain/SKILLS-MANIFEST.md`.
+
+## 2026-11-21 — Audit GEO: citește HTML-ul brut, nu pagina afișată
+
+**Pattern descoperit:** (1) Ce vede un crawler fără JavaScript se verifică pe HTML-ul descărcat cu `curl`,
+nu în browser: contoarele animate pornesc de la 0 în HTML („0 modele”), iar titlurile împărțite în
+`<span>`-uri fără spațiu între ele se citesc lipit („Tocătoarelucrate”). `<br/>` nu are problema.
+(2) Înainte de a raporta o „contradicție cu o decizie”, caută și în comentariile din teste, nu doar în
+decisions.md: adresa din Arad din `Organization` (layout.tsx) părea o scăpare, dar fact-check.spec.ts
+spune că sediul social rămâne intenționat în JSON-LD și că „Arad” se verifică doar pe textul vizibil.
+Am prins asta abia la verificarea finală a raportului. (3) PageSpeed Insights fără cheie are o cotă zilnică comună și
+răspunde 429; varianta locală din skill (`npx lighthouse`) cade sub regula 3. (4) Într-un raport de audit,
+fiecare rând se etichetează: măsurat, judecată sau afirmație a skillului nereverificată.
+**Aplicat la:** `_brain/notes/geo-audit-2026-11-21.md` (liste A/B/C + recomandările skillului care
+contrazic deciziile).
+**De ce contează:** nimic din audit nu e implementat; listele așteaptă aprobarea founder-ului. Înainte de
+orice task SEO/GEO, citește raportul și secțiunea 9 (ce NU se aplică din skilluri).
