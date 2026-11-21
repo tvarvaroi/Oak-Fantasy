@@ -9,6 +9,7 @@
 
 import { revalidatePath } from 'next/cache';
 
+import { revalidateProductCatalogue } from '@/lib/admin/revalidate-public';
 import { requireAdminOrNotFound } from '@/lib/auth/require-admin';
 import { getServerSupabase } from '@/lib/supabase-server';
 import { productSchema, ronToBani, type ProductFormOutput } from '@/lib/schemas/product';
@@ -103,22 +104,10 @@ function uniqueError(message: string): { error: string; fieldErrors?: Record<str
 
 function revalidate() {
   revalidatePath('/admin/produse');
-  revalidatePath('/tocatoare');
-  // The public pages a product change shows up on, by their route patterns
-  // (the bare '/tocatoare' above never matched a localized page). Without
-  // this, the first visitor after a save — often the crawler IndexNow just
-  // invited — is served the page from before the change.
-  // Guarded: the row is already saved at this point, and a cache refresh
-  // that fails must not be reported to the admin as a failed save (the pages
-  // still refresh on their own within the ISR window).
-  try {
-    revalidatePath('/[locale]/tocatoare', 'page');
-    revalidatePath('/[locale]/tocatoare/[slug]', 'page');
-    revalidatePath('/[locale]', 'page');
-    revalidatePath('/sitemap.xml');
-  } catch (err) {
-    console.warn('[products] public revalidation failed', err);
-  }
+  // The public pages a product change shows up on (lib/admin/revalidate-public.ts).
+  // Without this, the first visitor after a save — often the crawler IndexNow
+  // just invited — is served the page from before the change.
+  revalidateProductCatalogue();
 }
 
 // Tell IndexNow which public URLs changed (lib/indexnow.ts). Runs AFTER the

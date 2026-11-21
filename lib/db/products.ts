@@ -10,6 +10,14 @@ import type { Database } from '@/types/supabase';
 export type CatalogProduct = Database['public']['Tables']['products']['Row'];
 
 export async function fetchActiveProducts(): Promise<CatalogProduct[]> {
+  return (await readActiveProducts()) ?? [];
+}
+
+// Same read, for the one caller that must tell "the read FAILED" (null) from
+// "there is nothing on sale" ([]): the sitemap, which would otherwise cache a
+// list without any product for an hour. Missing configuration is not a
+// failure — it stays [] so a machine without Supabase env still renders.
+export async function readActiveProducts(): Promise<CatalogProduct[] | null> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !key) return [];
@@ -20,10 +28,10 @@ export async function fetchActiveProducts(): Promise<CatalogProduct[]> {
       .select('*')
       .eq('status', 'active')
       .order('sort_order', { ascending: true });
-    if (error) return [];
+    if (error) return null;
     return data ?? [];
   } catch {
-    return [];
+    return null;
   }
 }
 

@@ -1,16 +1,15 @@
 import type { MetadataRoute } from 'next';
 
 import { PATHNAMES, localizedPath } from '@/lib/i18n-routes';
-import { fetchActiveProducts } from '@/lib/db/products';
+import { readActiveProducts } from '@/lib/db/products';
 import { PAGE_LAST_MODIFIED, latest, type PageKey } from '@/lib/page-last-modified';
-import { PUBLIC_ROUTE_KEYS } from '@/lib/seo/public-routes';
+import { EXCLUDED_PRODUCT_SLUGS, PUBLIC_ROUTE_KEYS } from '@/lib/seo/public-routes';
 import { SITE_URL } from '@/lib/site-url';
 
 // Bilingual sitemap (SEO audit fix #2). Reuses lib/i18n-routes localizedPath()
 // as the single slug source of truth (never a second hardcoded map) and
-// fetchActiveProducts() (status='active' only, fails open to [] on a Supabase
-// hiccup so the build never crashes). Not referenced by robots.ts until the
-// Variant A → B flip at domain cutover, but built and valid now.
+// readActiveProducts() (status='active' only). Not referenced by robots.ts
+// until the Variant A → B flip at domain cutover, but built and valid now.
 
 // Public, indexable, non-transactional content only (lib/seo/public-routes.ts).
 // Excluded on purpose: cos/checkout/multumim (transactional, noindex),
@@ -28,15 +27,23 @@ import { SITE_URL } from '@/lib/site-url';
 // deploy; the admin actions also revalidate it on every save.
 export const revalidate = 3600;
 
-// Belt-and-suspenders: never surface known-junk slugs even if a test row
-// leaks through status='active' (a live "test" SKU was found in the 2026-07-02
-// audit; founder deactivates it in admin — this guard survives regressions).
-const EXCLUDED_PRODUCT_SLUGS = new Set(['test']);
+// Known-junk slugs (EXCLUDED_PRODUCT_SLUGS) are never surfaced, even if a
+// test row is status='active' — the same set IndexNow refuses.
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [];
 
-  const products = (await fetchActiveProducts()).filter((p) => !EXCLUDED_PRODUCT_SLUGS.has(p.slug));
+  // A failed read must not be cached as "no products": since the sitemap is
+  // regenerated at runtime, one Supabase hiccup would publish a list without
+  // any product page for an hour. Throwing makes Next keep the previous copy
+  // (hourly refresh) or answer with an error that crawlers retry (right after
+  // an admin save) — never a truncated list. At build time there is no
+  // previous copy and the build must not crash, so the build fails open.
+  const read = await readActiveProducts();
+  if (read === null && process.env.NEXT_PHASE !== 'phase-production-build') {
+    throw new Error('[sitemap] products could not be read — not publishing a list without them');
+  }
+  const products = (read ?? []).filter((p) => !EXCLUDED_PRODUCT_SLUGS.has(p.slug));
   const latestProductChange = products.reduce<string | null>(
     (max, p) => (p.updated_at && (!max || new Date(p.updated_at) > new Date(max)) ? p.updated_at : max),
     null,

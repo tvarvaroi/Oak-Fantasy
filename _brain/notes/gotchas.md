@@ -1386,6 +1386,21 @@ Paginile sunt sub `app/[locale]/…`, deci ruta reală e `/[locale]/tocatoare`. 
 calea fără locale nu se potrivește cu nimic; produsele modificate în admin apăreau doar după fereastra
 ISR de 60 s, iar primul vizitator de după primea pagina veche. Corect: tiparul rutei + tipul,
 `revalidatePath('/[locale]/tocatoare/[slug]', 'page')`.
+Aceeași zi, la revizuire: aceeași greșeală stătea și în `inventory-actions.ts` (inclusiv
+`/tocatoare/${slug}` și `/cutting-boards/${slug}`) și în `order-actions.ts`. Când repari un tipar greșit,
+caută-l în tot codul (`grep revalidatePath`), nu doar în fișierul la care lucrezi. Reîmprospătările
+publice stau acum doar în `lib/admin/revalidate-public.ts`, iar un test din `indexnow.spec.ts` pică la
+orice `revalidatePath` public scris altfel. Etichetele unei pagini sunt tiparul rutei și calea cerută
+(`/ro/tocatoare`), niciodată calea fără locale (`getDerivedTags` / `addImplicitTags` în Next 14.2).
+
+## 2026-11-21 — O citire care „eșuează în []” devine o problemă când rezultatul se păstrează în cache
+
+`fetchActiveProducts()` întoarce `[]` la orice eroare, ca build-ul să nu cadă. Cât sitemap-ul se genera
+doar la build, era în regulă. De când se regenerează la rulare (o oră + la salvările din admin), o
+singură eroare Supabase ar fi publicat un sitemap fără niciun produs, păstrat o oră. Pentru rezultate
+care se păstrează: deosebește „a eșuat” (`readActiveProducts()` → `null`) de „nu e nimic” și aruncă
+eroare în afara build-ului (`process.env.NEXT_PHASE !== 'phase-production-build'`); Next păstrează
+atunci copia anterioară.
 
 ## 2026-11-21 — `app/sitemap.ts` e static dacă nu-i spui altfel
 

@@ -7,6 +7,7 @@
 
 import { revalidatePath } from 'next/cache';
 
+import { revalidateProductPages } from '@/lib/admin/revalidate-public';
 import { requireAdminOrNotFound } from '@/lib/auth/require-admin';
 import { getServerSupabase } from '@/lib/supabase-server';
 import { isOrderStatus, type OrderStatus } from '@/lib/orders/status';
@@ -109,7 +110,7 @@ export async function updateOrderStatus(
   revalidatePath(`/admin/comenzi/${orderId}`);
   if (stockChanged) {
     // Availability changed → refresh the public catalog/detail (best-effort).
-    revalidatePath('/tocatoare');
+    revalidateProductPages();
     revalidatePath('/admin/produse');
   }
   return { ok: true };

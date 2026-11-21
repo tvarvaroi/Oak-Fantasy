@@ -52,7 +52,7 @@ export const LEGAL_INFO = {
   // Displayed handle: @oakfantasy (Instagram), @oak_fantasy (TikTok).
   social: {
     instagram: 'https://www.instagram.com/oakfantasy',
-    facebook: 'https://www.facebook.com/share/1Cqy62SdUd/',
+    facebook: 'https://www.facebook.com/fantasyoak',
     tiktok: 'https://www.tiktok.com/@oak_fantasy',
   },
 

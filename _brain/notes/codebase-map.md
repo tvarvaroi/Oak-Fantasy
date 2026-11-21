@@ -334,8 +334,13 @@ components/tocatoare/
   (nu aruncă niciodată). Apelat doar din `lib/admin/product-actions.ts`.
 - `public/<cheie>.txt` — fișierul de verificare IndexNow, în rădăcina site-ului.
 - `scripts/indexnow-submit-sitemap.mjs` — trimitere manuală a întregului sitemap (`--dry-run` întâi).
-- `lib/seo/public-routes.ts` — `PUBLIC_ROUTE_KEYS` și `PRIVATE_ROUTES`, o singură listă pentru sitemap,
-  robots.txt și IndexNow.
+- `lib/seo/public-routes.ts` — `PUBLIC_ROUTE_KEYS`, `PRIVATE_ROUTES` și `EXCLUDED_PRODUCT_SLUGS`, o singură
+  listă pentru sitemap, robots.txt și IndexNow.
+- `lib/admin/revalidate-public.ts` — singurul loc cu reîmprospătări de pagini publice:
+  `revalidateProductPages()` (stoc: catalog + pagini de produs) și `revalidateProductCatalogue()`
+  (produs: în plus homepage + sitemap). Folosit de acțiunile de produs, stoc și comenzi.
+- `lib/db/products.ts` — `readActiveProducts()` întoarce `null` la eșec (pentru sitemap);
+  `fetchActiveProducts()` rămâne tolerant (`[]`).
 - `lib/page-last-modified.ts` — data ultimei schimbări de conținut pe pagină + fișierele-sursă ale
   fiecărei pagini; folosit de `app/sitemap.ts`.
 - `lib/product-description.ts` — și `descriptionField(text, 'Material')`.

@@ -760,3 +760,21 @@ tests/e2e/{indexnow,sitemap-lastmod,geo}.spec.ts.
 **De ce contează:** când modifici conținutul unei pagini, actualizează-i data în
 lib/page-last-modified.ts (testul îți spune care). IndexNow nu pleacă din local sau din preview.
 Scriptul de trimitere a întregului sitemap NU se rulează la fiecare deploy.
+
+## 2026-11-21 — Închiderea lotului 2: o greșeală reparată într-un fișier trăiește de obicei și în vecini
+
+**Pattern descoperit:** (1) Am reparat `revalidatePath('/tocatoare')` în acțiunile de produs și am lăsat
+aceeași formă moartă în acțiunile de stoc și de comenzi; a găsit-o revizuirea independentă. După ce
+repari un tipar, caută-l în tot codul și pune un test care îl interzice peste tot. (2) Un singur agent
+de revizuire, doar citire, cu întrebări precise (ce URL privat poate scăpa, ce eroare strică salvarea, ce
+reîmprospătare lipsește) și cu cerința „urmărește în sursa Next, nu din memorie” a fost de ajuns pentru
+un lot mic. (3) Ce e marcat „plauzibil” sau ține de checkout se raportează, nu se repară pe loc.
+(4) O funcție care întoarce `[]` la eroare e bună pentru randare și greșită pentru orice rezultat păstrat
+în cache. (5) Un test nou se dovedește roșu-verde: pune la loc forma greșită, vezi-l picând, scoate-o.
+**Aplicat la:** lib/admin/revalidate-public.ts (nou), lib/admin/{product,inventory,order}-actions.ts,
+lib/indexnow.ts, lib/seo/public-routes.ts, lib/db/products.ts, app/sitemap.ts, lib/legal-info.ts,
+public/llms.txt, tests/e2e/{indexnow,geo}.spec.ts.
+**De ce contează:** orice reîmprospătare de pagină publică trece prin lib/admin/revalidate-public.ts.
+Profilurile de social sunt cele trei din decisions.md, fără linkuri „share”. Nu am acces la logurile
+Vercel din sesiune (fără CLI, fără proiect legat): verificarea unei trimiteri `[indexnow]` reale o face
+founder-ul în Vercel → Logs sau îmi dă acces.

@@ -1,6 +1,6 @@
 import { LOCALES, PATHNAMES, localizedPath } from './i18n-routes';
 import { SITE_URL } from './site-url';
-import { PUBLIC_ROUTE_KEYS } from './seo/public-routes';
+import { EXCLUDED_PRODUCT_SLUGS, PUBLIC_ROUTE_KEYS } from './seo/public-routes';
 
 // IndexNow (https://www.indexnow.org/documentation, read 2026-11-21 — notes in
 // _brain/resources/indexnow.md): tell the participating search engines (Bing
@@ -50,10 +50,13 @@ export function isSubmittable(url: string): boolean {
   if (u.origin !== ORIGIN || u.search || u.hash) return false;
   const path = u.pathname.replace(/\/$/, '');
   if (publicPagePaths().has(path)) return true;
-  // Product page: /<locale>/<catalogue slug>/<product slug>, nothing deeper.
+  // Product page: /<locale>/<catalogue slug>/<product slug>, nothing deeper,
+  // and never a slug the sitemap leaves out on purpose.
   return LOCALES.some((locale) => {
     const prefix = `${localizedPath('tocatoare', locale)}/`;
-    return path.startsWith(prefix) && /^[a-z0-9-]+$/.test(path.slice(prefix.length));
+    if (!path.startsWith(prefix)) return false;
+    const slug = path.slice(prefix.length);
+    return /^[a-z0-9-]+$/.test(slug) && !EXCLUDED_PRODUCT_SLUGS.has(slug);
   });
 }
 
@@ -118,9 +121,20 @@ export interface IndexNowDeps {
  */
 export async function submitToIndexNow(urls: string[], deps: IndexNowDeps = {}): Promise<IndexNowResult> {
   const log = deps.log ?? console;
-  const list = Array.from(new Set(urls)).filter(isSubmittable).slice(0, INDEXNOW_MAX_URLS);
+  const unique = Array.from(new Set(urls));
+  const list = unique.filter(isSubmittable).slice(0, INDEXNOW_MAX_URLS);
 
   try {
+    // A URL that does not pass the allowlist is dropped — safe, but it must
+    // leave a trace (e.g. a slug typed by hand in the database with characters
+    // the admin form would refuse). Counts only, like every line here.
+    if (list.length < unique.length) {
+      try {
+        log.warn(`[indexnow] ${unique.length - list.length} URL(s) not on the allowlist — dropped`);
+      } catch {
+        // A broken logger must not stop the URLs that did pass from being sent.
+      }
+    }
     if (list.length === 0) return { urls: list, status: null, skipped: 'no-urls' };
     if (typeof window !== 'undefined') return { urls: list, status: null, skipped: 'not-server' };
 

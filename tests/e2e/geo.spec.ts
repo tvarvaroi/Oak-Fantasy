@@ -311,6 +311,35 @@ test.describe('GEO: the served HTML carries the answers', () => {
     await expect(footer).toContainText(org.taxID as string);
   });
 
+  // Founder, 2026-11-21: the permanent profile addresses, the same everywhere —
+  // never a "share" link (it answers 400 to machines and is not the profile).
+  test('social profiles: sameAs, the footer and llms.txt carry exactly the same three addresses', async ({ page, request }) => {
+    const profiles = [
+      'https://www.facebook.com/fantasyoak',
+      'https://www.instagram.com/oakfantasy',
+      'https://www.tiktok.com/@oak_fantasy',
+    ];
+    const social = /https?:\/\/[^\s"'<>)]*(?:facebook|instagram|tiktok|fb)\.[a-z]+[^\s"'<>)]*/gi;
+    const sorted = (list: string[]) => Array.from(new Set(list)).sort();
+
+    for (const path of ['/ro', '/en']) {
+      const graph = (jsonLdBlocks(await html(request, path))[0] as { '@graph': Array<Record<string, unknown>> })['@graph'];
+      const org = graph.find((n) => n['@type'] === 'Organization') as Record<string, unknown>;
+      expect(sorted(org.sameAs as string[]), `${path} sameAs`).toEqual(sorted(profiles));
+    }
+
+    expect(sorted((await html(request, '/llms.txt')).match(social) ?? []), 'llms.txt').toEqual(sorted(profiles));
+
+    // The contact page has no social links of its own: they come with the footer.
+    for (const path of ['/ro', '/ro/contact', '/en/contact']) {
+      await page.goto(path);
+      const hrefs = await page
+        .locator('a[href*="facebook."], a[href*="instagram."], a[href*="tiktok."], a[href*="fb."]')
+        .evaluateAll((links) => links.map((a) => (a as HTMLAnchorElement).getAttribute('href') ?? ''));
+      expect(sorted(hrefs), `${path} links`).toEqual(sorted(profiles));
+    }
+  });
+
   test('Product schema: material and dimensions are the product’s own data, or absent', async ({ request }) => {
     // Many pages in one test: on a cold dev server each route compiles first.
     test.setTimeout(120_000);

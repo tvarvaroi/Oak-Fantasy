@@ -11,14 +11,12 @@ import { adjustStock } from '@/lib/admin/inventory-actions';
 
 export default function StockPanel({
   productId,
-  slug,
   total,
   reserved,
   available,
   hasInventory,
 }: {
   productId: string;
-  slug: string;
   total: number;
   reserved: number;
   available: number;
@@ -41,7 +39,7 @@ export default function StockPanel({
       return;
     }
     startTransition(async () => {
-      const res = await adjustStock(productId, parsed, reason, slug);
+      const res = await adjustStock(productId, parsed, reason);
       if (res.ok) {
         setFeedback({ kind: 'ok', msg: 'Stoc actualizat.' });
         setReason('');

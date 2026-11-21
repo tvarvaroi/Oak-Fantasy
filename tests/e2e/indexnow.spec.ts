@@ -66,6 +66,10 @@ test.describe('IndexNow', () => {
       `${SITE}/ro/reset-parola`,
       `${SITE}/ro/la-comanda/sent`,
       `${SITE}/ro/tocatoare/x/y`,
+      // The junk slug the sitemap leaves out on purpose (lib/seo/public-routes.ts).
+      `${SITE}/ro/tocatoare/test`,
+      `${SITE}/en/cutting-boards/test`,
+      `${SITE}/ro/tocatoare/Tocator_Mare`,
       `${SITE}/ro/tocatoare?sort=price`,
       `${SITE}/ro/tocatoare/tocator-taur-alb#top`,
       `${SITE}/sitemap.xml`,
@@ -132,6 +136,33 @@ test.describe('IndexNow', () => {
       key: INDEXNOW_KEY,
       urlList: [`${SITE}/ro/tocatoare/a`],
     });
+  });
+
+  test('submitToIndexNow: a dropped URL leaves a trace, and a broken logger does not stop the rest', async () => {
+    const warnings: string[] = [];
+    let sent: string[] = [];
+    const fetchImpl = (async (_: string, init: RequestInit) => {
+      sent = JSON.parse(init.body as string).urlList;
+      return new Response('', { status: 200 });
+    }) as unknown as typeof fetch;
+    const urls = [`${SITE}/ro/tocatoare/a`, `${SITE}/ro/tocatoare/test`, `${SITE}/ro/tocatoare/Tocator_Mare`];
+
+    await submitToIndexNow(urls, { fetchImpl, isProduction: true, log: { info: () => {}, warn: (m: string) => { warnings.push(m); } } });
+    expect(sent).toEqual([`${SITE}/ro/tocatoare/a`]);
+    expect(warnings).toEqual(['[indexnow] 2 URL(s) not on the allowlist — dropped']);
+    // Counts only: no URL in the log line.
+    expect(warnings.join(' ')).not.toContain('http');
+
+    // Nothing dropped → no warning.
+    warnings.length = 0;
+    await submitToIndexNow([`${SITE}/ro`], { fetchImpl, isProduction: true, log: { info: () => {}, warn: (m: string) => { warnings.push(m); } } });
+    expect(warnings).toEqual([]);
+
+    sent = [];
+    const badLog = { info: () => {}, warn: () => { throw new Error('logger broke'); } };
+    const result = await submitToIndexNow(urls, { fetchImpl, isProduction: true, log: badLog });
+    expect(result.status).toBe(200);
+    expect(sent).toEqual([`${SITE}/ro/tocatoare/a`]);
   });
 
   test('submitToIndexNow: sends nothing outside production, or when no URL is left', async () => {
@@ -205,6 +236,50 @@ test.describe('IndexNow', () => {
     };
     for (const dir of ['app', 'components', 'lib', 'emails']) walk(dir);
     expect(importers).toEqual(['lib/admin/product-actions.ts']);
+  });
+
+  // Pages live under app/[locale]/…: a bare revalidatePath('/tocatoare') or
+  // `/tocatoare/${slug}` matches no page and refreshes nothing (it sat unnoticed
+  // in the product, stock and order actions until 2026-11-21).
+  test('revalidation: every public refresh uses a real route pattern, and stock changes refresh too', () => {
+    const calls: Array<{ file: string; call: string }> = [];
+    const walk = (dir: string) => {
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        if (['node_modules', '.next', '__screenshots__'].includes(entry.name)) continue;
+        const full = join(dir, entry.name);
+        if (entry.isDirectory()) walk(full);
+        else if (/\.(ts|tsx)$/.test(entry.name)) {
+          // Code only: comment lines may quote the dead forms.
+          const code = readFileSync(full, 'utf8').replace(/^\s*\/\/.*$/gm, '');
+          for (const m of Array.from(code.matchAll(/revalidatePath\(([^)]*)\)/g))) {
+            calls.push({ file: full.split('\\').join('/'), call: m[1].trim() });
+          }
+        }
+      }
+    };
+    for (const dir of ['app', 'components', 'lib']) walk(dir);
+    expect(calls.length).toBeGreaterThan(0);
+
+    const allowed = [
+      /^'\/admin\/[a-z-]+'$/, // admin lists (force-dynamic; refreshes the admin's own view)
+      /^`\/admin\/[a-z-]+\/\$\{\w+\}(\/edit)?`$/, // one admin record
+      /^LIST_PATH$|^`\$\{LIST_PATH\}\/\$\{id\}`$/, // custom orders (an /admin constant)
+      /^'\/\[locale\](\/[a-z-]+)?(\/\[slug\])?', 'page'$/, // a public page, by its route pattern
+      /^'\/sitemap\.xml'$/,
+    ];
+    for (const { file, call } of calls) {
+      expect(allowed.some((re) => re.test(call)), `${file}: revalidatePath(${call})`).toBe(true);
+    }
+    // Public patterns live in one helper only.
+    expect(Array.from(new Set(calls.filter((c) => c.call.includes('[locale]') || c.call.includes('sitemap')).map((c) => c.file)))).toEqual([
+      'lib/admin/revalidate-public.ts',
+    ]);
+    expect(readFileSync('lib/admin/custom-order-actions.ts', 'utf8')).toMatch(/const LIST_PATH = '\/admin\//);
+
+    // The three places where what a visitor sees changes.
+    expect(readFileSync('lib/admin/product-actions.ts', 'utf8')).toContain('revalidateProductCatalogue()');
+    expect(readFileSync('lib/admin/inventory-actions.ts', 'utf8')).toContain('revalidateProductPages()');
+    expect(readFileSync('lib/admin/order-actions.ts', 'utf8')).toContain('revalidateProductPages()');
   });
 
   test('the manual script reads the same key, checks the key file and filters by robots.txt', () => {

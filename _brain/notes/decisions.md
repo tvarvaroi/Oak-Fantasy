@@ -669,3 +669,19 @@ nicio persoană (reprezentant legal, fondator, angajat).
   variantă ar însemna rescrierea componentei, cu risc vizual mare pentru circa 100 de cuvinte dublate.
 - `sameAs` Facebook: linkul de partajare răspunde 400 la cereri automate, deci adresa permanentă nu se
   poate determina sigur din afară. O dă founder-ul din pagină.
+  **Închis în aceeași zi:** founder-ul a dat adresele. Profilurile sunt exact acestea, aceleași în
+  `sameAs`, în subsol și în llms.txt (sursa: `LEGAL_INFO.social`; llms.txt e scris de mână):
+  https://www.facebook.com/fantasyoak, https://www.instagram.com/oakfantasy,
+  https://www.tiktok.com/@oak_fantasy. Niciun link de tip „share”. Păzit de un test în `geo.spec.ts`.
+
+**Completări după revizuirea independentă (21.11.2026):**
+- Reîmprospătarea paginilor publice are două trepte, în `lib/admin/revalidate-public.ts`: schimbare de
+  stoc (stoc pus de mână, comandă anulată) → catalogul și paginile de produs; schimbare de produs → în
+  plus homepage-ul (numărul de modele) și sitemap-ul. Homepage-ul și sitemap-ul nu arată stocul.
+- Sitemap-ul nu publică o listă fără produse când citirea din baza de date eșuează: aruncă eroare. La
+  reîmprospătarea orară rămâne copia anterioară; imediat după o salvare din admin răspunde cu eroare până
+  reușește citirea (crawlerele reîncearcă). La build rămâne tolerant, ca un deploy să nu cadă.
+- Slugurile excluse din sitemap (`test`) sunt excluse și din IndexNow, din aceeași listă.
+- Neschimbat, de hotărât de founder: comenzile plasate de clienți nu reîmprospătează paginile publice
+  (stocul epuizat apare după fereastra de 60 s); limita de 4 s a trimiterii IndexNow și lipsa unui
+  `maxDuration` pe acțiunile de admin.

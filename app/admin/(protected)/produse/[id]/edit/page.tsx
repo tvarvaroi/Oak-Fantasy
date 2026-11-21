@@ -67,7 +67,6 @@ export default async function EditProductPage({ params }: { params: { id: string
 
         <StockPanel
           productId={product.id}
-          slug={product.slug}
           total={inventory?.quantity_total ?? 0}
           reserved={inventory?.quantity_reserved ?? 0}
           available={inventory?.quantity_available ?? 0}

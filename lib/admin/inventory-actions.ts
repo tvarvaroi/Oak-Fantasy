@@ -8,6 +8,7 @@
 
 import { revalidatePath } from 'next/cache';
 
+import { revalidateProductPages } from '@/lib/admin/revalidate-public';
 import { requireAdminOrNotFound } from '@/lib/auth/require-admin';
 import { getServerSupabase } from '@/lib/supabase-server';
 
@@ -17,7 +18,6 @@ export async function adjustStock(
   productId: string,
   newTotal: number,
   reason: string,
-  slug?: string,
 ): Promise<StockActionResult> {
   const admin = await requireAdminOrNotFound();
 
@@ -48,10 +48,8 @@ export async function adjustStock(
 
   revalidatePath(`/admin/produse/${productId}/edit`);
   revalidatePath('/admin/produse');
-  revalidatePath('/tocatoare');
-  if (slug) {
-    revalidatePath(`/tocatoare/${slug}`);
-    revalidatePath(`/cutting-boards/${slug}`);
-  }
+  // Availability on the catalogue and on the product pages (badge, buy button,
+  // schema). The former `/tocatoare/${slug}` paths matched no localized page.
+  revalidateProductPages();
   return { ok: true };
 }

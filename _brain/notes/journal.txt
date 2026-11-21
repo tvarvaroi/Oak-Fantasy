@@ -1808,3 +1808,37 @@ validation pending”, conform documentației). Scriptul NU se mai rulează pân
 întregului site.
 validate-schema pe live: vocabular valid pe 22/22; validatorul online tot limitat (0/22). De reluat:
 `node scripts/validate-schema.mjs`. Validatorul local de reguli pentru comercianți: ok pe 2 produse.
+
+## 2026-11-21 — Închiderea lotului 2: revizuirea independentă, reîmprospătările de stoc, linkurile de social
+
+Task mic, la cererea founder-ului; un singur agent de revizuire (doar citire), fără workflow.
+1. validate-schema pe live, a treia rulare: vocabular valid pe 22/22; validatorul online tot limitat
+   (0/22 verificate). Nu am insistat. De reluat în altă zi.
+2. Revizuirea (IndexNow, reîmprospătările din admin, sitemap): nicio cale prin care un URL privat să
+   ajungă în trimitere și nicio eroare care să strice o salvare. Confirmate și reparate:
+   - Stoc și comenzi: `revalidatePath('/tocatoare')` și `/tocatoare/${slug}` din
+     lib/admin/inventory-actions.ts și order-actions.ts nu se potriveau cu nicio pagină (aceeași greșeală
+     reparată la produse în bdc6a79). Un stoc pus pe 0 sau o comandă anulată nu reîmprospăta nimic.
+     Acum: lib/admin/revalidate-public.ts, un singur loc. Schimbările de stoc reîmprospătează catalogul și
+     paginile de produs; schimbările de produs, în plus, homepage-ul și sitemap-ul.
+   - Slugul `test`, exclus din sitemap, nu era exclus și din IndexNow. Lista e acum una singură
+     (EXCLUDED_PRODUCT_SLUGS în lib/seo/public-routes.ts).
+   - Un URL respins de lista de permisiuni dispărea fără urmă; acum lasă un rând în log (doar numărul).
+   - Sitemap: o citire eșuată a produselor s-ar fi păstrat o oră ca „niciun produs”. Acum aruncă eroare
+     (Next păstrează copia anterioară la reîmprospătarea orară; imediat după o salvare din admin răspunde
+     cu eroare până reușește citirea). La build rămâne tolerant. Verificat: 500 cu baza de date de negăsit.
+   Doar raportate (nereparate): comenzile plasate de clienți nu reîmprospătează paginile publice (ține de
+   checkout, nu se poate verifica fără o comandă reală); trimiterea IndexNow e așteptată până la 4 s în
+   acțiune, fără `maxDuration` setat; lastmod-ul catalogului poate merge înapoi când se arhivează produsul
+   modificat cel mai recent; `isSubmittable` acceptă forme echivalente (`/ro/`), inaccesibile din codul actual.
+3. Loguri Vercel: NEVERIFICAT. CLI-ul Vercel nu e instalat, proiectul nu e legat local, extensia de
+   Chrome nu era conectată. Rămâne de văzut dacă o salvare reală din admin lasă `[indexnow] 200/202` și
+   dacă `VERCEL_ENV` e „production” la rulare (altfel nu pleacă nimic și singura urmă e un rând info).
+4. Social: singura abatere era Facebook, linkul de partajare `facebook.com/share/1Cqy62SdUd/`, în
+   lib/legal-info.ts (sursa pentru sameAs și subsol) și în public/llms.txt. Înlocuit cu
+   https://www.facebook.com/fantasyoak. Instagram și TikTok erau deja cele cerute. Pagina de contact nu
+   are linkuri de social proprii, doar pe cele din subsol. Test nou în geo.spec.ts (A9 din audit, închis).
+Verificări: typecheck, lint, check:i18n, build — curate. e2e: 888 trecute, 30 sărite, 0 picate.
+Testul de reîmprospătare dovedit roșu-verde (pică dacă pui la loc `revalidatePath('/tocatoare')`).
+Capturile vizuale nu au fost rulate: singura schimbare în pagini e adresa unui link din subsol.
+Neatins: OF-2026-0010, baza de date (nicio scriere), niciun formular trimis, nicio trimitere IndexNow.
